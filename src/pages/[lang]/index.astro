@@ -1,0 +1,159 @@
+---
+import { useTranslations } from "@/i18n/utils";
+import { getCollection } from "astro:content";
+import me from "@/assets/main/me.jpg";
+import { Separator } from "@/components/ui/separator";
+import { Image } from "astro:assets";
+import { ButtonLink } from "@/components/ui/button";
+import dayjs from "dayjs";
+import { ChevronRight, Construction, ExternalLink } from "@lucide/astro";
+import InstagramCarousel from "@/components/Main/InstagramCarousel";
+import Craft from "@/components/Main/Craft.astro";
+import ResendSubscriberCount from "@/components/Main/ResendSubscriberCount.astro";
+import { Button } from "@/components/ui/button";
+import InstagramFollowerCount from "@/components/Main/InstagramFollowerCount.astro";
+import InstagramPopOver from "@/components/Main/InstagramPopOver";
+import CS from "@/components/Main/CS.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ogMain from "@/assets/main/opengraph.jpg";
+
+export async function getStaticPaths() {
+  return [{ params: { lang: "ko" } }, { params: { lang: "en" } }];
+}
+
+const lang = Astro.params.lang;
+const t = useTranslations(lang)("MainPage");
+
+const allPosts = (await getCollection("post"))
+  .filter((post) => post.filePath?.includes(`${lang}/`))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout
+  lang={lang}
+  opengraph={{ image: ogMain.src }}
+>
+  <div class="mx-auto mt-7 flex max-w-6xl flex-col gap-7 px-6">
+    <div class="flex flex-col gap-7 md:flex-row">
+      {/* wrapper가 꼭 필요한건가?? */}
+      <div class="relative aspect-square md:w-1/2">
+        <Image
+          src={me}
+          alt=""
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+      <p class="md:w-1/2" set:html={t.bio} />
+    </div>
+
+    <Separator />
+
+    <div class="-ml-4 flex flex-wrap">
+      {
+        allPosts.map(({ data, id }) => (
+          <ButtonLink
+            href={`/${id}`}
+            variant="ghost"
+            className="max-w-full overflow-hidden"
+          >
+            <h3 class="truncate">{data.title}</h3>
+            <span class="text-muted-foreground">
+              {dayjs(data.date).format("YYYY MM")}
+            </span>
+          </ButtonLink>
+        ))
+      }
+    </div>
+
+    <Separator />
+
+    <CS />
+
+    <div class="flex flex-col gap-7">
+      <p class="w-full max-w-3xl">
+        {t.csIntro}{" "}
+        <ResendSubscriberCount />
+        {t.subscriberCount}
+      </p>
+    </div>
+
+    <ButtonLink href={`/${lang}/cs`} className="w-fit self-end">
+      {t.viewMore}
+      <ChevronRight />
+    </ButtonLink>
+
+    <Separator />
+
+    <InstagramCarousel client:idle locale={lang} />
+
+    <p>
+      {t.instagramIntro}{" "}
+      <InstagramFollowerCount />
+      {t.subscriberCount}{" "}
+      <InstagramPopOver lang={lang} client:idle />
+    </p>
+
+    <ButtonLink
+      href="https://instagram.com/yeol.dev"
+      target="_blank"
+      rel="noreferrer noopener"
+      className="w-fit self-end"
+    >
+      {t.viewMore}
+      <ExternalLink />
+    </ButtonLink>
+
+    <Separator />
+
+    <div
+      class="flex aspect-video min-h-[384px] w-full items-center justify-center"
+    >
+      <p class="text-center text-[min(6vw,70px)] leading-none font-extrabold">
+        <span class="opacity-10">performWorkUntilDeadline</span>
+        <br />
+        <span class="opacity-30">renderRootSync</span>
+        <br />
+        <span class="opacity-50">workLoopSync</span>
+        <br />
+        <span class="opacity-70">updateFunctionComponent</span>
+        <br />
+        <span class="opacity-90">renderWithHooks</span>
+        <br />
+        ...&lt;App /&gt;
+      </p>
+    </div>
+
+    <div class="max-w-3xl">
+      <p>
+        {t.reactIntro}{" "}
+        <ButtonLink
+          variant="secondary"
+          className="h-6 max-w-full overflow-hidden"
+          href="https://jser.dev/series/react-source-code-walkthrough"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          jser.dev
+        </ButtonLink>
+        {t.reactHelper}
+      </p>
+    </div>
+
+    <ButtonLink href={`/ko/react`} className="w-fit self-end">
+      {t.viewMore}
+      <ChevronRight />
+    </ButtonLink>
+
+    <Separator />
+
+    <Craft />
+
+    <div class="max-w-3xl">
+      <p>{t.craftIntro}</p>
+    </div>
+    <Button className="w-fit self-end" disabled>
+      {t.comingSoon}
+      <Construction />
+    </Button>
+  </div>
+</BaseLayout>

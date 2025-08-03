@@ -1,0 +1,110 @@
+---
+import { getCollection } from "astro:content";
+import { ButtonLink } from "@/components/ui/button";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ogReact from "@/assets/react/opengraph.png";
+
+export function getStaticPaths() {
+  return [{ params: { lang: "ko" } }];
+}
+
+const { lang } = Astro.params;
+const posts = await getCollection("react");
+const preparePosts = posts
+  .filter((post) => post.data.category === "prepare")
+  .sort((a, b) => a.data.order - b.data.order);
+const initialRenderPosts = posts
+  .filter((post) => post.data.category === "initial-render")
+  .sort((a, b) => a.data.order - b.data.order);
+const rerenderPosts = posts
+  .filter((post) => post.data.category === "rerender")
+  .sort((a, b) => a.data.order - b.data.order);
+const reactHookPosts = posts.filter((post) => post.data.category === "hook");
+---
+
+<BaseLayout
+  lang={lang}
+  title="React 소스코드 스터디"
+  opengraph={{ image: ogReact.src }}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-7 px-6">
+    <div
+      class="flex aspect-video min-h-[384px] w-full items-center justify-center select-none"
+    >
+      <p class="text-center text-[min(6vw,70px)] leading-none font-extrabold">
+        <span class="opacity-10">performWorkUntilDeadline</span>
+        <br />
+        <span class="opacity-30">renderRootSync</span>
+        <br />
+        <span class="opacity-50">workLoopSync</span>
+        <br />
+        <span class="opacity-70">updateFunctionComponent</span>
+        <br />
+        <span class="opacity-90">renderWithHooks</span>
+        <br />
+        ...&lt;App /&gt;
+      </p>
+    </div>
+
+    <p class="font-extrabold">「시작하기 앞서」</p>
+    <p>
+      {
+        preparePosts.map((post) => (
+          <ButtonLink
+            href={`/${post.id}`}
+            key={post.id}
+            className="max-w-full truncate"
+            variant="ghost"
+          >
+            {post.data.title}
+          </ButtonLink>
+        ))
+      }
+    </p>
+    <p class="font-extrabold">「첫 렌더링」</p>
+    <p>
+      {
+        initialRenderPosts.map((post) => (
+          <ButtonLink
+            href={`/${post.id}`}
+            key={post.id}
+            className="max-w-full truncate"
+            variant="ghost"
+          >
+            {post.data.title}
+          </ButtonLink>
+        ))
+      }
+    </p>
+    <p class="font-extrabold">「리렌더링」</p>
+    <p>
+      {
+        rerenderPosts.map((post) => (
+          <ButtonLink
+            href={`/${post.id}`}
+            key={post.id}
+            className="max-w-full truncate"
+            variant="ghost"
+          >
+            {post.data.title}
+          </ButtonLink>
+        ))
+      }
+    </p>
+    <p class="font-extrabold">「리액트 훅」</p>
+    <p>
+      {
+        reactHookPosts.map((post) => (
+          <ButtonLink
+            href={`/${post.id}`}
+            key={post.id}
+            className="max-w-full truncate"
+            variant="ghost"
+          >
+            {post.data.title}
+          </ButtonLink>
+        ))
+      }
+    </p>
+  </div>
+</BaseLayout>

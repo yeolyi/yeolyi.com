@@ -1,0 +1,155 @@
+"use client";
+
+import clsx from "clsx";
+import { Check, ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
+import { type Dispatch, type SetStateAction, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import type {
+  Rules,
+  State,
+  TapeSymbol,
+} from "@/content/ko/cs/turing-machine/hooks/turingMachineStore";
+import { useTranslations } from "@/i18n/utils";
+
+export const ControlUnit = ({
+  rules,
+  currentState,
+  currentSymbol,
+  editable,
+  rulesCsv,
+  onRulesCsvChange,
+  isEditing,
+  setIsEditing,
+  lang,
+}: {
+  rules: Rules;
+  currentState: State;
+  currentSymbol: TapeSymbol;
+  editable?: boolean;
+  rulesCsv: string;
+  onRulesCsvChange: (newCsv: string) => void;
+  isEditing: boolean;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+  lang: string;
+}) => {
+  const t = useTranslations(lang)("TuringMachine").ControlUnit;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hasScroll, setHasScroll] = useState(false);
+  const [editedCsv, setEditedCsv] = useState(rulesCsv.trim());
+
+  const handleApply = () => {
+    onRulesCsvChange(editedCsv);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedCsv(rulesCsv.trim());
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="mt-6">
+      <div className="mb-2 flex w-full items-center justify-between">
+        <p className="text-md font-semibold">{t.title}</p>
+        <div className="flex items-center gap-2">
+          {editable && !isEditing && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => setIsEditing(true)}
+            >
+              <Pencil />
+            </Button>
+          )}
+          {hasScroll && !isEditing && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => setIsExpanded((prev) => !prev)}
+            >
+              {isExpanded ? <ChevronUp /> : <ChevronDown />}
+            </Button>
+          )}
+        </div>
+      </div>
+      {isEditing ? (
+        <div className="flex flex-col gap-2">
+          <Textarea
+            className="h-48 w-full p-2 font-mono"
+            value={editedCsv}
+            onChange={(e) => setEditedCsv(e.target.value)}
+          />
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="destructive" size="icon" onClick={handleCancel}>
+              <X />
+            </Button>
+            <Button variant="default" size="icon" onClick={handleApply}>
+              <Check />
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div
+          className={clsx("overflow-auto", !isExpanded && "h-fit max-h-72")}
+          style={{ scrollbarGutter: "stable" }}
+          ref={(ref) => {
+            if (ref) {
+              setHasScroll(ref.scrollHeight > 288);
+            }
+          }}
+        >
+          <Table className="font-mono">
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t.currentState}</TableHead>
+                <TableHead>{t.readSymbol}</TableHead>
+                <TableHead>{t.nextState}</TableHead>
+                <TableHead>{t.writeSymbol}</TableHead>
+                <TableHead>{t.move}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Object.entries(rules).flatMap(([state, transitions]) =>
+                Object.entries(transitions).map(
+                  ([symbol, rule]) =>
+                    rule && (
+                      <TableRow
+                        key={`${state}-${symbol}`}
+                        className={clsx({
+                          "bg-secondary text-secondary-foreground":
+                            state === currentState &&
+                            symbol === currentSymbol &&
+                            currentState !== "q-halt",
+                        })}
+                      >
+                        <TableCell className="font-mono">{state}</TableCell>
+                        <TableCell className="font-mono">{symbol}</TableCell>
+                        <TableCell className="font-mono">
+                          {rule.newState}
+                        </TableCell>
+                        <TableCell className="font-mono">
+                          {rule.newSymbol}
+                        </TableCell>
+                        <TableCell className="font-mono">
+                          {rule.direction}
+                        </TableCell>
+                      </TableRow>
+                    ),
+                ),
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,99 @@
+---
+import { HEIGHT } from "@/components/Comment/HeartPhysics";
+import { Button } from "@/components/ui/button";
+import { Heart } from "@lucide/astro";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<script>
+  import { HeartPhysics } from "@/components/Comment/HeartPhysics";
+  import { getThumbUpUserIds } from "@/db/comment/read";
+  import { addEmojiReactionInDB } from "@/db/comment/update";
+  import { $sessionStore } from "@/stores/session";
+  import { tempUserId } from "@/stores/tempUser";
+
+  const postId = document
+    .querySelector("[data-post-id]")!
+    .getAttribute("data-post-id")!;
+
+  // elements
+  const commentContainer = document.getElementById(
+    "comment-container",
+  ) as HTMLDivElement;
+  const commentHeartButton = document.getElementById(
+    "comment-heart-button",
+  ) as HTMLButtonElement;
+  const commentHeartCount = document.getElementById(
+    "comment-heart-count",
+  ) as HTMLSpanElement;
+  const heart = document.getElementById("comment-heart") as HTMLElement;
+
+  const heartPhysics = new HeartPhysics(commentContainer);
+
+  const getUserId = () => {
+    return $sessionStore.get().session?.user.id ?? tempUserId;
+  };
+
+  const updateHeartCount = (count: number) => {
+    commentHeartCount.textContent = count.toString();
+  };
+
+  const updateHeart = async () => {
+    const userId = getUserId();
+    const userIds = await getThumbUpUserIds(postId);
+    const isReacted = userIds.includes(userId);
+
+    if (isReacted) {
+      heart.classList.add("fill-red-500");
+      heart.classList.add("stroke-0");
+    } else {
+      heart.classList.remove("fill-red-500");
+      heart.classList.remove("stroke-0");
+    }
+  };
+
+  (async () => {
+    const userIds = await getThumbUpUserIds(postId);
+    const thumbUpCount = userIds.length;
+
+    updateHeartCount(thumbUpCount);
+    userIds.forEach((userId) => {
+      heartPhysics.dropBall(userId);
+    });
+
+    updateHeart();
+  })();
+
+  $sessionStore.listen(updateHeart);
+
+  commentHeartButton.addEventListener("click", async () => {
+    const userId = getUserId();
+    heartPhysics.dropBall(userId);
+    await addEmojiReactionInDB({ postId, userId });
+    updateHeart();
+  });
+</script>
+
+<div class="relative space-y-7" data-post-id={id}>
+  <div class="relative">
+    <Button
+      id="comment-heart-button"
+      className="absolute top-2 left-2 z-10 flex items-center"
+      variant="outline"
+    >
+      <Heart id="comment-heart" />
+      <span id="comment-heart-count">0</span>
+    </Button>
+    <div
+      id="comment-container"
+      style={{ height: `${HEIGHT}px` }}
+      class="border-border bg-background relative box-content w-full overflow-hidden border"
+    >
+    </div>
+  </div>
+</div>

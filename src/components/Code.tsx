@@ -1,0 +1,53 @@
+import {
+  SandpackCodeEditor,
+  SandpackConsole,
+  SandpackPreview,
+  type SandpackProps,
+  SandpackProvider,
+} from "@codesandbox/sandpack-react";
+
+export default function Code(
+  props: SandpackProps & { showTabs?: boolean; activeFile?: string },
+) {
+  return (
+    <SandpackProvider
+      {...props}
+      theme="dark"
+      template="react"
+      files={{
+        // Strict Mode 제거
+        "/index.js": {
+          hidden: true,
+          code: `import React from "react";
+import { createRoot } from "react-dom/client";
+import "./styles.css";
+import App from "./App";
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
+`,
+        },
+        ...props.files,
+      }}
+      options={{
+        ...props.options,
+        recompileDelay: 1000,
+      }}
+    >
+      <SandpackCodeEditor
+        className="h-fit border"
+        showTabs={props.showTabs ?? false}
+        showLineNumbers={false}
+        showInlineErrors={false}
+      />
+      <SandpackPreview
+        showOpenInCodeSandbox={false}
+        className="border bg-white"
+      />
+      <SandpackConsole
+        resetOnPreviewRestart
+        className="font-(var(--font-monoplex-kr)) h-fit border text-base"
+        showResetConsoleButton={false}
+      />
+    </SandpackProvider>
+  );
+}

@@ -1,0 +1,36 @@
+---
+import { getLang } from "@/i18n/utils";
+import { ButtonLink } from "@/components/ui/button";
+import { Github, Instagram } from "@lucide/astro";
+
+const lang = getLang(Astro.url);
+
+const url = Astro.url.pathname;
+const changeLangUrl =
+  lang === "ko" ? url.replace("/ko", "/en") : url.replace("/en", "/ko");
+---
+
+<header class="flex items-center justify-between p-7">
+  <a href={`/${lang}`} class="font-extrabold">
+    {lang === "ko" ? "이성열" : "Seongyeol Yi"}
+  </a>
+  <div class="flex items-center gap-3">
+    <ButtonLink
+      variant="ghost"
+      href="https://github.com/yeolyi"
+      target="_blank"
+    >
+      <Github class="size-4" />
+    </ButtonLink>
+    <ButtonLink
+      variant="ghost"
+      href="https://instagram.com/yeol.dev"
+      target="_blank"
+    >
+      <Instagram class="size-4" />
+    </ButtonLink>
+    <ButtonLink variant="ghost" href={changeLangUrl}>
+      {lang === "ko" ? "A" : "가"}
+    </ButtonLink>
+  </div>
+</header>

@@ -1,0 +1,13 @@
+<script>
+  import { actions } from "astro:actions";
+
+  const { data } = await actions.getInstagramFollowers();
+  if (data) {
+    const subscriberCount = document.getElementById(
+      "subscriber-count",
+    ) as HTMLElement;
+    subscriberCount.textContent = data.followers_count.toString();
+  }
+</script>
+<!-- span 못없애나? -->
+<span id="subscriber-count" class="font-extrabold">-</span>

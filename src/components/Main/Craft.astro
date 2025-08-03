@@ -1,0 +1,55 @@
+---
+const WORD = "CRAFT";
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+// 초기 문자들의 알파벳 인덱스 구하기
+const getInitialIndices = () => {
+  return WORD.split("").map((char) => ALPHABET.indexOf(char));
+};
+const charIndices = getInitialIndices();
+---
+
+<div
+  class="flex aspect-video h-full min-h-[384px] w-full items-center justify-center"
+>
+  <div class="relative flex items-center gap-2">
+    {/* 선택된 항목을 강조하는 배경 */}
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="bg-card border-border h-[min(12vw,130px)] w-full border">
+      </div>
+    </div>
+    {
+      charIndices.map((currentIdx, charIdx) => {
+        const prevIdx = (currentIdx - 1 + ALPHABET.length) % ALPHABET.length;
+        const nextIdx = (currentIdx + 1) % ALPHABET.length;
+
+        const prevChar = ALPHABET[prevIdx];
+        const currentChar = ALPHABET[currentIdx];
+        const nextChar = ALPHABET[nextIdx];
+
+        return (
+          <div
+            class="flex w-[min(12vw,130px)] flex-col items-center text-[min(12vw,130px)]"
+            style={{ perspective: "200px" }}
+          >
+            <span
+              class="text-muted-foreground leading-none font-black opacity-30"
+              style={{ transform: "rotateX(30deg)" }}
+            >
+              {prevChar}
+            </span>
+            <span class="leading-none font-black text-black dark:text-white">
+              {currentChar}
+            </span>
+            <span
+              class="text-muted-foreground leading-none font-black opacity-30"
+              style={{ transform: "rotateX(-30deg)" }}
+            >
+              {nextChar}
+            </span>
+          </div>
+        );
+      })
+    }
+  </div>
+</div>

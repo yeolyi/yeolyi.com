@@ -1,0 +1,74 @@
+---
+import { ChevronLeft, ChevronRight, List } from "@lucide/astro";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { getCollection } from "astro:content";
+import type { CollectionKey } from "astro:content";
+import { getLang, useTranslations } from "@/i18n/utils";
+
+interface Props {
+  collection: CollectionKey;
+  listHref: string;
+  slug: string;
+}
+
+const { collection, listHref, slug } = Astro.props;
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang)("PostNavigation");
+const posts = (
+  await getCollection(collection, ({ id }) => id.includes(`${lang}/`))
+).sort((a, b) => {
+  if ("order" in a.data && "order" in b.data) {
+    return a.data.order - b.data.order;
+  }
+  if ("date" in a.data && "date" in b.data) {
+    return a.data.date.getTime() - b.data.date.getTime();
+  }
+  return 0;
+});
+
+// 괜찮겠지??
+const currentIndex = posts.findIndex((post) => post.id.includes(slug));
+
+const prevPostIndex = currentIndex > 0 ? currentIndex - 1 : null;
+const nextPostIndex = currentIndex < posts.length - 1 ? currentIndex + 1 : null;
+
+const prevPost = prevPostIndex !== null ? posts[prevPostIndex] : null;
+const nextPost = nextPostIndex !== null ? posts[nextPostIndex] : null;
+---
+
+<div class="flex justify-between gap-2 pt-21">
+  {
+    prevPost ? (
+      <ButtonLink href={`/${prevPost.id}`} variant="ghost">
+        <ChevronLeft size={16} />
+        <span>{t.prev}</span>
+      </ButtonLink>
+    ) : (
+      // TODO 나은 방법
+      <Button variant="ghost" className="text-transparent" disabled>
+        <ChevronLeft size={16} />
+        <span>{t.prev}</span>
+      </Button>
+    )
+  }
+
+  <ButtonLink href={listHref} variant="ghost">
+    <List size={16} />
+    {t.backToList}
+  </ButtonLink>
+
+  {
+    nextPost ? (
+      <ButtonLink href={`/${nextPost.id}`} variant="default">
+        <span>{t.next}</span>
+        <ChevronRight size={16} />
+      </ButtonLink>
+    ) : (
+      <Button variant="ghost" className="text-transparent" disabled>
+        <span>{t.next}</span>
+        <ChevronRight size={16} />
+      </Button>
+    )
+  }
+</div>

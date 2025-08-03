@@ -1,0 +1,281 @@
+const ko = {
+  MainPage: {
+    bio: `<span class="font-extrabold">이성열</span> <span class="text-muted-foreground">프론트엔드 개발자, 컨텐츠 크리에이터</span><br/>많은 사람들에게 가치를 전하는 무언가를 만드는데 관심이 있습니다. 카카오에서 프론트엔드 개발자로 일합니다. 서울대학교에서 환경재료과학, 컴퓨터공학을 전공했습니다.`,
+    csIntro: "컴퓨터 공학을 공부하며 느낀 경이로움을 전달합니다.",
+    subscriberCount: "명과 함께합니다.",
+    instagramIntro: "개발 인스타그램 계정입니다.",
+    viewMore: "보러가기",
+    instagramDescription:
+      "<a href='https://minguhongmfg.com/about' class='underline' target='_blank' rel='noreferrer noopener'>민구홍 매뉴팩처링</a>에서 아이디어를 얻어 계정이 하는 일들과 마음에 들었던 컨텐츠들을 공유합니다.",
+    reactIntro: "사내 스터디에서 리액트 소스코드를 직접 뜯어봅니다.",
+    reactHelper: "의 도움을 많이 받았습니다.",
+    craftIntro: "만든 것들을 소개합니다.",
+    comingSoon: "준비중",
+  },
+  PostNavigation: {
+    backToList: "목록으로",
+    prev: "이전글",
+    next: "다음글",
+  },
+  CS: {
+    part1Title: "파트 1: 0과 1로 컴퓨터 조립하기",
+    hw1Title: "컴퓨터의 손가락이 두 개인 이유",
+    hw1Description:
+      "컴퓨터는 왜 0과 1을 쓸까요? 이 두 숫자가 어떻게 소리, 이미지, 그리고 우리가 상상하는 모든 것을 담아낼 수 있는 첫걸음이 되는지 알아봅시다.",
+    hw2Title: "컴퓨터는 엄마가 좋은지 아빠가 좋은지로 구성됨",
+    hw2Description:
+      "'비가 올 때 외출하면 우산을 챙긴다'는 논리적 규칙을 실제로 어떻게 회로로 구현할 수 있을까요? 단 세 가지 기본 게이트의 조합으로 세상 모든 논리 회로를 만들 수 있음을 확인해봅시다.",
+    hw3Title: "사실 엄마 아빠가 둘 다 좋지는 않았던 컴퓨터",
+    hw3Description:
+      "컴퓨터를 만들려면 얼마나 많은 종류의 게이트를 알아야 할까요? 단 하나의 게이트로 AND, OR, NOT은 물론 모든 디지털 논리 회로를 구성할 수 있음을 확인해봅시다.",
+    hw4Title: "이제 여러분들은 계산기를 만들 수 있어요",
+    hw4Description:
+      "지금까지 배운 내용을 활용해 우리보다 덧셈을 잘하는 계산기를 만들어봅시다. 무인도에 NAND 더미와 남겨졌을 때 덧셈 못할 걱정은 없겠네요.",
+    hw5Title: "기억상실증 걸린 컴퓨터 고쳐주기",
+    hw5Description:
+      "지금까지 만든 회로는 계산 결과를 전혀 기억하지 못합니다. NOR 게이트 두 개를 교묘하게 연결해 정보를 저장할 수 있음을 확인해봅시다.",
+    hw6Title: "계산만 할 줄 알면 계산기지 그게 컴퓨터니?",
+    hw6Description:
+      "덧셈, 뺄셈을 하는 회로를 만들었으니 '컴퓨터'를 만든걸까요? 컴퓨터의 본질이 무엇인지, 그리고 하나의 기계로 어떻게 무한한 가능성을 구현할 수 있는지 함께 알아봅시다.",
+    hw7Title: "컴퓨터 조립법은 폰 노이만에게 물어보기",
+    hw8Title: "CPU가 일초에 10억 번 하는 루틴",
+    hw8Description: "명령어 사이클 (Fetch-Decode-Execute)",
+    hw9Title: "아니 엄마 이건 방정리를 안한게 아니라 캐시라니까?",
+    hw9Description: "메모리 계층 구조",
+
+    part2Title: "파트 2: 컴퓨터스럽게 문제 해결하기",
+    ds1Title: "방 정리는 안하니 데이터 정리라도 잘해보자",
+    ds1Description: "배열과 연결 리스트",
+    ds2Title: "늦게 온 사람이 먼저 들어가는 식당",
+    ds2Description: "스택과 큐",
+    ds3Title: "신분 상승이 쉽지않은 알고리즘 세계",
+    ds3Description: "시간 복잡도",
+    ds4Title: "정렬 알고리즘 계급도",
+    ds4Description: "버블, 선택, 삽입, 머지, 퀵, 힙 정렬",
+    ds5Title: "컴공생들은 나무가 어떻게 생겼는지도 몰라",
+    ds5Description: "트리",
+    ds6Title: "하나만 파는 애 vs 정신이 좀 산만한 애",
+    ds6Description: "DFS, BFS",
+    ds7Title: "될 때까지 해보는데 성과도 좋은 자료구조",
+    ds7Description: "해시 테이블",
+
+    part3Title: "파트 3: 더 쓰기 좋은 컴퓨터 만들기",
+    os1Title: "CPU 쉬는걸 못참는 악랄한 개발자들이 만든 것",
+    os1Description: "운영체제의 등장 배경",
+    os2Title: "내가 내 컴퓨터의 모든 기능을 쓸 수 없는 이유",
+    os2Description: "시스템 콜",
+    os3Title: "C언어를 열심히 공부했지만 사실 컴퓨터는 알아듣지 못함",
+    os3Description: "컴파일러",
+    os4Title: "일잘러 컴퓨터의 할 일 관리법을 배워보자",
+    os4Description: "프로세스와 스레드",
+    os5Title: "'게임 설치 용량이 50기가인데 램도 50기가 사야하나요?'",
+    os5Description: "가상 메모리",
+    os6Title: "이 글이 여러분들에게 도착하기까지",
+    os6Description: "네트워크",
+
+    andGate: "AND 게이트",
+    truthTable: "진리표",
+    turingMachineDemo: "튜링 머신 실습",
+    binaryAddition: "이진수 덧셈 11(2) + 11(2) = 110(2)",
+    decimalToBinary: "십진수-이진수 변환기",
+    decimalToBinaryDesc:
+      "십진수를 입력하면 이진수와 그 계산 과정을 보여줍니다.",
+    enterDecimal: "십진수를 입력하세요",
+    intro:
+      "0과 1에서 시작해 함께 컴퓨터를 만들어봅시다. 컴퓨터 공학을 공부하며 느낀 경이로움을 전달합니다.",
+    demoDescription:
+      "인터렉티브한 데모들과 함께 컴퓨터 과학의 주요 개념들을 돌아보세요.",
+
+    rippleCarryAdder: "리플 캐리 가산기",
+    rippleCarryAdderDescription:
+      "여러 개의 가산기를 연결하여 이진수를 더하는 방법",
+  },
+  Comment: {
+    placeholder: "읽어주셔서 감사합니다 :)",
+    noComments: "첫 댓글을 남겨보세요!",
+    submit: "댓글 작성",
+    submitting: "작성 중...",
+    loginRequired: "댓글을 남기려면 로그인이 필요합니다.",
+    dateFormat: "YYYY/MM/DD HH:mm:ss",
+    developer: (number: number) => `${number}번째 개발자님`,
+    loading: "로그인 중...",
+  },
+  ZeroAndOne: {
+    PixelateImage: {
+      title: "이미지 픽셀화",
+      analogLandscape: "아날로그 풍경",
+      digitalizedImage: "디지털화된 이미지",
+      loading: "이미지 로드 중...",
+      pixelSize: "픽셀 크기",
+    },
+    TruthTableDemo: {
+      rainForecast: "비 예보",
+      goingOut: "외출 계획",
+      takeUmbrella: "우산 챙기기",
+    },
+  },
+
+  Sequential: {
+    ClockSyncVisualizer: {
+      reset: "초기화",
+      clockSignal: "클럭 신호 주기",
+    },
+    EdgeTriggerDemo: {
+      risingEdge: "상승 엣지",
+      fallingEdge: "하강 엣지",
+      clock: "클럭",
+    },
+    CombVsSeq: {
+      cannotRemember: "기억을 못할 때",
+      canRemember: "기억이 가능할 때",
+    },
+  },
+
+  TuringMachine: {
+    title: "튜링 머신",
+    ControlUnit: {
+      title: "제어 장치",
+      currentState: "현재 상태",
+      readSymbol: "읽은 기호",
+      nextState: "다음 상태",
+      writeSymbol: "쓸 기호",
+      move: "이동",
+    },
+    Tape: {
+      title: "테이프",
+      head: "▲ 헤드",
+    },
+  },
+
+  AmdahlLawExample: {
+    description: ({
+      proportion,
+      speedup,
+      overallSpeedup,
+      maxSpeedup,
+    }: {
+      proportion: string;
+      speedup: string;
+      overallSpeedup: string;
+      maxSpeedup: string;
+    }) =>
+      `전체의 <span class="font-extrabold">${proportion}</span> 부분의 성능이 <span class="font-extrabold">${speedup}</span>배로 향상되었을 때, 전체 성능은 <span class="font-extrabold">${overallSpeedup}</span>배 증가합니다. 하지만 성능 향상폭이 무한히 높아져도 전체 성능의 증가폭은 <span class="font-extrabold">${maxSpeedup}</span>배를 넘지 못합니다.`,
+    proportionLabel: (value: number) => `개선할 부분의 비율 (${value}%)`,
+    speedupLabel: (value: number) => `해당 부분의 성능 향상 배율 (${value}배)`,
+    infinity: "무한대",
+  },
+
+  VonNeumann: {
+    Memory: {
+      title: "메모리 시뮬레이터",
+      description: "주소를 통해 데이터를 읽고 써보세요.",
+      operation: "작업",
+      read: "읽기",
+      write: "쓰기",
+      address: "주소",
+      addressUnit: ({ address }: { address: number }) => `${address}번지`,
+      data: "데이터",
+      dataPlaceholder: "0-255",
+      submit: "실행",
+      readResult: ({
+        address,
+        value,
+      }: {
+        address: number | null;
+        value: number | null;
+      }) => `${address ?? "-"}번지의 값은 ${value ?? "-"}입니다.`,
+    },
+    InstructionSetTable: {
+      structure: "명령어 구조",
+      example: "예제",
+      descriptionMove: "Rs 레지스터의 값을 Rd 레지스터로 복사합니다.",
+      descriptionAdd:
+        "레지스터 Rd와 레지스터 Rs를 더하고 결과를 레지스터 Rd에 저장합니다.",
+      descriptionSub:
+        "레지스터 Rd에서 레지스터 Rs를 빼고 결과를 레지스터 Rd에 저장합니다.",
+      descriptionAddi:
+        "레지스터 Rd와 즉시값(0~3)을 더해 레지스터 Rd에 저장합니다.",
+      descriptionSubi:
+        "레지스터 Rd에서 즉시값(0~3)을 빼고 레지스터 Rd에 저장합니다.",
+      descriptionLdi: "레지스터 Rd에 즉시값(0~3)을 로드합니다.",
+      descriptionLoad: "메모리 주소(0~15)에서 R0 레지스터로 값을 가져옵니다.",
+      descriptionStore: "R0 레지스터의 값을 메모리 주소(0~15)에 저장합니다.",
+      descriptionJump: "지정된 주소(0~15)로 무조건 점프합니다.",
+      descriptionJz: "Z 플래그가 1이면 지정된 주소(0~15)로 점프합니다.",
+    },
+    InstructionDecoder: {
+      title: "제어장치 시뮬레이터",
+      description: "각 명령어가 어떻게 제어 신호로 변환되는지 확인해보세요.",
+      register: "레지스터",
+      memory: "메모리",
+      alu: "ALU",
+      notUsed: "사용 안함",
+      signalRegisterMove: "Rs의 값을 읽어 Rd에 씁니다.",
+      signalRegisterAddSub:
+        "Rd와 Rs의 값을 읽어 ALU로 보내고, 결과를 다시 Rd에 씁니다.",
+      signalRegisterAddiSubi:
+        "Rd의 값과 명령어의 상수값을 읽어 ALU로 보내고, 결과를 Rd에 씁니다.",
+      signalRegisterLdi: "명령어의 상수값을 읽어 Rd에 씁니다.",
+      signalRegisterLoad: "메모리에서 읽어온 값을 R0에 씁니다.",
+      signalRegisterStore: "R0의 값을 읽습니다.",
+      signalRegisterJump:
+        "PC(프로그램 카운터)를 명령어의 주소값으로 변경합니다.",
+      signalRegisterJz: "Z 플래그가 1이면 PC를 명령어의 주소값으로 변경합니다.",
+      signalMemoryLoad:
+        "명령어의 주소값을 이용해 해당 메모리 위치의 데이터를 읽습니다.",
+      signalMemoryStore:
+        "명령어의 주소값과 R0의 값을 이용해 해당 메모리 위치에 데이터를 씁니다.",
+      signalAluAdd:
+        "덧셈 연산을 수행하고, 결과가 0이면 Z 플래그를 1로 설정합니다.",
+      signalAluSub:
+        "뺄셈 연산을 수행하고, 결과가 0이면 Z 플래그를 1로 설정합니다.",
+    },
+    ALU: {
+      title: "ALU 시뮬레이터",
+      registerA: "레지스터 A",
+      registerB: "레지스터 B",
+      operation: "연산",
+      result: "결과",
+      flags: "상태 플래그",
+      zero: "Zero (Z)",
+      carry: "Carry (C)",
+      negative: "Negative (N)",
+      overflow: "Overflow (V)",
+    },
+    Monitor: {
+      title: "모니터 시뮬레이터",
+      description: "메모리의 값을 수정해 화면을 제어해 보세요.",
+      screen: ({ height, width }: { height: number; width: number }) =>
+        `화면 (${height}x${width})`,
+      vram: "비디오 메모리 (VRAM)",
+      guide: "* 텍스트 영역의 0과 1을 수정해보세요.",
+    },
+    Simulator: {
+      title: "폰 노이만 시뮬레이터",
+      instructions: "프로그램",
+      loadProgram: "프로그램 로드",
+      step: "다음 단계",
+      reset: "초기화",
+      cpuState: "CPU 상태",
+      pc: "PC (프로그램 카운터)",
+      register: "레지스터",
+      assembly: "명령어",
+      memory: "메모리 (실행 코드)",
+      address: "주소",
+      valueBinary: "값 (이진수)",
+      valueDecimal: "값 (십진수)",
+      placeholder: "이곳에 프로그램을 입력하세요...",
+      instructionSetInfo: "명령어 세트 정보",
+      defaultCode:
+        "// 피보나치 수를 계산하여 mem[15]에 저장\nLDI R1, 1\nLDI R2, 1\nMOVE R0, R1\nADD R0, R2\nMOVE R1, R2\nMOVE R2, R0\nSTORE 15\nJUMP 2",
+      description:
+        "프로그램을 실행하고 CPU와 메모리 상태의 변화를 관찰해보세요.",
+    },
+  },
+  LocaleSwitcher: {
+    label: "언어 변경",
+    locale: "{locale, select, ko {한국어} en {English} other {Unknown}}",
+  },
+} as const;
+
+export default ko;

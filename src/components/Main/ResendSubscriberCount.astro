@@ -1,0 +1,13 @@
+<script>
+  import { actions } from "astro:actions";
+
+  const { data } = await actions.getResendSubscriberCount();
+  if (data) {
+    const subscriberCount = document.getElementById(
+      "resend-subscriber-count",
+    ) as HTMLElement;
+    subscriberCount.textContent = data.toString();
+  }
+</script>
+<!-- span 못없애나? -->
+<span id="resend-subscriber-count" class="font-extrabold">-</span>

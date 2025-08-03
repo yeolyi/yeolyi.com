@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from "astro:content";
+import { Separator } from "@/components/ui/separator";
+import PostNav from "@/components/PostNav.astro";
+import Comment from "@/components/Comment/index.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ogCS from "@/assets/cs/opengraph.png";
+
+export async function getStaticPaths() {
+  const pages = await getCollection("cs");
+
+  const paths = pages.map((page) => {
+    const [lang, ...slug] = page.id.split("/");
+    return { params: { lang, slug: slug.at(-1) || undefined }, props: page };
+  });
+
+  return paths;
+}
+
+const { lang, slug } = Astro.params;
+const page = Astro.props;
+const { Content } = await render(page);
+
+const id = page.id.split("/").at(-1);
+---
+
+<BaseLayout lang={lang} title={page.data.title} opengraph={{ image: ogCS.src }}>
+  <div class="mdx">
+    <h1>{page.data.title}</h1>
+    <Separator />
+    <Content />
+    <PostNav collection="cs" listHref={`/${lang}/cs`} slug={slug!} />
+    {id && <Comment id={id} lang={lang} />}
+  </div>
+</BaseLayout>

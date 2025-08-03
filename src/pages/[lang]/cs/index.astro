@@ -1,0 +1,174 @@
+---
+import CS from "@/components/Main/CS.astro";
+import Flow from "@/components/cs/flow";
+import { useTranslations } from "@/i18n/utils";
+import { Separator } from "@/components/ui/separator";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ogCS from "@/assets/cs/opengraph.png";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Send } from "@lucide/astro";
+import ripple from "@/content/ko/cs/adder/assets/ripple.json";
+
+
+export function getStaticPaths() {
+  return [{ params: { lang: "ko" } }, { params: { lang: "en" } }];
+}
+const { lang } = Astro.params;
+
+const tMain = useTranslations(lang)("MainPage");
+const tCS = useTranslations(lang)("CS");
+---
+
+<script>
+  import { getLang } from "@/i18n/utils";
+  import { actions } from "astro:actions";
+
+  const lang = getLang(location);
+
+  const subscriberCount = document.getElementById(
+    "resend-subscriber-count",
+  ) as HTMLElement;
+  const resultParagraph = document.getElementById(
+    "resend-subscribe-result",
+  ) as HTMLElement;
+
+  const refresh = async () => {
+    const { data, error } = await actions.getResendSubscriberCount();
+    if (error) {
+      resultParagraph.textContent = error.message;
+      return;
+    }
+    if (data) {
+      subscriberCount.textContent = data.toString();
+    }
+  };
+
+  refresh();
+
+  const subscribe = async () => {
+    const email = document.getElementById(
+      "resend-email-input",
+    ) as HTMLInputElement;
+
+    const { error, data } = await actions.subscribeEmail({
+      email: email.value,
+    });
+    if (error) {
+      resultParagraph.textContent = error.message;
+      resultParagraph.className = "text-red-500";
+      return;
+    }
+    if (data) {
+      resultParagraph.textContent =
+        lang === "ko" ? "구독 완료! 감사합니다 :D" : "Subscribed! Thank you :D";
+      resultParagraph.className = "text-green-500";
+      refresh();
+    }
+  };
+
+  const input = document.getElementById(
+    "resend-email-input",
+  ) as HTMLInputElement;
+  const button = document.getElementById(
+    "resend-subscribe-button",
+  ) as HTMLButtonElement;
+  button.addEventListener("click", subscribe);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      subscribe();
+    }
+  });
+</script>
+
+<BaseLayout
+  lang={lang}
+  title="NAND IS MORE THAN JUST NAND"
+  opengraph={{ image: ogCS.src }}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-7 px-6">
+    <CS />
+
+    <p>{tCS.intro}</p>
+    <p>
+      <span id="resend-subscriber-count" class="font-extrabold">-</span>
+      {tMain.subscriberCount}
+    </p>
+
+    <div class="flex flex-col gap-2">
+      <div class="flex gap-3">
+        <Input
+          title={"email"}
+          type="email"
+          name="email"
+          placeholder={lang === "ko" ? "이메일 주소" : "Email address"}
+          required
+          className="max-w-xs"
+          id="resend-email-input"
+        />
+
+        <Button type="button" id="resend-subscribe-button">
+          <Send />
+          {lang === "ko" ? "구독하기" : "Subscribe"}
+        </Button>
+      </div>
+
+      <p id="resend-subscribe-result" class="text-sm text-red-500"></p>
+    </div>
+
+    <Separator />
+
+    <p>{tCS.demoDescription}</p>
+
+    <div class="max-w-2xl">
+      <Flow
+        id="/cs"
+        initialJSON={ripple}
+        hideNodeButtons
+        height={400}
+        client:idle
+      />
+    </div>
+
+    <Separator />
+
+    <p class="font-extrabold">「{tCS.part1Title}」</p>
+
+    <div
+      class="[&>p]:text-muted-foreground flex flex-col items-start gap-2 [&>a]:hover:underline"
+    >
+      <a href={`/${lang}/cs/zero-and-one`}>{tCS.hw1Title}</a>
+      <a href={`/${lang}/cs/and-or-not`}>{tCS.hw2Title}</a>
+      <a href={`/${lang}/cs/nand-is-all-you-need`}>{tCS.hw3Title}</a>
+      <a href={`/${lang}/cs/adder`}>{tCS.hw4Title}</a>
+      <a href={`/${lang}/cs/sequential`}>{tCS.hw5Title}</a>
+      <a href={`/${lang}/cs/turing-machine`}>{tCS.hw6Title}</a>
+      <a href={`/${lang}/cs/von-neumann`}>{tCS.hw7Title}</a>
+      <p>{tCS.hw8Title}</p>
+      <p>{tCS.hw9Title}</p>
+    </div>
+
+    <p class="font-extrabold">「{tCS.part2Title}」</p>
+
+    <div class="[&>p]:text-muted-foreground flex flex-col items-start gap-2">
+      <p>{tCS.ds1Title}</p>
+      <p>{tCS.ds2Title}</p>
+      <p>{tCS.ds3Title}</p>
+      <p>{tCS.ds4Title}</p>
+      <p>{tCS.ds5Title}</p>
+      <p>{tCS.ds6Title}</p>
+      <p>{tCS.ds7Title}</p>
+    </div>
+
+    <p class="font-extrabold">「{tCS.part3Title}」</p>
+
+    <div class="[&>p]:text-muted-foreground flex flex-col items-start gap-2">
+      <p>{tCS.os1Title}</p>
+      <p>{tCS.os2Title}</p>
+      <p>{tCS.os3Title}</p>
+      <p>{tCS.os4Title}</p>
+      <p>{tCS.os5Title}</p>
+      <p>{tCS.os6Title}</p>
+    </div>
+  </div>
+</BaseLayout>

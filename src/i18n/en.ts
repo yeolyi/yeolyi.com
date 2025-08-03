@@ -1,0 +1,287 @@
+const en = {
+  MainPage: {
+    bio: `<span class="font-extrabold">Seongyeol Yi</span> <span class="text-muted-foreground">Frontend Developer, Content creator</span><br/>I'm interested in creating things that provide value to many people. I work as a Frontend Developer at Kakao. I majored in Materials Science and Engineering and Computer Science and Engineering at Seoul National University.`,
+    csIntro: "I share the wonder I felt learning computer science in school.",
+    subscriberCount: " people are joining us!",
+    instagramIntro: "Developer Instagram account.",
+    viewMore: "View More",
+    instagramDescription:
+      "Inspired by <a href='https://minguhongmfg.com/about' class='underline' target='_blank' rel='noreferrer noopener'>Minguhong Manufacturing</a>, I share what this account is about and some of my favorite posts.",
+    reactIntro:
+      "We explore React source code in Kakao's internal study sessions.",
+    reactHelper: " has been incredibly helpful.",
+    craftIntro: "Showcasing things I've built.",
+    comingSoon: "Coming Soon",
+  },
+  PostNavigation: {
+    backToList: "Back to List",
+    prev: "Previous",
+    next: "Next",
+  },
+  CS: {
+    dateFormat: "{date, date, long}",
+    plannedDateFormat: "{date, date, long}",
+    part1Title: "Part 1: Building a Computer with Just 0s and 1s",
+    hw1Title: "Why Computers Only Have Two Fingers",
+    hw1Description:
+      "Why do computers use 0s and 1s? Let's find out how these two numbers become the first step in capturing sound, images, and everything we can imagine.",
+    hw2Title: "Computers Are Built on Choosing Between Mom and Dad",
+    hw2Description:
+      "How can a logical rule like 'If it rains when you go out, take an umbrella' actually be implemented as a circuit? Let's see how we can create all the logic circuits in the world with a combination of just three basic gates.",
+    hw3Title: "Turns Out The Computer Didn't Really Like Both Mom and Dad",
+    hw3Description:
+      "How many types of gates do you need to know to build a computer? Let's see how a single gate can be used to construct all digital logic circuits, including AND, OR, and NOT.",
+    hw4Title: "Now You Can Make A Calculator",
+    hw4Description:
+      "Let's use what we've learned so far to build a calculator that's better at addition than we are. If you were stranded on a deserted island with a pile of NAND gates, you wouldn't have to worry about not being able to add.",
+    hw5Title: "Fixing a Computer with Amnesia",
+    hw5Description:
+      "The circuits we've built so far can't remember calculation results at all. Let's see how we can cleverly connect two NOR gates to store information.",
+    hw6Title: "If All It Does Is Math, It's Just a Calculator",
+    hw6Description:
+      "Now that we've made circuits for addition and subtraction, have we built a 'computer'? Let's explore what the essence of a computer is, and how one machine can realize infinite possibilities.",
+    hw7Title: "Ask Von Neumann if you want to build a computer.",
+    hw8Title: "The Billion-Times-a-Second Routine of a CPU",
+    hw8Description: "Instruction Cycle (Fetch-Decode-Execute)",
+    hw9Title: "Mom, It's Not a Mess — It's Called Cache!",
+    hw9Description: "Memory Hierarchy",
+
+    part2Title: "Part 2: Solving Problems Like a Computer",
+    ds1Title: "Can't Clean Your Room? At Least Organize Your Data",
+    ds1Description: "Arrays and Linked Lists",
+    ds2Title: "A Restaurant Where Latecomers Eat First",
+    ds2Description: "Stacks and Queues",
+    ds3Title: "Climbing the Algorithm Social Ladder Is Hard",
+    ds3Description: "Time Complexity",
+    ds4Title: "The Sorting Algorithm Hierarchy",
+    ds4Description: "Bubble, Selection, Insertion, Merge, Quick, Heap Sort",
+    ds5Title: "CS Students Don't Even Know What Trees Look Like",
+    ds5Description: "Trees",
+    ds6Title: "Obsessed with One Thing vs. Can't Focus on Anything",
+    ds6Description: "DFS, BFS",
+    ds7Title: "The Try-Hard That Gets Things Done",
+    ds7Description: "Hash Tables",
+
+    part3Title: "Part 3: Making Computers More Usable",
+    os1Title: "Born from Devs Who Couldn't Stand Idle CPUs",
+    os1Description: "Background of Operating System's Emergence",
+    os2Title: "Why You Can't Use Everything in Your Own Computer",
+    os2Description: "System Calls",
+    os3Title: "You Learned C, But Your Computer Doesn't Understand It",
+    os3Description: "Compilers",
+    os4Title: "Task Management Tips from a Productive CPU",
+    os4Description: "Processes and Threads",
+    os5Title: "'The Game Is 50GB, Do I Need To Buy 50GB Of RAM?'",
+    os5Description: "Virtual Memory",
+    os6Title: "How This Text Reached You",
+    os6Description: "Network",
+
+    andGate: "AND Gate",
+    truthTable: "Truth Table",
+    turingMachineDemo: "Turing Machine Demo",
+    binaryAddition: "Binary Addition 11(2) + 11(2) = 110(2)",
+    decimalToBinary: "Decimal to Binary Converter",
+    decimalToBinaryDesc:
+      "Enter a decimal number to see its binary representation and calculation process.",
+    enterDecimal: "Enter a decimal number",
+    intro:
+      "Let's build a computer together, starting from 0s and 1s. I share the wonder I felt learning computer science.",
+    demoDescription:
+      "Explore key concepts in computer science with interactive demos.",
+    rippleCarryAdder: "Ripple Carry Adder",
+    rippleCarryAdderDescription:
+      "A method of adding binary numbers by connecting multiple adders",
+  },
+  Comment: {
+    loginRequired: `You need to login to leave a comment.`,
+    placeholder: "Thank you for reading! 👍",
+    submit: "Submit",
+    submitting: "Submitting...",
+    noComments: "Be the first to comment!",
+    developer: (number: number) => `Developer ${number}`,
+    dateFormat: "MMM DD, YYYY HH:mm:ss",
+    loading: "Logging in...",
+  },
+  ZeroAndOne: {
+    PixelateImage: {
+      title: "Image Pixelation",
+      analogLandscape: "Analog Landscape",
+      digitalizedImage: "Digitalized Image",
+      loading: "Loading image...",
+      pixelSize: "Pixel Size",
+    },
+    TruthTableDemo: {
+      rainForecast: "Rain Forecast",
+      goingOut: "Going Out",
+      takeUmbrella: "Take Umbrella",
+    },
+  },
+  Sequential: {
+    ClockSyncVisualizer: {
+      reset: "Reset",
+      clockSignal: "Clock Signal Period",
+    },
+    EdgeTriggerDemo: {
+      risingEdge: "Rising Edge",
+      fallingEdge: "Falling Edge",
+      clock: "Clock",
+    },
+    CombVsSeq: {
+      cannotRemember: "When it can't remember",
+      canRemember: "When it can remember",
+    },
+  },
+  TuringMachine: {
+    title: "Turing Machine",
+    ControlUnit: {
+      title: "Control Unit",
+      currentState: "Current State",
+      readSymbol: "Read Symbol",
+      nextState: "Next State",
+      writeSymbol: "Write Symbol",
+      move: "Move",
+    },
+    Tape: {
+      title: "Tape",
+      head: "▲ Head",
+    },
+  },
+  AmdahlLawExample: {
+    description: ({
+      proportion,
+      speedup,
+      overallSpeedup,
+      maxSpeedup,
+    }: {
+      proportion: string;
+      speedup: string;
+      overallSpeedup: string;
+      maxSpeedup: string;
+    }) =>
+      `When the performance of <span class='font-extrabold'>${proportion}</span> of the whole is improved by a factor of <span class='font-extrabold'>${speedup}</span>, the overall performance increases by a factor of <span class='font-extrabold'>${overallSpeedup}</span>. However, even if the performance improvement is infinite, the overall performance increase cannot exceed <span class='font-extrabold'>${maxSpeedup}</span> times.`,
+    proportionLabel: (value: number) =>
+      `Proportion of the part to be improved (${value}%)`,
+    speedupLabel: (value: number) =>
+      `Performance improvement factor of the part (${value}x)`,
+    infinity: "infinity",
+  },
+  VonNeumann: {
+    Memory: {
+      title: "Memory Simulator",
+      description: "Read and write data using addresses.",
+      operation: "Operation",
+      read: "Read",
+      write: "Write",
+      address: "Address",
+      addressUnit: ({ address }: { address: number }) => `Address ${address}`,
+      data: "Data",
+      dataPlaceholder: "0-255",
+      submit: "Execute",
+      readResult: ({
+        address,
+        value,
+      }: {
+        address: number | null;
+        value: number | null;
+      }) => `The value at address ${address ?? "-"} is ${value ?? "-"}.`,
+    },
+    InstructionSetTable: {
+      structure: "Instruction Structure",
+      example: "Example",
+      descriptionMove: "Copies the value from register Rs to register Rd.",
+      descriptionAdd:
+        "Adds the values of register Rd and register Rs, and stores the result in register Rd.",
+      descriptionSub:
+        "Subtracts the value of register Rs from register Rd, and stores the result in register Rd.",
+      descriptionAddi:
+        "Adds an immediate value (0-3) to register Rd and stores the result in register Rd.",
+      descriptionSubi:
+        "Subtracts an immediate value (0-3) from register Rd and stores the result in register Rd.",
+      descriptionLdi: "Loads an immediate value (0-3) into register Rd.",
+      descriptionLoad:
+        "Loads a value from a memory address (0-15) into register R0.",
+      descriptionStore:
+        "Stores the value from register R0 into a memory address (0-15).",
+      descriptionJump: "Unconditionally jumps to the specified address (0-15).",
+      descriptionJz:
+        "Jumps to the specified address (0-15) if the Z flag is 1.",
+    },
+    InstructionDecoder: {
+      title: "Control Unit Simulator",
+      description:
+        "See how each instruction is converted into control signals.",
+      register: "Register",
+      memory: "Memory",
+      alu: "ALU",
+      notUsed: "Not used",
+      signalRegisterMove: "Read value from Rs and write to Rd.",
+      signalRegisterAddSub:
+        "Read values from Rd and Rs, send to ALU, and write the result back to Rd.",
+      signalRegisterAddiSubi:
+        "Read value from Rd and immediate value from instruction, send to ALU, and write result to Rd.",
+      signalRegisterLdi:
+        "Read immediate value from instruction and write to Rd.",
+      signalRegisterLoad: "Write value read from memory to R0.",
+      signalRegisterStore: "Read value from R0.",
+      signalRegisterJump:
+        "Change PC (Program Counter) to the address value from the instruction.",
+      signalRegisterJz:
+        "If Z flag is 1, change PC to the address value from the instruction.",
+      signalMemoryLoad:
+        "Use the address from the instruction to read data from that memory location.",
+      signalMemoryStore:
+        "Use the address from the instruction and the value from R0 to write data to that memory location.",
+      signalAluAdd:
+        "Perform addition, and if the result is 0, set the Z flag to 1.",
+      signalAluSub:
+        "Perform subtraction, and if the result is 0, set the Z flag to 1.",
+    },
+    ALU: {
+      title: "ALU Simulator",
+      registerA: "Register A",
+      registerB: "Register B",
+      operation: "Operation",
+      result: "Result",
+      flags: "Status Flags",
+      zero: "Zero (Z)",
+      carry: "Carry (C)",
+      negative: "Negative (N)",
+      overflow: "Overflow (V)",
+    },
+    Monitor: {
+      title: "Monitor Simulator",
+      description: "Control the screen by modifying memory values.",
+      screen: ({ height, width }: { height: number; width: number }) =>
+        `Screen (${height}x${width})`,
+      vram: "Video Memory (VRAM)",
+      guide: "* Modify the 0s and 1s in the text area.",
+    },
+    Simulator: {
+      title: "Von Neumann Simulator",
+      instructions: "Program",
+      loadProgram: "Load Program",
+      step: "Step Forward",
+      reset: "Reset",
+      cpuState: "CPU State",
+      pc: "PC (Program Counter)",
+      register: "Register",
+      assembly: "Instruction",
+      memory: "Memory (Code)",
+      address: "Address",
+      valueBinary: "Value (Binary)",
+      valueDecimal: "Value (Decimal)",
+      placeholder: "Enter your program here...",
+      instructionSetInfo: "ISA Cheatsheet",
+      defaultCode:
+        "// Calculate Fibonacci sequence and store in mem[15]\nLDI R1, 1\nLDI R2, 1\nMOVE R0, R1\nADD R0, R2\nMOVE R1, R2\nMOVE R2, R0\nSTORE 15\nJUMP 2",
+      description:
+        "Run the program and observe the changes in CPU and memory states.",
+    },
+  },
+  LocaleSwitcher: {
+    label: "Change language",
+    locale: "{locale, select, ko {한국어} en {English} other {Unknown}}",
+  },
+} as const;
+
+export default en;

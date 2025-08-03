@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from "astro:content";
+import { Separator } from "@/components/ui/separator";
+import PostNav from "@/components/PostNav.astro";
+import Comment from "@/components/Comment/index.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getSandpackCssText } from "@codesandbox/sandpack-react";
+import ogReact from "@/assets/react/opengraph.png";
+
+export async function getStaticPaths() {
+  const pages = await getCollection("react");
+
+  const paths = pages.map((page) => {
+    const [lang, ...slug] = page.id.split("/");
+    return { params: { lang, slug: slug.at(-1) || undefined }, props: page };
+  });
+
+  return paths;
+}
+const { lang, slug } = Astro.params;
+const page = Astro.props;
+const { Content } = await render(page);
+
+const tmp = page.id.split("/").at(-1);
+const id = tmp === "setup" ? "react-local-build" : `react/${tmp}`;
+---
+
+<BaseLayout lang={lang} title={page.data.title} opengraph={{ image: ogReact.src }}>
+  <!-- TODO: color scheme 적용안되는 문제 수정 -->
+  <style set:html={getSandpackCssText()}></style>
+  <div class="mdx">
+    <h1>{page.data.title}</h1>
+    <Separator />
+    <Content />
+    <PostNav collection="react" listHref={`/${lang}/react`} slug={slug!} />
+    {id && <Comment id={id} lang={lang} />}
+  </div>
+</BaseLayout>
