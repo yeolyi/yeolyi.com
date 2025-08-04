@@ -48,4 +48,12 @@ export default defineConfig({
       ],
     },
   },
+  redirects: {
+    "/": "/ko",
+    "/post/[slug]": "/ko/post/[slug]",
+    "/cs": "/ko/cs",
+    "/cs/[slug]": "/ko/cs/[slug]",
+    "/react": "/ko/react",
+    "/react/[slug]": "/ko/react/[slug]",
+  },
 });

@@ -35,14 +35,17 @@ const opengraphImage = _opengraph?.image ?? ogMain.src;
 <script>
   import { spring, animate } from "motion";
 
-  animate(
-    document.getElementById("container")!,
-    {
-      opacity: 1,
-      transform: "translateY(0px)",
-    },
-    { duration: 1.25, type: spring },
-  );
+  // 눈아픔
+  if (!import.meta.env.DEV) {
+    animate(
+      document.getElementById("container")!,
+      {
+        opacity: 1,
+        transform: "translateY(0px)",
+      },
+      { duration: 1.25, type: spring },
+    );
+  }
 </script>
 
 <html lang={lang}>
@@ -64,7 +67,9 @@ const opengraphImage = _opengraph?.image ?? ogMain.src;
     <Header />
     <div
       id="container"
-      style="opacity: 0.01; transform: translateY(5px); will-change: opacity, transform"
+      style={import.meta.env.DEV
+        ? ""
+        : "opacity: 0.01; transform: translateY(5px); will-change: opacity, transform"}
     >
       <slot />
     </div>

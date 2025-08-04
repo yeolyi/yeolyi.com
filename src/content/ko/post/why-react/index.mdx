@@ -1,0 +1,146 @@
+---
+title: "리액트 이외의 선택지"
+date: 2025-08-04
+---
+
+import { components } from "@/content/components";
+export { components };
+
+import Example from "./Example.astro";
+import SimpleCart from "./components/SimpleCart.astro";
+import ComplexCart from "./components/ComplexCart.tsx";
+import RaceConditionCart from "./components/RaceConditionCart.tsx";
+import Compare from "./Compare.astro";
+import { Image } from 'astro:assets';
+
+import stateOfJs from './assets/state-of-js.png'
+
+저는 개인/동아리 프로젝트에 주로 Next.js를 사용합니다. 하지만 쓰면 쓸수록 이게 프론트엔드 공부가 되긴 하는건지, Next.js 디버깅 능력만 느는건 아닌지 헷갈리더라고요. 문득 기술 스택으로 **리액트나 Next.js 이외의 선택지를 고려해본 적이 없었음을 깨달았습니다**.
+
+2020년대에 프론트엔드 개발 공부를 시작하셨다면 리액트를 중점적으로 배웠을 가능성이 높을 것입니다. 아마 회사에서 가장 많이 사용되는(=취업에 도움이 되는) 프론트엔드 툴이 리액트이기 때문이지 않을까요?
+
+<Image src={stateOfJs} alt="" className="object-cover w-full h-[180px] object-left"/>
+
+하지만 리액트가 유일한 도구는 아닙니다. 리액트가 처음 출시되기 이전에도 프론트엔드 개발은 존재했지요. 10년이 넘게 지난 요즈음 상황을 보면 [state-of-js](https://2024.stateofjs.com/en-US/libraries/front-end-frameworks/#front_end_frameworks_pain_points)의 설문조사에서 보이듯이 Next.js/리액트에 화가 난 개발자들이 많기도 하고 [astro](https://astro.build/)같은 몇몇 대안들이 주목받고 있기도 합니다.
+
+공부하고 취준할 때는 당연히 받아들여 썼지만 왜 리액트를 쓰는지 돌아보기 좋은 타이밍같습니다. 왜 DOM을 직접 조작하지 않고 리액트를 쓰는 걸까요? 혹시 굳이 리액트를 사용하지 않아도 되는 상황이 있지는 않을까요?
+
+## DOM API 복습
+
+리액트 이전의 프론트엔드 개발은 DOM API를 사용해 직접 UI를 수정하는 방식이었습니다. 기억이 가물가물한 분을 위해 버튼을 누를 때마다 카운터가 올라가는 예제를 보여드릴게요:
+
+<Example />
+
+버튼을 누르면 아래 `increment`함수가 실행됩니다. 직접 HTML 요소에 접근해 내용물을 변경하는게 보이시나요?
+
+```javascript
+let count = 0;
+const countElement = document.getElementById("count");
+
+function increment() {
+    count++;
+    countElement.textContent = count.toString();
+}
+```
+
+## DOM API로 쇼핑몰 만들기
+
+위 코드만 봤을 때는 DOM을 직접 만지는 것도 괜찮아보이는데요, 이번에는 좀 더 복잡한 예제를 살펴봅시다. 쇼핑몰을 예제로 DOM API 방식이 머리아파지는 부분을 살펴볼게요.
+
+처음에는 단순하게 장바구니 버튼을 클릭하면 상품이 추가되는 기능만 있습니다.
+
+<SimpleCart />
+
+이후 기획이 변경되어 "이미 장바구니에 있는 상품을 다시 클릭하면 수량이 증가하고, 수량이 0이 되면 항목이 삭제되는" 기능이 추가되었다고 가정해봅시다. 이제 개발자는 기존에 만들어둔 장바구니 UI를 어떻게 업데이트할지 고민해야 합니다. 
+
+- 새로운 상품 항목을 추가할 때는 새 DOM 요소를 생성해야 하지만... 
+- 기존 상품의 수량만 변경할 때는 기존 요소를 찾아서 텍스트만 바꿔야 하고... 
+- 상품을 삭제할 때는 해당 DOM 요소를 완전히 제거하며 요소에 연결된 이벤트 리스너들도 모두 정리해야 합니다.
+
+<ComplexCart client:idle/>
+
+더 복잡한 상황도 발생합니다. 상품 목록 페이지에서 사용자가 필터를 변경할 때마다 서버에서 새로운 데이터를 가져와야 하는 기능을 개발하고 있다고 가정해봅시다. 아래 필터를 차례대로 빠르게 클릭하여 race condition을 재현해보세요.
+
+1. '가격: 10,000원 이하' (1.5초 소요) 클릭
+2. '색상: 블랙' (0.5초 소요) 클릭
+
+<RaceConditionCart client:idle />
+
+라디오 버튼은 색상에 가있는데 실제 필터는 가격으로 되어있는 것이 보이시나요? 이때 개발자는 어떻게 마지막 요청만 남길지 고민해야 합니다. DOM API로 이를 구현하려면 각 요청의 상태를 추적하고, 응답이 도착했을 때 그것이 최신 요청인지 확인해야 합니다. 현재 어떤 요청이 진행 중인지, 어떤 DOM 요소가 어떤 요청과 연결되어 있는지를 일일이 추적하고 관리하는 것은 꽤나 머리아픈 작업입니다.
+
+## DOM API 요약
+
+**DOM API 사용 시 가장 큰 어려움 중 하나는 상태가 변경될 때 기존 DOM 요소들을 어떻게 처리할지 결정하는 것입니다.** 개발자는 기존 요소를 완전히 제거하고 새로 만들 것인지, 기존 요소를 재사용하고 내용만 업데이트할 것인지, 어떤 이벤트 리스너들을 제거하고 다시 추가해야 하는지, 애니메이션이나 트랜지션은 어떻게 처리할 것인지 등의 복잡한 결정을 내려야 합니다.
+
+## 리액트 등장
+
+리액트는 상태로부터 UI를 그리는 작업을 대신해줍니다. 
+
+> `UI = f(state)`
+
+개발자는 상태가 변경될 때마다 어떤 UI가 보여져야 하는지 **선언**만 하고 DOM API에 어떻게 **명령**해 그 UI를 만들지는 신경쓰지 않아도 됩니다. 이는 리액트 문서에서도 언급됩니다.
+
+> React components receive data and return what should appear on the screen. 
+
+> React는 상호작용이 많은 UI를 만들 때 생기는 어려움을 줄여줍니다. 애플리케이션의 각 상태에 대한 간단한 뷰만 설계하세요. 그럼 React는 데이터가 변경됨에 따라 적절한 컴포넌트만 효율적으로 갱신하고 렌더링합니다.
+
+아래 컴포넌트를 DOM API로 구현한 것과 리액트로 구현한 것을 비교해보세요.
+
+<Compare/>
+
+DOM API를 사용하면 어떻게(HOW) 변경할지 단계별로 명령합니다.
+
+```javascript
+let count = 0;
+const counter = document.getElementById('counter');
+
+function increment() {
+  count++;
+  // DOM을 직접 찾아서 수정
+  counter.textContent = count;
+  // 조건에 따라 스타일도 직접 변경
+  if (count > 0) {
+    counter.className = 'positive';
+  } else if (count < 0) {
+    counter.className = 'negative';
+  } else {
+    counter.className = 'zero';
+  }
+}
+
+const counterButton = document.getElementById('counter-button');
+counterButton.addEventListener('click', increment);
+```
+
+리액트를 사용하면 상태에 따라 UI가 무엇(WHAT)이어야 하는지만 선언합니다.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <div className={count > 0 ? 'positive' : count < 0 ? 'negative' : 'zero'}>
+        {count}
+      </div>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </div>
+  );
+}
+```
+
+## 언제 리액트를 쓰면 좋을까
+
+상태 변화가 복잡하고 빈번한 애플리케이션에서는 리액트의 장점이 명확하게 드러납니다. 예를 들어 위에서 예제로 보였던 쇼핑몰처럼 사용자 로그인과 로그아웃, 장바구니 관리, 상품 필터링과 정렬 등 여러 상태가 서로 영향을 주는 경우나 사용자 인터랙션이 많아서 DOM이 자주 업데이트되는 경우에는 리액트가 개발 복잡도를 크게 줄여줍니다. 
+
+하지만 모든 상황에서 리액트가 필요한 것은 아닙니다. 회사 소개 페이지나 블로그 글처럼 상태 변화가 거의 없는 정적인 페이지나, 단순한 폼 제출 정도의 기능만 있는 웹사이트에서는 리액트가 과할 수 있습니다. 이런 경우 오히려 라이브러리 용량과 초기 로딩 시간만 늘어날 뿐입니다. 
+
+## 마무리
+
+리액트가 해결해주는 불편함이 무엇인지 돌아보았습니다. 기술의 발전은 계속될 것이고, 새로운 패러다임도 등장하겠지만 중요한 것은 **각 도구가 해결하려는 문제를 이해하고, 상황에 맞는 선택을 하는 것이겠습니다**.
+
+컴퓨터공학에서 **추상화**(Abstraction)란 복잡한 세부사항을 숨기고 핵심적인 개념이나 기능만을 드러내는 과정입니다. DOM을 직접 건들일 필요가 없게하는 리액트도 일종의 DOM에 대한 추상화일 것입니다. Next.js는 이미지 최적화나 라우팅을 더해 거기서 더 추상화가 된 것이겠지요.
+
+사실 우리가 0과 1로 코딩하지 않는 것도 추상화에 추상화를 거듭해 기계어를 고수준 언어로 추상화했기 때문일 것입니다. 그렇다면 미래에는 고수준 프론트엔드 언어가 보편화돼 HTML은 구경해보지도 않은 프론트엔드 개발자가 생길 수도 있을까요? Next.js나 리액트에 대한 불만이 나오는걸 보면 아직 요원해보이지만 언젠가 그런 날이 올지도 모르겠습니다.
+
+그 날이 오기 전까지는 HTML/CSS/JS 공부를 소홀히 하지 말아야겠네요. 혹시 Next.js를 쓰는데 HTML/CSS/JS에서 멀어지는 것 같다면 [astro](https://astro.build/)도 시도해보세요 :D

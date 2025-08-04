@@ -1,0 +1,32 @@
+---
+import { Button } from "@/components/ui/button";
+---
+
+<script>
+  // 명령형 DOM API - 어떻게(HOW) 변경할지 단계별로 명령
+  let count = 0;
+
+  const counter = document.getElementById("counter")!;
+  const counterButton = document.getElementById("counter-button")!;
+
+  function increment() {
+    count++;
+    // DOM을 직접 찾아서 수정
+    counter.textContent = count.toString();
+    // 조건에 따라 스타일도 직접 변경
+    if (count > 0) {
+      counter.className = "positive";
+    } else if (count < 0) {
+      counter.className = "negative";
+    } else {
+      counter.className = "zero";
+    }
+  }
+
+  counterButton.addEventListener("click", increment);
+</script>
+
+<div class="flex w-fit items-center gap-7 border p-4">
+  <div id="counter">0</div>
+  <Button id="counter-button"> +1 </Button>
+</div>

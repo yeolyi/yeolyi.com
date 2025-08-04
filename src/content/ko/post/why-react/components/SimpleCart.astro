@@ -1,0 +1,70 @@
+---
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+---
+
+<Card client:load>
+  <CardHeader>
+    <h2 class="text-xl font-bold">성열굿즈샵🛍️</h2>
+  </CardHeader>
+  <Separator />
+  <CardHeader>
+    <CardTitle>상품 목록</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div id="products-simple" class="flex flex-col gap-4">
+      <div class="flex items-center justify-between" data-product-name="상품 A">
+        <p>상품 A</p>
+        <Button id="toggle-cart-btn-simple">장바구니에 추가</Button>
+      </div>
+    </div>
+  </CardContent>
+  <CardHeader>
+    <CardTitle>장바구니</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul id="cart-items-simple" class="list-disc pl-5">
+      <!-- 장바구니 항목이 여기에 추가됩니다 -->
+    </ul>
+  </CardContent>
+</Card>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById(
+      "toggle-cart-btn-simple",
+    ) as HTMLButtonElement;
+    const cartItemsList = document.getElementById("cart-items-simple");
+    const productElement = document.querySelector("[data-product-name]");
+    const productName = (productElement as HTMLElement)?.dataset.productName;
+
+    if (!toggleBtn || !cartItemsList || !productName) return;
+
+    if (toggleBtn.dataset.listenerAttached) return;
+    toggleBtn.dataset.listenerAttached = "true";
+
+    let isInCart = false;
+
+    toggleBtn.addEventListener("click", () => {
+      if (isInCart) {
+        // Remove from cart
+        const itemToRemove = Array.from(cartItemsList.children).find(
+          (item) => item.textContent === productName,
+        );
+        if (itemToRemove) {
+          cartItemsList.removeChild(itemToRemove);
+        }
+        toggleBtn.textContent = "장바구니에 추가";
+        isInCart = false;
+      } else {
+        // Add to cart
+        const cartItem = document.createElement("li");
+        cartItem.textContent = productName;
+        cartItemsList.appendChild(cartItem);
+        toggleBtn.textContent = "제거";
+        isInCart = true;
+      }
+    });
+  });
+</script>

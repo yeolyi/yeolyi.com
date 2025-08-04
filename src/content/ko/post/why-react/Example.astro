@@ -1,0 +1,21 @@
+---
+import { Button } from "@/components/ui/button";
+---
+
+<script>
+  const button = document.getElementById("btn")!;
+
+  let count = 0;
+
+  function increment() {
+    count++;
+    document.getElementById("count")!.textContent = count.toString();
+  }
+
+  button.addEventListener("click", increment);
+</script>
+
+<div class="flex items-center gap-2">
+  <Button id="btn" variant="outline" size="icon">❤️</Button>
+  <p id="count">0</p>
+</div>
