@@ -1,14 +1,57 @@
 ---
-import { getLang } from "@/i18n/utils";
-import BaseLayout from "@/layouts/BaseLayout.astro";
+export const prerender = false;
 
-const url = Astro.url;
-const lang = getLang(url);
-// 실제 HTTP 응답 보여줘도 재밌겠다
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const pathname = Astro.url.pathname;
+const isAlreadyRedirected =
+  pathname.startsWith("/ko") || pathname.startsWith("/en");
+
+const header = Astro.request.headers;
+const acceptLanguage = header.get("accept-language");
+const lang = acceptLanguage?.includes("ko") ? "ko" : "en";
+
+if (!isAlreadyRedirected) {
+  const redirectUrl = `/${lang}${pathname}`;
+  return Astro.redirect(redirectUrl);
+}
+
+const headerEntries = Array.from(header.entries());
 ---
 
 <BaseLayout lang={lang} title="404 Not Found">
-  <div class="flex flex-col items-center gap-7 px-6">
-    <h1 class="text-4xl font-bold">404 Not Found</h1>
+  <div class="flex min-h-[60vh] flex-col items-center gap-7 px-6 py-10">
+    <div class="flex flex-col items-center gap-2">
+      <h1 class="text-4xl font-bold">404 Not Found</h1>
+      <p class="text-muted-foreground">요청하신 페이지를 찾을 수 없습니다.</p>
+    </div>
+    <div class="w-full max-w-4xl rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[200px]">Key</TableHead>
+            <TableHead>Value</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {
+            headerEntries.map(([key, value]) => (
+              <TableRow>
+                <TableCell>{key}</TableCell>
+                <TableCell className="truncate max-w-sm">{value}</TableCell>
+              </TableRow>
+            ))
+          }
+        </TableBody>
+      </Table>
+    </div>
   </div>
 </BaseLayout>

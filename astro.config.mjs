@@ -30,10 +30,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  i18n: {
-    locales: ["en", "ko"],
-    defaultLocale: "en",
-  },
   markdown: {
     shikiConfig: {
       themes: {

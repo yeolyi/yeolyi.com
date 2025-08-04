@@ -1,8 +1,0 @@
----
-import { getStaticPaths } from "@/pages/[lang]/react/[slug].astro";
-export { getStaticPaths };
-
-const { slug } = Astro.params;
-
-return Astro.redirect(`/ko/react/${slug}`);
----
