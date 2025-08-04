@@ -24,6 +24,9 @@ if (!isAlreadyRedirected) {
   return Astro.redirect(redirectUrl);
 }
 
+Astro.response.status = 404;
+Astro.response.statusText = "Not found";
+
 const headerEntries = Array.from(header.entries());
 ---
 
