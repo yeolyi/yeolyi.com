@@ -29,10 +29,7 @@ const allPosts = (await getCollection("post"))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<BaseLayout
-  lang={lang}
-  opengraph={{ image: ogMain.src }}
->
+<BaseLayout lang={lang} opengraph={{ image: ogMain.src }}>
   <div class="mx-auto mt-7 flex max-w-6xl flex-col gap-7 px-6">
     <div class="flex flex-col gap-7 md:flex-row">
       {/* wrapper가 꼭 필요한건가?? */}
@@ -41,6 +38,8 @@ const allPosts = (await getCollection("post"))
           src={me}
           alt=""
           class="absolute inset-0 h-full w-full object-cover"
+          priority
+          format="avif"
         />
       </div>
       <p class="md:w-1/2" set:html={t.bio} />

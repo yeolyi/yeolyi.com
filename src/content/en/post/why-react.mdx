@@ -1,0 +1,146 @@
+---
+title: "Alternatives to React"
+date: 2025-08-04
+---
+
+import { components } from "@/content/components";
+export { components };
+
+import Example from "@/content/ko/post/why-react/components/Example.astro";
+import SimpleCart from "@/content/ko/post/why-react/components/SimpleCart.astro";
+import ComplexCart from "@/content/ko/post/why-react/components/ComplexCart.tsx";
+import RaceConditionCart from "@/content/ko/post/why-react/components/RaceConditionCart.tsx";
+import Compare from "@/content/ko/post/why-react/components/Compare.astro";
+import stateOfJs from '@/content/ko/post/why-react/assets/state-of-js.png'
+
+import { Image } from 'astro:assets';
+
+I mainly use Next.js for personal and club projects. However, the more I use it, the more I wonder whether this is actually helping me study frontend development, or if I'm just getting better at debugging Next.js. I suddenly realized that **I had never considered alternatives to React or Next.js as technology stack choices**.
+
+If you started studying frontend development in the 2020s, you likely focused on learning React. This is probably because React is the most widely used frontend tool in companies (= helpful for job hunting).
+
+<Image src={stateOfJs} alt="" className="object-cover w-full h-[180px] object-left"/>
+
+However, React is not the only tool available. Frontend development existed even before React was first released. Looking at the current situation after more than 10 years, as shown in the [state-of-js](https://2024.stateofjs.com/en-US/libraries/front-end-frameworks/#front_end_frameworks_pain_points) survey, many developers are frustrated with Next.js/React, and several alternatives like [astro](https://astro.build/) are gaining attention.
+
+While we naturally accepted and used React during our studies and job preparation, it seems like a good time to reflect on why we use React. Why do we use React instead of directly manipulating the DOM? Are there situations where we don't necessarily need to use React?
+
+## DOM API Review
+
+Frontend development before React involved directly modifying the UI using DOM APIs. For those whose memory is a bit fuzzy, let me show you an example of a counter that increases every time you press a button:
+
+<Example />
+
+When you press the button, the `increment` function below is executed. Can you see how it directly accesses HTML elements and changes their content?
+
+```javascript
+let count = 0;
+const countElement = document.getElementById("count");
+
+function increment() {
+    count++;
+    countElement.textContent = count.toString();
+}
+```
+
+## Building an E-commerce Site with DOM API
+
+Looking at the code above, directly manipulating the DOM seems fine, but let's look at a more complex example. Let's examine where the DOM API approach becomes headache-inducing using an e-commerce site as an example.
+
+Initially, there's just a simple feature where clicking the cart button adds a product.
+
+<SimpleCart />
+
+Later, the requirements change to add a feature where "clicking a product already in the cart increases its quantity, and items are deleted when quantity becomes 0." Now the developer needs to think about how to update the existing cart UI.
+
+- When adding a new product item, you need to create a new DOM element... 
+- When only changing the quantity of an existing product, you need to find the existing element and just change the text... 
+- When deleting a product, you need to completely remove the corresponding DOM element and clean up all event listeners attached to that element.
+
+<ComplexCart client:idle/>
+
+More complex situations also arise. Suppose you're developing a feature that needs to fetch new data from the server every time a user changes filters on the product list page. Try clicking the filters below in quick succession to reproduce a race condition:
+
+1. Click 'Price: Under 10,000 won' (takes 1.5 seconds)
+2. Click 'Color: Black' (takes 0.5 seconds)
+
+<RaceConditionCart client:idle />
+
+Can you see that the radio button is on color but the actual filter is set to price? In this case, the developer needs to figure out how to keep only the last request. To implement this with DOM APIs, you need to track the state of each request and verify if it's the latest request when a response arrives. Tracking and managing which requests are in progress and which DOM elements are connected to which requests is quite a headache-inducing task.
+
+## DOM API Summary
+
+**One of the biggest difficulties when using DOM APIs is deciding how to handle existing DOM elements when state changes.** Developers need to make complex decisions about whether to completely remove existing elements and create new ones, reuse existing elements and only update their content, which event listeners to remove and re-add, and how to handle animations or transitions.
+
+## Enter React
+
+React takes care of drawing UI from state.
+
+> `UI = f(state)`
+
+Developers only need to **declare** what UI should be shown when state changes, without worrying about how to **command** the DOM API to create that UI. This is also mentioned in the React documentation.
+
+> React components receive data and return what should appear on the screen. 
+
+> React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes.
+
+Compare the component below implemented with DOM API versus React.
+
+<Compare/>
+
+Using DOM API commands step-by-step how (HOW) to make changes.
+
+```javascript
+let count = 0;
+const counter = document.getElementById('counter');
+
+function increment() {
+  count++;
+  // Directly find and modify the DOM
+  counter.textContent = count;
+  // Directly change styles based on conditions
+  if (count > 0) {
+    counter.className = 'positive';
+  } else if (count < 0) {
+    counter.className = 'negative';
+  } else {
+    counter.className = 'zero';
+  }
+}
+
+const counterButton = document.getElementById('counter-button');
+counterButton.addEventListener('click', increment);
+```
+
+Using React, you only declare what (WHAT) the UI should be based on state.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <div className={count > 0 ? 'positive' : count < 0 ? 'negative' : 'zero'}>
+        {count}
+      </div>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </div>
+  );
+}
+```
+
+## When Should You Use React?
+
+React's advantages become clearly apparent in applications with complex and frequent state changes. For example, in e-commerce sites like the example shown above, where multiple states affect each other (user login/logout, cart management, product filtering and sorting) or where the DOM is frequently updated due to heavy user interaction, React significantly reduces development complexity.
+
+However, React isn't necessary in all situations. For static pages with little to no state changes, like company introduction pages or blog posts, or websites with only simple features like form submission, React might be overkill. In such cases, it only increases library size and initial loading time.
+
+## Conclusion
+
+We've looked back at what inconveniences React solves. Technology will continue to evolve and new paradigms will emerge, but what's important is **understanding the problems each tool tries to solve and making appropriate choices for each situation**.
+
+In computer science, **abstraction** is the process of hiding complex details and revealing only essential concepts or functions. React, which eliminates the need to directly handle the DOM, is also a kind of abstraction over the DOM. Next.js adds image optimization and routing, making it even more abstracted.
+
+Actually, the reason we don't code in 0s and 1s is also because we've abstracted machine language into high-level languages through layers of abstraction. So, might there be frontend developers in the future who have never even seen HTML because high-level frontend languages become commonplace? Looking at the complaints about Next.js and React, it seems far off, but maybe that day will come.
+
+Until that day arrives, we shouldn't neglect studying HTML/CSS/JS. If you're using Next.js but feel like you're getting distant from HTML/CSS/JS, try [astro](https://astro.build/) too :D

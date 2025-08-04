@@ -5,10 +5,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import meme1 from "@/assets/main/meme1.jpeg";
-import meme2 from "@/assets/main/meme2.png";
-import meme3 from "@/assets/main/meme3.jpeg";
-import meme4 from "@/assets/main/meme4.png";
+import meme1 from "@/assets/main/meme1.avif";
+import meme2 from "@/assets/main/meme2.avif";
+import meme3 from "@/assets/main/meme3.avif";
+import meme4 from "@/assets/main/meme4.avif";
 import mergeSort from "@/assets/main/merge-sort.webm";
 import InstagramDescription from "@/components/Main/InstagramDescription";
 
@@ -24,6 +24,7 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             src={meme1.src}
             alt=""
             className="h-full w-full object-contain"
+            loading="lazy"
           />
         </CarouselItem>
         <CarouselItem className="aspect-[4/5] max-w-sm pl-4">
@@ -34,6 +35,7 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             loop
             playsInline
             className="h-full w-full object-contain"
+            loading="lazy"
           />
         </CarouselItem>
         <CarouselItem className="aspect-[4/5] max-w-sm pl-4">
@@ -41,6 +43,7 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             src={meme2.src}
             alt=""
             className="h-full w-full object-contain"
+            loading="lazy"
           />
         </CarouselItem>
         <CarouselItem className="aspect-[4/5] max-w-sm pl-4">
@@ -48,6 +51,7 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             src={meme3.src}
             alt=""
             className="h-full w-full object-contain"
+            loading="lazy"
           />
         </CarouselItem>
         <CarouselItem className="aspect-[4/5] max-w-sm pl-4">
@@ -55,6 +59,7 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             src={meme4.src}
             alt=""
             className="h-full w-full object-contain"
+            loading="lazy"
           />
         </CarouselItem>
       </CarouselContent>
