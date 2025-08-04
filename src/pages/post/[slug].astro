@@ -1,0 +1,8 @@
+---
+import { getStaticPaths } from "@/pages/[lang]/post/[slug].astro";
+export { getStaticPaths };
+
+const { slug } = Astro.params;
+
+return Astro.redirect(`/ko/post/${slug}`);
+---
