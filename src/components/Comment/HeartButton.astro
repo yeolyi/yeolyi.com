@@ -39,14 +39,12 @@ const { id } = Astro.props;
     return $sessionStore.get().session?.user.id ?? tempUserId;
   };
 
-  const updateHeartCount = (count: number) => {
-    commentHeartCount.textContent = count.toString();
-  };
-
   const updateHeart = async () => {
     const userId = getUserId();
     const userIds = await getThumbUpUserIds(postId);
     const isReacted = userIds.includes(userId);
+
+    commentHeartCount.textContent = userIds.length.toString();
 
     if (isReacted) {
       heart.classList.add("fill-red-500");
@@ -59,9 +57,7 @@ const { id } = Astro.props;
 
   (async () => {
     const userIds = await getThumbUpUserIds(postId);
-    const thumbUpCount = userIds.length;
 
-    updateHeartCount(thumbUpCount);
     userIds.forEach((userId) => {
       heartPhysics.dropBall(userId);
     });
