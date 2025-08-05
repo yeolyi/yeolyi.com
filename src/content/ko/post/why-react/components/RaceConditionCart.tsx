@@ -13,14 +13,38 @@ interface Product {
   color: string;
 }
 
-const allProducts: Product[] = [
-  { id: 1, name: "포토카드", price: 5000, color: "블랙" },
-  { id: 2, name: "키링", price: 15000, color: "블랙" },
-  { id: 3, name: "스티커", price: 4000, color: "화이트" },
-  { id: 4, name: "머그컵", price: 12000, color: "화이트" },
-];
+interface RaceConditionCartProps {
+  lang: "ko" | "en";
+}
 
-export default function RaceConditionCart() {
+export default function RaceConditionCart({ lang }: RaceConditionCartProps) {
+  const allProducts: Product[] = [
+    {
+      id: 1,
+      name: lang === "ko" ? "포토카드" : "Photocard",
+      price: 5000,
+      color: lang === "ko" ? "블랙" : "Black",
+    },
+    {
+      id: 2,
+      name: lang === "ko" ? "키링" : "Keyring",
+      price: 15000,
+      color: lang === "ko" ? "블랙" : "Black",
+    },
+    {
+      id: 3,
+      name: lang === "ko" ? "스티커" : "Sticker",
+      price: 4000,
+      color: lang === "ko" ? "화이트" : "White",
+    },
+    {
+      id: 4,
+      name: lang === "ko" ? "머그컵" : "Mug",
+      price: 12000,
+      color: lang === "ko" ? "화이트" : "White",
+    },
+  ];
+
   const [filteredProducts, setFilteredProducts] =
     useState<Product[]>(allProducts);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +65,9 @@ export default function RaceConditionCart() {
       if (filterType === "price") {
         results = results.filter((p) => p.price <= 10000);
       } else if (filterType === "color") {
-        results = results.filter((p) => p.color === "블랙");
+        results = results.filter(
+          (p) => p.color === (lang === "ko" ? "블랙" : "Black"),
+        );
       }
       setFilteredProducts(results);
       setIsLoading(false);
@@ -53,11 +79,13 @@ export default function RaceConditionCart() {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-xl font-bold">성열굿즈샵🛍️</h2>
+        <h2 className="text-xl font-bold">
+          {lang === "ko" ? "성열굿즈샵🛍️" : "Seongyeol's Goods Shop🛍️"}
+        </h2>
       </CardHeader>
       <Separator />
       <CardHeader>
-        <CardTitle>상품 필터</CardTitle>
+        <CardTitle>{lang === "ko" ? "상품 필터" : "Product Filter"}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <RadioGroup
@@ -73,23 +101,32 @@ export default function RaceConditionCart() {
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="none" id="filter-none-react" />
-            <Label htmlFor="filter-none-react">필터 없음</Label>
+            <Label htmlFor="filter-none-react">
+              {lang === "ko" ? "필터 없음" : "No Filter"}
+            </Label>
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="price" id="filter-price-react" />
             <Label htmlFor="filter-price-react">
-              가격: 10,000원 이하 (1.5초)
+              {lang === "ko"
+                ? "가격: 10,000원 이하 (1.5초)"
+                : "Price: under ₩10,000 (1.5s)"}
             </Label>
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="color" id="filter-color-react" />
-            <Label htmlFor="filter-color-react">색상: 블랙 (0.5초)</Label>
+            <Label htmlFor="filter-color-react">
+              {lang === "ko" ? "색상: 블랙 (0.5초)" : "Color: Black (0.5s)"}
+            </Label>
           </div>
         </RadioGroup>
       </CardContent>
       <Separator />
       <CardHeader>
-        <CardTitle>상품 목록 {isLoading && "(로딩 중...)"}</CardTitle>
+        <CardTitle>
+          {lang === "ko" ? "상품 목록" : "Products"}{" "}
+          {isLoading && (lang === "ko" ? "(로딩 중...)" : "(Loading...)")}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="min-h-[100px]">
@@ -103,7 +140,7 @@ export default function RaceConditionCart() {
                     : "text-muted-foreground"
                 }
               >
-                {p.name} - {p.price}원 ({p.color})
+                {p.name} - ₩{p.price} ({p.color})
               </li>
             ))}
           </ul>

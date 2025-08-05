@@ -2,26 +2,34 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+export interface Props {
+  lang: "ko" | "en";
+}
+const { lang } = Astro.props;
 ---
 
 <Card client:load>
   <CardHeader>
-    <h2 class="text-xl font-bold">성열굿즈샵🛍️</h2>
+    <h2 class="text-xl font-bold">
+      {lang === "ko" ? "성열굿즈샵🛍️" : "Seongyeol's Goods Shop🛍️"}
+    </h2>
   </CardHeader>
   <Separator />
   <CardHeader>
-    <CardTitle>상품 목록</CardTitle>
+    <CardTitle>{lang === "ko" ? "상품 목록" : "Products"}</CardTitle>
   </CardHeader>
   <CardContent>
     <div id="products-simple" class="flex flex-col gap-4">
-      <div class="flex items-center justify-between" data-product-name="상품 A">
-        <p>상품 A</p>
-        <Button id="toggle-cart-btn-simple">장바구니에 추가</Button>
+      <div class="flex items-center justify-between">
+        <p>{lang === "ko" ? "상품 A" : "Product A"}</p>
+        <Button id="toggle-cart-btn-simple"
+          >{lang === "ko" ? "장바구니에 추가" : "Add to Cart"}</Button
+        >
       </div>
     </div>
   </CardContent>
   <CardHeader>
-    <CardTitle>장바구니</CardTitle>
+    <CardTitle>{lang === "ko" ? "장바구니" : "Cart"}</CardTitle>
   </CardHeader>
   <CardContent>
     <ul id="cart-items-simple" class="list-disc pl-5">
@@ -46,6 +54,8 @@ import { Separator } from "@/components/ui/separator";
 
     let isInCart = false;
 
+    const lang = document.documentElement.lang;
+
     toggleBtn.addEventListener("click", () => {
       if (isInCart) {
         // Remove from cart
@@ -55,14 +65,15 @@ import { Separator } from "@/components/ui/separator";
         if (itemToRemove) {
           cartItemsList.removeChild(itemToRemove);
         }
-        toggleBtn.textContent = "장바구니에 추가";
+        toggleBtn.textContent =
+          lang === "ko" ? "장바구니에 추가" : "Add to Cart";
         isInCart = false;
       } else {
         // Add to cart
         const cartItem = document.createElement("li");
         cartItem.textContent = productName;
         cartItemsList.appendChild(cartItem);
-        toggleBtn.textContent = "제거";
+        toggleBtn.textContent = lang === "ko" ? "제거" : "Remove";
         isInCart = true;
       }
     });
