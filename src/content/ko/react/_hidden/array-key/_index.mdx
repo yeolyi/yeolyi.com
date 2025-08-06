@@ -1,0 +1,248 @@
+---
+title: Array Key
+order: 100
+category: hook
+isHidden: true
+---
+
+two ended optimization GPT 대답 - 예를 들어, [A, B, C]가 [C, A, B]로 변경되었을 때, 앞에서부터 순회만 하면 모든 요소를 move로 간주하게 되지만 앞과 뒤에서 동시에 비교하면 C가 뒤로 옮겨졌다는 것을 빠르게 감지할 수 있습니다.
+
+dev모드면 O(n) 순회를 한 번씩 더 하며 중복 키 경고를 출력한다. 
+
+```js
+let knownKeys = null;
+for (let i = 0; i < newChildren.length; i++) {
+const child = newChildren[i];
+knownKeys = warnOnInvalidKey(child, knownKeys, returnFiber);
+}
+```
+
+헷갈리는데... Fiber 자체는 자식 노드를 연결리스트로 관리하지만 JSX?는 배열로 children을 관리한다. 그래서 reconcile할 때도 배열로 입력받음. 
+
+oldFiber: 꽉꽉 차있음
+newChild: 중간에 null이 있을 수 있음. isVisible && <Element/> 이런식으로 처리했나보지.
+
+This means that, once React finds key mismatch, it will try to “move” or “create new fiber”.
+
+
+```js
+function reconcileChildrenArray(
+    returnFiber: Fiber,
+    // [1,2,3,4,5,6]
+    currentFirstChild: Fiber | null,
+    // [1,6,null,5,4,3]
+    newChildren: Array<*>,
+    lanes: Lanes,
+  ): Fiber | null {
+    let resultingFirstChild: Fiber | null = null;
+    let previousNewFiber: Fiber | null = null;
+
+    // 현재 보고있는 newChildren의 포인터
+    // 1
+    let oldFiber = currentFirstChild;
+    
+    // 다음 for문에서 사용할 newChildren의 포인터
+    // for문 마지막에 oldFiber = nextOldFiber; 해준다.
+    let nextOldFiber = null;
+
+    let lastPlacedIndex = 0;
+    
+    // 현재 처리중인 newChildren의 인덱스
+    let newIdx = 0;
+
+    // 일종의 투포인터 알고리즘
+    // 두 정렬된 배열을 합치는 코테 문제를 생각하자. 
+    for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+      // index might not be exactly its position????
+      if (oldFiber.index > newIdx) {
+        // ??????
+        nextOldFiber = oldFiber;
+        oldFiber = null;
+      } else {
+        nextOldFiber = oldFiber.sibling;
+      }
+      
+      // newChildren[newIdx]를 나타내는 Fiber 생성
+      // null, undefined 요소면 newFiber가 null이다.
+      const newFiber = ... 
+
+      if (newFiber === null) {
+        if (oldFiber === null) {
+          oldFiber = nextOldFiber;
+        }
+        break;
+      }
+
+      lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+      if (previousNewFiber === null) {
+        // TODO: Move out of the loop. This only happens for the first run.
+        resultingFirstChild = newFiber;
+      } else {
+        // TODO: Defer siblings if we're not at the right index for this slot.
+        // I.e. if we had null values before, then we want to defer this
+        // for each null value. However, we also don't want to call updateSlot
+        // with the previous one.
+        previousNewFiber.sibling = newFiber;
+      }
+      previousNewFiber = newFiber;
+      oldFiber = nextOldFiber;
+    }
+
+    // for문 끝
+
+    if (newIdx === newChildren.length) {
+      // We've reached the end of the new children. We can delete the rest.
+      deleteRemainingChildren(returnFiber, oldFiber);
+      if (getIsHydrating()) {
+        const numberOfForks = newIdx;
+        pushTreeFork(returnFiber, numberOfForks);
+      }
+      return resultingFirstChild;
+    }
+
+    if (oldFiber === null) {
+      // If we don't have any more existing children we can choose a fast path
+      // since the rest will all be insertions.
+      for (; newIdx < newChildren.length; newIdx++) {
+        const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+        if (newFiber === null) {
+          continue;
+        }
+        lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+        if (previousNewFiber === null) {
+          // TODO: Move out of the loop. This only happens for the first run.
+          resultingFirstChild = newFiber;
+        } else {
+          previousNewFiber.sibling = newFiber;
+        }
+        previousNewFiber = newFiber;
+      }
+      if (getIsHydrating()) {
+        const numberOfForks = newIdx;
+        pushTreeFork(returnFiber, numberOfForks);
+      }
+      return resultingFirstChild;
+    }
+
+    // Add all children to a key map for quick lookups.
+    const existingChildren = mapRemainingChildren(returnFiber, oldFiber);
+
+    // Keep scanning and use the map to restore deleted items as moves.
+    for (; newIdx < newChildren.length; newIdx++) {
+      const newFiber = updateFromMap(
+        existingChildren,
+        returnFiber,
+        newIdx,
+        newChildren[newIdx],
+        lanes,
+      );
+      if (newFiber !== null) {
+        if (shouldTrackSideEffects) {
+          if (newFiber.alternate !== null) {
+            // The new fiber is a work in progress, but if there exists a
+            // current, that means that we reused the fiber. We need to delete
+            // it from the child list so that we don't add it to the deletion
+            // list.
+            existingChildren.delete(
+              newFiber.key === null ? newIdx : newFiber.key,
+            );
+          }
+        }
+        lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+        if (previousNewFiber === null) {
+          resultingFirstChild = newFiber;
+        } else {
+          previousNewFiber.sibling = newFiber;
+        }
+        previousNewFiber = newFiber;
+      }
+    }
+
+    return resultingFirstChild;
+  }
+```
+💡 전제: `oldFiber.index` 와 `newIdx` 가 의미하는 것
+
+| 값 | 의미 |
+|----|------|
+| `oldFiber.index` | 기존 Fiber 트리에서의 순서 (React가 렌더링 시 할당한 index) |
+| `newIdx` | `newChildren` 배열에서의 현재 순서 (새롭게 렌더링된 순서) |
+
+즉, 둘을 비교하면 "기존 순서"와 "새 순서" 간의 차이를 알 수 있습니다.
+
+🔍 코드 블록 분석
+
+```js
+if (oldFiber.index > newIdx) {
+  nextOldFiber = oldFiber;
+  oldFiber = null;
+} else {
+  nextOldFiber = oldFiber.sibling;
+}
+```
+
+이 로직은 Fiber 간 순서 역전 (out-of-order) 을 감지하고, 정렬된 비교를 유지하기 위한 것입니다.
+
+📌 각각의 경우 설명
+
+✅ oldFiber.index &lt;= newIdx (정상 순서)
+
+nextOldFiber = oldFiber.sibling;
+
+	•	현재 oldFiber는 newIdx와 순서상 일치하거나 앞에 있음 → 정상 순서로 간주.
+	•	다음 순회 시에 oldFiber.sibling을 비교 대상으로 사용하도록 nextOldFiber에 저장함.
+	•	즉, oldFiber를 계속 앞으로 전진하며 newChildren과 나란히 비교할 수 있음.
+
+❌ oldFiber.index > newIdx (역전 발생)
+
+nextOldFiber = oldFiber;
+oldFiber = null;
+
+	•	현재 oldFiber의 순서가 newIdx보다 뒤에 있음 → 순서가 틀림!
+	•	즉, 현재 newChild에 해당하는 oldFiber는 없는 것으로 판단.
+	•	oldFiber를 null로 설정하여 해당 newChildren[newIdx] 에 대해 새로 생성(create) 로직을 유도함.
+	•	하지만 nextOldFiber는 그대로 oldFiber로 유지 → 이후 루프에서 다시 oldFiber로 사용 가능
+
+이렇게 함으로써:
+	•	Fiber 순서가 지켜지는 한 빠르게 진행하고,
+	•	순서가 꼬이면 기존 Fiber를 일시적으로 무시하고, 새 Fiber를 생성하거나 Map 기반 비교로 넘어가는 구조입니다.
+
+🤔 왜 이런 처리를 할까?
+
+React는 가능한 한 기존 Fiber를 재사용하여 성능을 높이려 합니다. 이때 Fiber는 연결 리스트 형태이고, 역방향 포인터(back pointer)가 없기 때문에 양쪽에서 동시에 탐색할 수 없습니다.
+
+그래서 다음과 같은 전략을 씁니다:
+	1.	가능한 경우 한 방향으로 순서대로 비교하며 재사용
+	2.	순서가 어긋나는 순간, oldFiber를 null로 두어 “새 Fiber를 만들도록” 유도
+	3.	이후 필요하면 Map 기반 비교 로직으로 fallback
+
+이 처리는 특히 다음과 같은 상황에서 중요합니다:
+
+```jsx
+<ul>
+  <li key="A" />
+  <li key="B" />
+  <li key="C" />
+</ul>
+
+// → 순서 변경
+<ul>
+  <li key="C" />
+  <li key="A" />
+  <li key="B" />
+</ul>
+```
+
+이렇게 순서가 뒤바뀌면 index 기준 비교로는 문제가 생기기 때문에, 이 조건문을 통해 “순서 역전”을 감지하고 처리 방향을 바꿉니다.
+
+✅ 정리
+
+조건	의미	처리 방식
+oldFiber.index &lt;= newIdx	oldFiber가 올바른 위치에 있음	비교 후 다음 sibling으로 진행
+oldFiber.index > newIdx	oldFiber의 위치가 뒤에 있음 (순서 어긋남)	재사용하지 않고, newChild는 새로 생성 유도
+
+이 조건문 덕분에 React는 최소한의 변경만을 감지하고 수행하는 방식으로 동작하며, 대부분의 UI 업데이트에서 성능을 극대화할 수 있습니다.
+
+📌 참고
+
+필요하시다면 이 다음에 이어지는 updateSlot과 placeChild도 같이 해석해드릴 수 있어요.

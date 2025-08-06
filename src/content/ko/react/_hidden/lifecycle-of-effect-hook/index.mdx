@@ -1,0 +1,139 @@
+---
+title: The lifecycle of effect hooks in React
+order: 100
+category: hook
+isHidden: true
+---
+
+## useEffect 복습
+
+React는 설정 함수와 정리 함수가 필요할 때마다 호출할 수 있으며, 이는 여러 번 호출될 수 있습니다.
+
+1. 컴포넌트가 화면에 추가되었을 때 설정 코드가 동작합니다 (마운트 시).
+1. 의존성이 변경된 컴포넌트가 리렌더링 될 때마다 아래 동작을 수행합니다. 먼저 정리 코드가 오래된 props와 state와 함께 실행됩니다. 이후, 설정 코드가 새로운 props와 state와 함께 실행됩니다.
+1. 컴포넌트가 화면에서 제거된 이후에 정리 코드가 마지막으로 실행됩니다 (마운트 해제 시).
+
+## 훅 복습
+
+> A hook is something attached to a fiber.
+
+## 구조
+
+- flushPassiveEffects
+  - **commitPassiveUnmountEffects**
+    - commitPassiveUnmountEffects_begin
+      - commitPassiveUnmountEffectsInsideOfDeletedTree_begin
+      - commitPassiveUnmountEffects_complete
+        - commitPassiveUnmountOnFiber
+  - **commitPassiveMountEffects**
+    - commitHookEffectListMount
+
+## commitPassiveUnmountEffects_begin 
+
+```js
+function commitPassiveUnmountEffects_begin() {
+  while (nextEffect !== null) {
+    const fiber = nextEffect;
+    const child = fiber.child;
+    if ((nextEffect.flags & ChildDeletion) !== NoFlags) {
+      const deletions = fiber.deletions;
+      if (deletions !== null) {
+        // nextEffect를 삭제할 Fiber로 변경하고 
+        // 각 Fiber에 대해 commitPassiveUnmountEffectsInsideOfDeletedTree_begin 호출
+        if (deletedTreeCleanUpLevel >= 1) {
+          // A fiber was deleted from this parent fiber, but it's still part of
+          // the previous (alternate) parent fiber's list of children. Because
+          // children are a linked list, an earlier sibling that's still alive
+          // will be connected to the deleted fiber via its `alternate`:
+          //
+          //   live fiber
+          //   --alternate--> previous live fiber
+          //   --sibling--> deleted fiber
+          //
+          // We can't disconnect `alternate` on nodes that haven't been deleted
+          // yet, but we can disconnect the `sibling` and `child` pointers.
+          const previousFiber = fiber.alternate;
+          if (previousFiber !== null) {
+            let detachedChild = previousFiber.child;
+            if (detachedChild !== null) {
+              previousFiber.child = null;
+              do {
+                const detachedSibling = detachedChild.sibling;
+                detachedChild.sibling = null;
+                detachedChild = detachedSibling;
+              } while (detachedChild !== null);
+            }
+          }
+        }
+        nextEffect = fiber;
+      }
+    }
+    if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && child !== null) {
+      ensureCorrectReturnPointer(child, fiber);
+      nextEffect = child;
+    } else {
+      commitPassiveUnmountEffects_complete();
+    }
+  }
+}
+```
+
+React의 Fiber 아키텍처는 두 개의 트리(current와 alternate)를 번갈아 재사용하는 구조입니다.
+	•	current: 현재 화면에 렌더링된 트리
+	•	alternate: 다음 렌더를 준비하는 작업 트리 (workInProgress)
+
+렌더링이 완료되면 두 트리의 역할이 서로 교체됩니다.
+
+삭제된 컴포넌트(Fiber)는 alternate 트리에 여전히 연결된 상태로 남아 있을 수 있습니다:
+
+```
+live fiber
+ └─ alternate → previous fiber
+                      └─ sibling → deleted fiber
+```
+
+이 상태에서 문제가 되는 이유:
+- alternate는 다음 렌더링에서 재사용됨
+- 삭제된 Fiber가 연결된 채로 남아 있으면
+- React가 그것을 다시 살아있는 것으로 착각할 수 있음
+- 불필요한 effect 호출, 메모리 접근, 크래시 가능성 발생
+
+따라서 passive effect(unmount clean-up) 단계에서:
+	•	alternate.child, sibling 포인터를 수동으로 끊어줌
+	•	다음 렌더링 시 안전하게 workInProgress로 재사용할 수 있도록 정리함
+
+
+👉 정리:
+삭제된 Fiber를 포함한 alternate 트리의 연결을 정리(clean-up)하는 것은
+React의 렌더링 일관성과 메모리 안전성을 유지하기 위한 필수 작업입니다.
+
+## commitPassiveUnmountEffectsInsideOfDeletedTree_begin
+
+```js
+function commitPassiveUnmountEffectsInsideOfDeletedTree_begin(
+  deletedSubtreeRoot: Fiber,
+  nearestMountedAncestor: Fiber | null,
+) {
+  while (nextEffect !== null) {
+    const fiber = nextEffect;
+
+    // Deletion effects fire in parent -> child order
+    // 이후 어찌어찌해서 safelyCallDestroy 호출
+    // 별거 없고 catch문으로 감싸서 'safely'이다.
+    commitPassiveUnmountInsideDeletedTreeOnFiber(fiber, nearestMountedAncestor);
+
+    const child = fiber.child;
+    if (child !== null) {
+      // [!code highlight]
+      // return은 왜?
+      child.return = fiber;
+      nextEffect = child;
+    } else {
+      commitPassiveUnmountEffectsInsideOfDeletedTree_complete(
+        deletedSubtreeRoot,
+      );
+    }
+  }
+}
+```
+

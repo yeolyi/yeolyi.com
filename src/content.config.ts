@@ -21,6 +21,7 @@ const react = defineCollection({
     title: z.string(),
     order: z.number(),
     category: z.string(),
+    isHidden: z.boolean().optional(),
   }),
 });
 

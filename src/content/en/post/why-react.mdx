@@ -29,7 +29,7 @@ While we naturally accepted and used React during our studies and job preparatio
 
 Frontend development before React involved directly modifying the UI using DOM APIs. For those whose memory is a bit fuzzy, let me show you an example of a counter that increases every time you press a button:
 
-<Example />
+<Example lang="en"/>
 
 When you press the button, the `increment` function below is executed. Can you see how it directly accesses HTML elements and changes their content?
 
@@ -49,7 +49,7 @@ Looking at the code above, directly manipulating the DOM seems fine, but let's l
 
 Initially, there's just a simple feature where clicking the cart button adds a product.
 
-<SimpleCart />
+<SimpleCart lang="en"/>
 
 Later, the requirements change to add a feature where "clicking a product already in the cart increases its quantity, and items are deleted when quantity becomes 0." Now the developer needs to think about how to update the existing cart UI.
 
@@ -57,14 +57,14 @@ Later, the requirements change to add a feature where "clicking a product alread
 - When only changing the quantity of an existing product, you need to find the existing element and just change the text... 
 - When deleting a product, you need to completely remove the corresponding DOM element and clean up all event listeners attached to that element.
 
-<ComplexCart client:idle/>
+<ComplexCart client:idle lang="en"/>
 
 More complex situations also arise. Suppose you're developing a feature that needs to fetch new data from the server every time a user changes filters on the product list page. Try clicking the filters below in quick succession to reproduce a race condition:
 
 1. Click 'Price: Under 10,000 won' (takes 1.5 seconds)
 2. Click 'Color: Black' (takes 0.5 seconds)
 
-<RaceConditionCart client:idle />
+<RaceConditionCart client:idle lang="en"/>
 
 Can you see that the radio button is on color but the actual filter is set to price? In this case, the developer needs to figure out how to keep only the last request. To implement this with DOM APIs, you need to track the state of each request and verify if it's the latest request when a response arrives. Tracking and managing which requests are in progress and which DOM elements are connected to which requests is quite a headache-inducing task.
 
@@ -86,7 +86,7 @@ Developers only need to **declare** what UI should be shown when state changes, 
 
 Compare the component below implemented with DOM API versus React.
 
-<Compare/>
+<Compare lang="en"/>
 
 Using DOM API commands step-by-step how (HOW) to make changes.
 

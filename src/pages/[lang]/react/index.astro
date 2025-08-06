@@ -8,18 +8,18 @@ export function getStaticPaths() {
   return [{ params: { lang: "ko" } }];
 }
 
+const filterPosts = (category: string) => {
+  return posts
+    .filter((post) => post.data.category === category && !post.data.isHidden)
+    .sort((a, b) => a.data.order - b.data.order);
+};
+
 const { lang } = Astro.params;
 const posts = await getCollection("react");
-const preparePosts = posts
-  .filter((post) => post.data.category === "prepare")
-  .sort((a, b) => a.data.order - b.data.order);
-const initialRenderPosts = posts
-  .filter((post) => post.data.category === "initial-render")
-  .sort((a, b) => a.data.order - b.data.order);
-const rerenderPosts = posts
-  .filter((post) => post.data.category === "rerender")
-  .sort((a, b) => a.data.order - b.data.order);
-const reactHookPosts = posts.filter((post) => post.data.category === "hook");
+const preparePosts = filterPosts("prepare");
+const initialRenderPosts = filterPosts("initial-render");
+const rerenderPosts = filterPosts("rerender");
+const reactHookPosts = filterPosts("hook");
 ---
 
 <BaseLayout
