@@ -1,0 +1,86 @@
+---
+title: Scheduler
+order: 100
+category: hook
+isHidden: true
+---
+
+import { components } from '@/content/components'
+export { components }
+
+import Compare from "./Compare";
+import Measure from "./Measure";
+import Quiz from "./Quiz";
+
+
+## Why setTimeout Can Only Be Set to 4ms Minimum
+
+> However, if the specified timeout is too short, the browser may not have enough time to process other tasks in the queue before executing your function. This can lead to a phenomenon called “starvation” where some tasks are never executed because the browser is too busy executing the short timeouts.
+> 
+> https://medium.com/geekculture/why-settimeout-can-only-be-set-to-4ms-minimum-7ad9e2c2822e
+
+
+## 비교
+
+<Compare client:idle/>
+
+?????
+
+https://developer.mozilla.org/en-US/docs/Web/API/Window/queueMicrotask
+
+| 큐 타입 | 대표 예시 | 처리 시점 | 우선순위 |
+|---------|-----------|-----------|-----------|
+| **Microtask Queue** | `Promise.then`, `queueMicrotask` | 현재 실행 중인 task 이후, **렌더링 전에** | ⭐ 가장 빠름 |
+| **Macrotask Queue** (Task Queue) | `setTimeout`, `setInterval`, `setImmediate`, `MessageChannel` | 모든 microtask 처리 후, **렌더링 이후** | 느림 |
+| **Render Queue** (브라우저 내부) | `requestAnimationFrame` | 렌더 직전 | 직접 제어 불가 |
+
+## Date vs performance.now
+
+Unlike Date.now, the timestamps returned by performance.now() are not limited to one-millisecond resolution. Instead, they represent times as floating-point numbers with up to microsecond precision.
+
+<Measure client:idle/>
+
+> Meltdown 또는 Spectre를 악용하려면 공격자가 메모리에서 특정 값을 읽는 데 걸리는 시간을 측정해야 합니다. 이를 위해서는 안정적이고 정확한 타이머가 필요합니다.
+>
+> 웹 플랫폼에서 제공하는 API 중 하나는 5마이크로초까지 정확한 performance.now()입니다. 완화 조치로 모든 주요 브라우저는 공격을 더 어렵게 만들기 위해 performance.now()의 해상도를 낮췄습니다.
+>
+> https://developer.chrome.com/blog/meltdown-spectre?utm_source=chatgpt.com&hl=ko
+
+
+## Scheduler API
+
+```ts
+export {
+  ImmediatePriority as unstable_ImmediatePriority,
+  UserBlockingPriority as unstable_UserBlockingPriority,
+  NormalPriority as unstable_NormalPriority,
+  IdlePriority as unstable_IdlePriority,
+  LowPriority as unstable_LowPriority,
+  unstable_runWithPriority,
+  unstable_next,
+  // [!code highlight]
+  unstable_scheduleCallback,
+  unstable_cancelCallback,
+  unstable_wrapCallback,
+  unstable_getCurrentPriorityLevel,
+  shouldYieldToHost as unstable_shouldYield,
+  unstable_requestPaint,
+  unstable_continueExecution,
+  unstable_pauseExecution,
+  unstable_getFirstCallbackNode,
+  getCurrentTime as unstable_now,
+  forceFrameRate as unstable_forceFrameRate,
+};
+
+export const unstable_Profiling = enableProfiling
+  ? {
+      startLoggingProfilingEvents,
+      stopLoggingProfilingEvents,
+    }
+  : null;
+```
+
+
+## Quiz
+
+<Quiz client:idle/>

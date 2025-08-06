@@ -1,0 +1,28 @@
+---
+title: Array Key
+order: 100
+category: hook
+---
+
+two ended optimization GPT 대답 - 예를 들어, [A, B, C]가 [C, A, B]로 변경되었을 때, 앞에서부터 순회만 하면 모든 요소를 move로 간주하게 되지만 앞과 뒤에서 동시에 비교하면 C가 뒤로 옮겨졌다는 것을 빠르게 감지할 수 있습니다.
+
+dev모드면 O(n) 순회를 한 번씩 더 하며 중복 키 경고를 출력한다. 
+
+```js
+let knownKeys = null;
+for (let i = 0; i < newChildren.length; i++) {
+const child = newChildren[i];
+knownKeys = warnOnInvalidKey(child, knownKeys, returnFiber);
+}
+```
+
+헷갈리는데... Fiber 자체는 자식 노드를 연결리스트로 관리하지만 JSX?는 배열로 children을 관리한다. 그래서 reconcile할 때도 배열로 입력받음. 
+
+## 실습
+
+```js
+const arr1 = [1, 2, 3, 4, 5];
+const arr2 = [1, 2, undefined, 5, 4];
+
+// currentFirstChild 
+```
