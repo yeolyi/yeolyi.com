@@ -1,0 +1,35 @@
+---
+import OgForm from "@/components/craft/og/OgForm";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+export const prerender = false;
+
+const { lang, value } = Astro.params;
+
+const [rawTitle, rawDescription] = value?.split("/") ?? [];
+const title = decodeURIComponent(rawTitle ?? "");
+const description = decodeURIComponent(rawDescription ?? "");
+
+const ogImageUrl = new URL(
+  `/api/og/${encodeURIComponent(title)}`,
+  Astro.url.origin,
+);
+---
+
+<BaseLayout
+  lang="ko"
+  title={title}
+  description={description}
+  opengraph={{
+    image: ogImageUrl.toString(),
+  }}
+>
+  <div class="mx-auto flex max-w-2xl flex-col px-6">
+    <OgForm
+      client:load
+      lang={lang}
+      initialTitle={title}
+      initialDescription={description}
+    />
+  </div>
+</BaseLayout>

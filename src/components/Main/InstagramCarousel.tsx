@@ -35,7 +35,6 @@ export default function InstagramCarousel({ locale }: { locale: string }) {
             loop
             playsInline
             className="h-full w-full object-contain"
-            loading="lazy"
           />
         </CarouselItem>
         <CarouselItem className="aspect-[4/5] max-w-sm pl-4">
