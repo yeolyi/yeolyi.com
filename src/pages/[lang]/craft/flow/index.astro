@@ -1,0 +1,14 @@
+---
+import Flow from "@/components/cs/flow";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+export function getStaticPaths() {
+  return [{ params: { lang: "ko" } }];
+}
+---
+
+<BaseLayout lang="ko">
+  <div class="flex flex-col justify-center p-2">
+    <Flow id="flow-playground" client:load height={512} />
+  </div>
+</BaseLayout>
