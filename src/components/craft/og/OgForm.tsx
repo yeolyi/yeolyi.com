@@ -40,7 +40,7 @@ export default function OgForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const shortLink = await insertOgShortLink(title, description);
-    const url = `${location.origin}/${lang}/craft/og/${shortLink}`;
+    const url = `${location.origin}/craft/og/${shortLink}`;
     await navigator.clipboard.writeText(url);
 
     setIsCopied(true);

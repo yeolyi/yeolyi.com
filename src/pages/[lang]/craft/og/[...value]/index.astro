@@ -16,9 +16,13 @@ const parse = async () => {
   }
 
   if (values.length === 1) {
-    const shortLink = values[0];
-    const { title, description } = await getOgShortLink(shortLink);
-    return { title: title, description: description ?? "" };
+    try {
+      const shortLink = values[0];
+      const { title, description } = await getOgShortLink(shortLink);
+      return { title: title, description: description ?? "" };
+    } catch {
+      return { title: decodeURI(values[0]), description: "" };
+    }
   }
 
   if (values.length === 2) {
