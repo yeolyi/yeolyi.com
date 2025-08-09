@@ -139,6 +139,30 @@ export type Database = {
         }
         Relationships: []
       }
+      og_short_links: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -281,6 +305,10 @@ export type Database = {
       hnswhandler: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      insert_og_short_link: {
+        Args: { _title: string; _description: string; _max_attempts?: number }
+        Returns: string
       }
       insert_subscriber: {
         Args: { _email: string }

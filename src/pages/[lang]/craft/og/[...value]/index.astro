@@ -1,14 +1,38 @@
 ---
 import OgForm from "@/components/craft/og/OgForm";
+import { Separator } from "@/components/ui/separator";
+import { getOgShortLink, getOgShortLinkCount } from "@/db/og";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 export const prerender = false;
 
 const { lang, value } = Astro.params;
 
-const [rawTitle, rawDescription] = value?.split("/") ?? [];
-const title = decodeURIComponent(rawTitle ?? "");
-const description = decodeURIComponent(rawDescription ?? "");
+const parse = async () => {
+  const values = value?.split("/") ?? [];
+
+  if (values.length === 0) {
+    return { title: "", description: "" };
+  }
+
+  if (values.length === 1) {
+    const shortLink = values[0];
+    const { title, description } = await getOgShortLink(shortLink);
+    return { title: title, description: description ?? "" };
+  }
+
+  if (values.length === 2) {
+    // legacy
+    const [rawTitle, rawDescription] = value?.split("/") ?? [];
+    const title = decodeURIComponent(rawTitle ?? "");
+    const description = decodeURIComponent(rawDescription ?? "");
+    return { title, description };
+  }
+
+  return { title: "test", description: "test" };
+};
+
+const { title, description } = await parse();
 
 const ogImageUrl = new URL(
   `/api/og/${encodeURIComponent(title)}`,
@@ -20,16 +44,27 @@ const ogImageUrl = new URL(
   lang="ko"
   title={title}
   description={description}
-  opengraph={{
-    image: ogImageUrl.toString(),
-  }}
+  opengraph={{ image: ogImageUrl.toString() }}
 >
-  <div class="mx-auto flex max-w-2xl flex-col px-6">
+  <div class="mx-auto flex max-w-2xl flex-col gap-8 px-6">
+    <h1 class="text-2xl font-bold">
+      {lang === "ko" ? "미리보기 링크 생성기" : "Link Preview Generator"}
+    </h1>
+
     <OgForm
       client:load
-      lang={lang}
+      lang={lang ?? "en"}
       initialTitle={title}
       initialDescription={description}
     />
+
+    <Separator />
+
+    <div class="mt-4">
+      <h2 class="font-bold">{lang === "ko" ? "변경사항" : "Changelog"}</h2>
+      <ol>
+        <li>2025.08.09 숏링크 지원</li>
+      </ol>
+    </div>
   </div>
 </BaseLayout>
