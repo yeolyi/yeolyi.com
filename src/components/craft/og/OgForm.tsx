@@ -32,9 +32,14 @@ export default function OgForm({
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    getOgShortLinkCount().then((count) => {
+    const updateCount = async () => {
+      const count = await getOgShortLinkCount();
       setCount(count ?? 0);
-    });
+    };
+    updateCount();
+
+    const polling = setInterval(updateCount, 3000);
+    return () => clearInterval(polling);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

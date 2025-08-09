@@ -21,7 +21,7 @@ const parse = async () => {
       const { title, description } = await getOgShortLink(shortLink);
       return { title: title, description: description ?? "" };
     } catch {
-      return { title: decodeURI(values[0]), description: "" };
+      return { title: decodeURIComponent(values[0]), description: "" };
     }
   }
 
