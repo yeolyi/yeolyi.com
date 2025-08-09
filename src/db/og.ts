@@ -1,10 +1,15 @@
 import supabase from "@/db";
 
-export const insertOgShortLink = async (title: string, description: string) => {
+export const insertOgShortLink = async (
+  title: string,
+  description: string,
+  redirectUrl: string,
+) => {
   const { data } = await supabase
-    .rpc("insert_og_short_link", {
+    .rpc("insert_og_short_link_v2", {
       _title: title,
       _description: description,
+      _redirect_url: redirectUrl,
     })
     .throwOnError();
 

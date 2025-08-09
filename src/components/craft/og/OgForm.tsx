@@ -11,15 +11,18 @@ interface OgFormProps {
   lang: string;
   initialTitle?: string;
   initialDescription?: string;
+  initialRedirectUrl?: string;
 }
 
 export default function OgForm({
   lang,
   initialTitle,
   initialDescription,
+  initialRedirectUrl,
 }: OgFormProps) {
   const [title, setTitle] = useState(initialTitle ?? "");
   const [description, setDescription] = useState(initialDescription ?? "");
+  const [redirectUrl, setRedirectUrl] = useState(initialRedirectUrl ?? "");
 
   const [previewTitle, setPreviewTitle] = useState(initialTitle ?? "");
   const debouncedSetPreviewTitle = useCallback(
@@ -28,23 +31,23 @@ export default function OgForm({
   );
 
   const [isCopied, setIsCopied] = useState(false);
-
   const [count, setCount] = useState(0);
+  const isDisabled = title === "";
+
+  const updateCount = useCallback(async () => {
+    const count = await getOgShortLinkCount();
+    setCount(count ?? 0);
+  }, []);
 
   useEffect(() => {
-    const updateCount = async () => {
-      const count = await getOgShortLinkCount();
-      setCount(count ?? 0);
-    };
     updateCount();
-
     const polling = setInterval(updateCount, 3000);
     return () => clearInterval(polling);
-  }, []);
+  }, [updateCount]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const shortLink = await insertOgShortLink(title, description);
+    const shortLink = await insertOgShortLink(title, description, redirectUrl);
     const url = `${location.origin}/craft/og/${shortLink}`;
     await navigator.clipboard.writeText(url);
 
@@ -53,15 +56,14 @@ export default function OgForm({
       setIsCopied(false);
     }, 1000);
 
-    const count = await getOgShortLinkCount();
-    setCount(count ?? 0);
+    updateCount();
   };
 
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="space-y-2">
-          <Label htmlFor="title">{lang === "ko" ? "제목" : "Title"}</Label>
+          <Label htmlFor="title">{lang === "ko" ? "제목*" : "Title*"}</Label>
           <Input
             id="title"
             name="title"
@@ -70,7 +72,7 @@ export default function OgForm({
               setTitle(e.target.value);
               debouncedSetPreviewTitle(e.target.value);
             }}
-            placeholder={lang === "ko" ? "제목을 입력하세요" : "Enter title"}
+            placeholder={lang === "ko" ? "점심 ㄱ?" : "Lunch?"}
           />
         </div>
 
@@ -84,7 +86,25 @@ export default function OgForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={
-              lang === "ko" ? "설명을 입력하세요" : "Enter description"
+              lang === "ko"
+                ? "오늘 점심 돈까스래요"
+                : "Today's lunch is burger & fries"
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">URL</Label>
+          <Input
+            id="redirectUrl"
+            name="redirectUrl"
+            type="url"
+            value={redirectUrl}
+            onChange={(e) => setRedirectUrl(e.target.value)}
+            placeholder={
+              lang === "ko"
+                ? "입력된 URL로 리다이렉트됩니다"
+                : "Redirect to the entered URL"
             }
           />
         </div>
@@ -96,7 +116,7 @@ export default function OgForm({
               ? "개의 링크가 지금까지 만들어졌어요!"
               : " links created so far!"}
           </p>
-          <Button type="submit">
+          <Button type="submit" disabled={isDisabled}>
             {isCopied ? <Check /> : <Copy />}
             {isCopied
               ? lang === "ko"

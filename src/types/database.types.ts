@@ -144,6 +144,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          redirect_url: string | null
           slug: string
           title: string
         }
@@ -151,6 +152,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          redirect_url?: string | null
           slug: string
           title: string
         }
@@ -158,6 +160,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          redirect_url?: string | null
           slug?: string
           title?: string
         }
@@ -307,7 +310,32 @@ export type Database = {
         Returns: unknown
       }
       insert_og_short_link: {
-        Args: { _title: string; _description: string; _max_attempts?: number }
+        Args:
+          | { _title: string; _description: string; _max_attempts?: number }
+          | {
+              _title: string
+              _description: string
+              _redirect_url: string
+              _max_attempts?: number
+            }
+        Returns: string
+      }
+      insert_og_short_link_v2: {
+        Args: {
+          _title: string
+          _description: string
+          _redirect_url: string
+          _max_attempts?: number
+        }
+        Returns: string
+      }
+      insert_short_link: {
+        Args: {
+          _title: string
+          _description: string
+          _redirect_url: string
+          _max_attempts?: number
+        }
         Returns: string
       }
       insert_subscriber: {

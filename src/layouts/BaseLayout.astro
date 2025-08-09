@@ -4,6 +4,7 @@ import Analytics from "@vercel/analytics/astro";
 import ogMain from "@/assets/main/opengraph.jpg";
 
 import "@/styles/global.css";
+import type { HTMLAttributes } from "astro/types";
 
 interface Props {
   lang: string;
@@ -12,6 +13,7 @@ interface Props {
   opengraph?: {
     image: string;
   };
+  additionalMetaProperties?: HTMLAttributes<"meta">[];
 }
 
 const {
@@ -19,6 +21,7 @@ const {
   title: _title,
   description: _description,
   opengraph: _opengraph,
+  additionalMetaProperties,
 } = Astro.props;
 
 const title = _title ?? (lang === "ko" ? "이성열" : "Seongyeol Yi");
@@ -60,6 +63,8 @@ const opengraphImage = _opengraph?.image ?? ogMain.src;
     <meta property="og:image" content={opengraphImage} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+
+    {additionalMetaProperties?.map((property) => <meta {...property} />)}
 
     <link rel="sitemap" href="/sitemap-index.xml" />
 

@@ -35,3 +35,15 @@ export const getErrMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   return `알 수 없는 에러: ${String(error)}`;
 };
+
+export const isValidHttpUrl = (string: string) => {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+};

@@ -1,0 +1,33 @@
+---
+import OgForm from "@/components/craft/og/OgForm";
+import { Separator } from "@/components/ui/separator";
+
+interface Props {
+  lang: string;
+  title: string;
+  description: string;
+  redirectUrl: string;
+}
+
+const { lang, title, description, redirectUrl } = Astro.props;
+---
+
+<OgForm
+  client:load
+  lang={lang ?? "en"}
+  initialTitle={title}
+  initialDescription={description}
+  initialRedirectUrl={redirectUrl}
+/>
+
+<Separator />
+
+<div>
+  <h2 class="font-bold">
+    {lang === "ko" ? "변경사항" : "Changelog"}
+  </h2>
+  <ol>
+    <li>2025.08.10 redirect URL 지원</li>
+    <li>2025.08.09 숏링크 지원</li>
+  </ol>
+</div>
