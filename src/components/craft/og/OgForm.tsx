@@ -69,7 +69,12 @@ export default function OgForm({
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="space-y-2">
-          <Label htmlFor="title">{lang === "ko" ? "제목*" : "Title*"}</Label>
+          <Label htmlFor="title">
+            {lang === "ko" ? "제목" : "Title"}
+            <span className="text-muted-foreground text-sm">
+              {lang === "ko" ? "필수" : "Required"}
+            </span>
+          </Label>
           <Input
             id="title"
             name="title"
