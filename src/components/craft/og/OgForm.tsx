@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { getOgShortLinkCount, insertOgShortLink } from "@/db/og";
 import { debounce } from "es-toolkit";
-import { Check, Copy } from "lucide-react";
+import { Blocks, Check, Copy, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 interface OgFormProps {
@@ -30,9 +30,12 @@ export default function OgForm({
     [],
   );
 
-  const [isCopied, setIsCopied] = useState(false);
   const [count, setCount] = useState(0);
-  const isDisabled = title === "";
+  const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const isDisabled = title === "" || generatedLink !== null;
 
   const updateCount = useCallback(async () => {
     const count = await getOgShortLinkCount();
@@ -47,16 +50,19 @@ export default function OgForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const shortLink = await insertOgShortLink(title, description, redirectUrl);
-    const url = `${location.origin}/craft/og/${shortLink}`;
-    await navigator.clipboard.writeText(url);
-
-    setIsCopied(true);
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 1000);
-
-    updateCount();
+    setError(null);
+    try {
+      const shortLink = await insertOgShortLink(
+        title,
+        description,
+        redirectUrl,
+      );
+      const url = `${location.origin}/craft/og/${shortLink}`;
+      setGeneratedLink(url);
+      updateCount();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "에러가 발생했어요");
+    }
   };
 
   return (
@@ -70,6 +76,7 @@ export default function OgForm({
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
+              setGeneratedLink(null);
               debouncedSetPreviewTitle(e.target.value);
             }}
             placeholder={lang === "ko" ? "점심 ㄱ?" : "Lunch?"}
@@ -84,7 +91,10 @@ export default function OgForm({
             id="description"
             name="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setGeneratedLink(null);
+            }}
             placeholder={
               lang === "ko"
                 ? "오늘 점심 돈까스래요"
@@ -100,7 +110,10 @@ export default function OgForm({
             name="redirectUrl"
             type="url"
             value={redirectUrl}
-            onChange={(e) => setRedirectUrl(e.target.value)}
+            onChange={(e) => {
+              setRedirectUrl(e.target.value);
+              setGeneratedLink(null);
+            }}
             placeholder={
               lang === "ko"
                 ? "입력된 URL로 리다이렉트됩니다"
@@ -110,6 +123,7 @@ export default function OgForm({
         </div>
 
         <div className="flex items-center gap-4 self-end">
+          {error && <p className="text-red-500">{error}</p>}
           <p className="text-muted-foreground text-sm">
             {count}
             {lang === "ko"
@@ -117,16 +131,43 @@ export default function OgForm({
               : " links created so far!"}
           </p>
           <Button type="submit" disabled={isDisabled}>
-            {isCopied ? <Check /> : <Copy />}
-            {isCopied
-              ? lang === "ko"
-                ? "복사 완료!"
-                : "Copied!"
-              : lang === "ko"
-                ? "URL 복사"
-                : "Copy URL"}
+            <Blocks />
+            {lang === "ko"
+              ? generatedLink
+                ? "생성 완료!"
+                : "링크 생성"
+              : generatedLink
+                ? "Created"
+                : "Create Link"}
           </Button>
         </div>
+
+        {generatedLink && (
+          <div className="flex items-center gap-4 self-end">
+            <a
+              href={generatedLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground text-sm underline"
+            >
+              {generatedLink}
+            </a>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(generatedLink);
+                setIsCopied(true);
+                setTimeout(() => {
+                  setIsCopied(false);
+                }, 1500);
+              }}
+            >
+              {isCopied ? <Check /> : <Copy />}
+            </Button>
+          </div>
+        )}
       </form>
 
       <Separator />
