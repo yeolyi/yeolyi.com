@@ -42,17 +42,23 @@ const ogImageUrl = new URL(
   `/api/og/${encodeURIComponent(title)}`,
   Astro.url.origin,
 );
+
+const ogTitle = title === "" ? "링크 미리보기 생성기" : title;
+const ogDescription =
+  description === ""
+    ? "내맘대로 만드는 링크 미리보기 제목/설명/이미지"
+    : description;
 ---
 
 <BaseLayout
   lang="ko"
-  title={title}
-  description={description}
+  title={ogTitle}
+  description={ogDescription}
   opengraph={{ image: ogImageUrl.toString() }}
 >
   <div class="mx-auto flex max-w-2xl flex-col gap-8 px-6">
     <h1 class="text-2xl font-bold">
-      {lang === "ko" ? "미리보기 링크 생성기" : "Link Preview Generator"}
+      {lang === "ko" ? "링크 미리보기 생성기" : "Link Preview Generator"}
     </h1>
 
     <OgForm
