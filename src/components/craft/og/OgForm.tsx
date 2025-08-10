@@ -1,4 +1,10 @@
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +20,19 @@ interface OgFormProps {
   initialRedirectUrl?: string;
 }
 
+const getInitialPath = (url?: string) => {
+  if (!url) {
+    return "";
+  }
+  if (url.startsWith("https://")) {
+    return url.substring(8);
+  }
+  if (url.startsWith("http://")) {
+    return url.substring(7);
+  }
+  return url;
+};
+
 export default function OgForm({
   lang,
   initialTitle,
@@ -22,7 +41,10 @@ export default function OgForm({
 }: OgFormProps) {
   const [title, setTitle] = useState(initialTitle ?? "");
   const [description, setDescription] = useState(initialDescription ?? "");
-  const [redirectUrl, setRedirectUrl] = useState(initialRedirectUrl ?? "");
+  const [protocol, setProtocol] = useState<"http://" | "https://">(
+    initialRedirectUrl?.startsWith("http://") ? "http://" : "https://",
+  );
+  const [path, setPath] = useState(getInitialPath(initialRedirectUrl));
 
   const [previewTitle, setPreviewTitle] = useState(initialTitle ?? "");
   const debouncedSetPreviewTitle = useCallback(
@@ -52,6 +74,7 @@ export default function OgForm({
     e.preventDefault();
     setError(null);
     try {
+      const redirectUrl = path ? `${protocol}${path}` : "";
       const shortLink = await insertOgShortLink(
         title,
         description,
@@ -109,22 +132,44 @@ export default function OgForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">URL</Label>
-          <Input
-            id="redirectUrl"
-            name="redirectUrl"
-            type="url"
-            value={redirectUrl}
-            onChange={(e) => {
-              setRedirectUrl(e.target.value);
-              setGeneratedLink(null);
-            }}
-            placeholder={
-              lang === "ko"
-                ? "입력된 URL로 리다이렉트됩니다"
-                : "Redirect to the entered URL"
-            }
-          />
+          <Label htmlFor="redirectUrl">URL</Label>
+          <div className="flex">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">{protocol}</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setProtocol("https://");
+                    setGeneratedLink(null);
+                  }}
+                >
+                  https://
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setProtocol("http://");
+                    setGeneratedLink(null);
+                  }}
+                >
+                  http://
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Input
+              id="redirectUrl"
+              name="redirectUrl"
+              type="text"
+              value={path}
+              onChange={(e) => {
+                setPath(e.target.value);
+                setGeneratedLink(null);
+              }}
+              className="rounded-l-none"
+              placeholder="google.com"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-4 self-end">
