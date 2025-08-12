@@ -30,7 +30,7 @@ import { Image } from 'astro:assets';
 
 리액트 이전의 프론트엔드 개발은 DOM API를 사용해 직접 UI를 수정하는 방식이었습니다. 기억이 가물가물한 분을 위해 버튼을 누를 때마다 카운터가 올라가는 예제를 보여드릴게요:
 
-<Example />
+<Example client:idle />
 
 버튼을 누르면 아래 `increment`함수가 실행됩니다. 직접 HTML 요소에 접근해 내용물을 변경하는게 보이시나요?
 
@@ -50,7 +50,7 @@ function increment() {
 
 처음에는 단순하게 장바구니 버튼을 클릭하면 상품이 추가되는 기능만 있습니다.
 
-<SimpleCart lang="ko"/>
+<SimpleCart client:idle lang="ko"/>
 
 이후 기획이 변경되어 "이미 장바구니에 있는 상품을 다시 클릭하면 수량이 증가하고, 수량이 0이 되면 항목이 삭제되는" 기능이 추가되었다고 가정해봅시다. 이제 개발자는 기존에 만들어둔 장바구니 UI를 어떻게 업데이트할지 고민해야 합니다. 
 
@@ -87,7 +87,7 @@ function increment() {
 
 아래 컴포넌트를 DOM API로 구현한 것과 리액트로 구현한 것을 비교해보세요.
 
-<Compare lang="ko"/>
+<Compare client:idle lang="ko"/>
 
 DOM API를 사용하면 어떻게(HOW) 변경할지 단계별로 명령합니다.
 

@@ -29,7 +29,7 @@ While we naturally accepted and used React during our studies and job preparatio
 
 Frontend development before React involved directly modifying the UI using DOM APIs. For those whose memory is a bit fuzzy, let me show you an example of a counter that increases every time you press a button:
 
-<Example lang="en"/>
+<Example lang="en" client:idle />
 
 When you press the button, the `increment` function below is executed. Can you see how it directly accesses HTML elements and changes their content?
 
@@ -49,7 +49,7 @@ Looking at the code above, directly manipulating the DOM seems fine, but let's l
 
 Initially, there's just a simple feature where clicking the cart button adds a product.
 
-<SimpleCart lang="en"/>
+<SimpleCart client:idle lang="en"/>
 
 Later, the requirements change to add a feature where "clicking a product already in the cart increases its quantity, and items are deleted when quantity becomes 0." Now the developer needs to think about how to update the existing cart UI.
 
