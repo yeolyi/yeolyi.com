@@ -1,0 +1,125 @@
+---
+title: What are Lanes in React source code?
+order: 100
+category: hook
+isHidden: true
+---
+
+import Lane from "./components/Lane";
+
+리액트 19에서는 달라진 것 같다. 18로 보자.
+
+## getHighestPriorityLane
+
+```js
+export function getHighestPriorityLane(lanes: Lanes): Lane {
+  return lanes & -lanes;
+}
+```
+
+?????
+
+```js
+export type Lanes = number;
+```
+
+일단 Lanes는 숫자다.
+
+## bits & -bits
+
+`bits & -bits`는 가장 낮은 자리 비트를 찾는다. 왜?
+
+https://stackoverflow.com/a/16155417/30126918 를 참고하면 JS에서 이진수는 아래와 같이 출력할 수 있다.
+
+```js
+console.log(Number.toString(5)); // 101
+console.log(Number.toString(-5)); // -101 👎
+
+console.log((5 >>> 0).toString(2)); // 101
+console.log((-5 >>> 0).toString(2)); // 11111111111111111111111111111011 👍
+```
+
+> you can use the unsigned right shift bitwise operator (>>>) to coerce your number to an unsigned integer.
+
+2의 보수법에서 음수는 비트 반전 후 1을 더해서 구할 수 있음을 확인할 수 있다.
+
+따라서 `bits & -bits`는 가장 낮은 비트를 찾는다.
+
+```js
+console.log((12 >>> 0).toString(2)); // 1100
+console.log((-12 >>> 0).toString(2)); // 11111111111111111111111111110100
+console.log((12 & -12).toString(2)); // 100
+
+console.log((48 >>> 0).toString(2)); // 110000
+console.log((-48 >>> 0).toString(2)); // 11111111111111111111111111010000
+console.log((48 & -48).toString(2)); // 10000
+```
+
+**lanes는 lane 비트의 집합이고, 낮은 비트일수록 우선순위가 높다.** 복수형 s가 있냐 없냐를 신경써야할듯.
+
+## priority의 종류
+
+We have 3 priority systems
+
+- Scheduler priority - used to prioritize tasks in scheduler
+- Event priority - to mark priority of user event.
+- Lane priority - to mark priority of work. 
+
+지피티에게 물어봤다.
+
+1.	Lane Priority. React Fiber 전용의 비트마스크 기반 우선순위. 예: SyncLane, InputContinuousLane, DefaultLane…
+2.	Event Priority. 브라우저 이벤트 레벨에서의 추상 우선순위. 예: DiscreteEventPriority(클릭, 키보드), ContinuousEventPriority(마우스무브), DefaultEventPriority(렌더)…
+3.	Scheduler Priority. React 스케줄러 라이브러리에서 쓰는 숫자 기반 우선순위. 예: ImmediatePriority, UserBlockingPriority, NormalPriority…
+
+> Fiber는 자기 lane을 보고 “이게 SyncLane이네”라고 알지만, 스케줄러는 “SyncLane이 뭔데? 숫자로 줘.“라고 말합니다.
+
+
+
+## Demo 
+
+1 -> 10 -> 11 인줄 알았다...
+
+<Lane client:idle/>
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { startTransition, useRef, useState } from "react";
+
+export default function Lane() {
+  const [num, setNum] = useState(1);
+  const log = useRef<string[]>([]);
+  log.current.push(`rendering ${num}`);
+
+  return (
+    <div>
+      <Button
+        onClick={() => {
+          // 낮은 우선순위(transition)로 실행 — 사용자 입력을 블로킹하지 않음
+          startTransition(() => {
+            setNum((n) => {
+              log.current.push(`🐢 transition ${n} -> ${n + 1}`);
+              return n + 1;
+            });
+          });
+
+          // 보통/즉시성 높은 업데이트
+          setNum((n) => {
+            log.current.push(`🐇 normal ${n} -> ${n * 10}`);
+            return n * 10;
+          });
+        }}
+      >
+        click me ({num})
+      </Button>
+      <div>
+        {log.current.map((item, index) => (
+          <div key={index}>{item}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+```
+
+setState가 몇 번 호출될지 함부로 예측하지 말자. (특히 useTransition과 같은 concurrent render가 이루어질때.)
