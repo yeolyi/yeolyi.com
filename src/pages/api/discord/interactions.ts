@@ -56,7 +56,8 @@ function json(data: unknown, status = 200) {
 }
 
 function badRequest(message: string) {
-  return new Response(message, { status: 400 });
+  // Return an ephemeral interaction response instead of HTTP 400
+  return ephemeral(message);
 }
 
 function ephemeral(content: string, embeds?: any[]) {
@@ -89,11 +90,11 @@ async function discordFetch(path: string) {
 async function getRegisteredForumIdsForGuild(
   guildId: string,
 ): Promise<string[]> {
-  const { data, error } = await serverDb
+  const { data } = await serverDb
     .from("registered_forums")
     .select("channel_id")
-    .eq("guild_id", guildId);
-  if (error) throw error;
+    .eq("guild_id", guildId)
+    .throwOnError();
   return (data ?? []).map((r: any) => r.channel_id);
 }
 
@@ -107,20 +108,22 @@ async function upsertSubmission(payload: {
   messagePreview?: string;
   dueDateISO?: string;
 }) {
-  const { error } = await serverDb.from("submissions").upsert(
-    {
-      guild_id: payload.guildId,
-      forum_channel_id: payload.forumChannelId,
-      thread_id: payload.threadId,
-      user_id: payload.userId,
-      message_id: payload.messageId,
-      message_link: payload.messageLink,
-      message_preview: payload.messagePreview ?? null,
-      due_date: payload.dueDateISO ?? null,
-    },
-    { onConflict: "guild_id,forum_channel_id,thread_id,user_id" },
-  );
-  if (error) throw error;
+  await serverDb
+    .from("submissions")
+    .upsert(
+      {
+        guild_id: payload.guildId,
+        forum_channel_id: payload.forumChannelId,
+        thread_id: payload.threadId,
+        user_id: payload.userId,
+        message_id: payload.messageId,
+        message_link: payload.messageLink,
+        message_preview: payload.messagePreview ?? null,
+        due_date: payload.dueDateISO ?? null,
+      },
+      { onConflict: "guild_id,forum_channel_id,thread_id,user_id" },
+    )
+    .throwOnError();
 }
 
 function parseMessageLink(url: string) {
@@ -263,14 +266,18 @@ async function handleStudyStats(i: Interaction) {
     return ephemeral("요청 정보를 확인할 수 없습니다.");
 
   // Sum submissions by forum and overall
-  const { data, error } = await serverDb
-    .from("submissions")
-    .select("forum_channel_id, thread_id, due_date")
-    .eq("guild_id", i.guild_id)
-    .eq("user_id", targetUserId);
-
-  if (error)
-    return ephemeral("일시적인 저장소 오류입니다. 잠시 후 다시 시도해 주세요.");
+  let data: any[] | null = null;
+  try {
+    const res = await serverDb
+      .from("submissions")
+      .select("forum_channel_id, thread_id, due_date")
+      .eq("guild_id", i.guild_id)
+      .eq("user_id", targetUserId)
+      .throwOnError();
+    data = res.data;
+  } catch (e: any) {
+    return ephemeral(`저장소 오류: ${e?.message ?? "다시 시도해 주세요."}`);
+  }
 
   const total = data?.length ?? 0;
   const byForum: Record<string, number> = {};
@@ -319,94 +326,102 @@ async function handleStudyStats(i: Interaction) {
 async function handleStudyDashboard(i: Interaction) {
   if (!i.guild_id) return ephemeral("길드 정보를 확인할 수 없습니다.");
 
-  // My status
-  const userId = i.member?.user?.id ?? i.user?.id;
-  const { data: myRows } = await serverDb
-    .from("submissions")
-    .select("due_date")
-    .eq("guild_id", i.guild_id)
-    .eq("user_id", userId!);
-  const myTotal = myRows?.length ?? 0;
-  const recentMy = (myRows ?? [])
-    .filter((r: any) => r.due_date)
-    .map((r: any) => r.due_date as string)
-    .sort((a: string, b: string) => (a > b ? -1 : 1))
-    .slice(0, 6);
-
-  // Latest week overview: pick latest due across guild
-  const { data: allRows } = await serverDb
-    .from("submissions")
-    .select("due_date")
-    .eq("guild_id", i.guild_id)
-    .not("due_date", "is", null);
-
-  let latestDue: string | null = null;
-  if (allRows && allRows.length > 0) {
-    const dueList: string[] = (allRows as any[])
+  try {
+    // My status
+    const userId = i.member?.user?.id ?? i.user?.id;
+    const { data: myRows } = await serverDb
+      .from("submissions")
+      .select("due_date")
+      .eq("guild_id", i.guild_id)
+      .eq("user_id", userId!)
+      .throwOnError();
+    const myTotal = myRows?.length ?? 0;
+    const recentMy = (myRows ?? [])
+      .filter((r: any) => r.due_date)
       .map((r: any) => r.due_date as string)
-      .filter(Boolean);
-    latestDue =
-      [...new Set(dueList)].sort((a: string, b: string) =>
-        a > b ? -1 : 1,
-      )[0] ?? null;
-  }
+      .sort((a: string, b: string) => (a > b ? -1 : 1))
+      .slice(0, 6);
 
-  let latestCount = 0;
-  if (latestDue) {
-    const { count } = await serverDb
+    // Latest week overview: pick latest due across guild
+    const { data: allRows } = await serverDb
       .from("submissions")
-      .select("*", { count: "exact", head: true })
+      .select("due_date")
       .eq("guild_id", i.guild_id)
-      .eq("due_date", latestDue);
-    latestCount = count ?? 0;
+      .not("due_date", "is", null)
+      .throwOnError();
+
+    let latestDue: string | null = null;
+    if (allRows && allRows.length > 0) {
+      const dueList: string[] = (allRows as any[])
+        .map((r: any) => r.due_date as string)
+        .filter(Boolean);
+      latestDue =
+        [...new Set(dueList)].sort((a: string, b: string) =>
+          a > b ? -1 : 1,
+        )[0] ?? null;
+    }
+
+    let latestCount = 0;
+    if (latestDue) {
+      const { count } = await serverDb
+        .from("submissions")
+        .select("*", { count: "exact", head: true })
+        .eq("guild_id", i.guild_id)
+        .eq("due_date", latestDue)
+        .throwOnError();
+      latestCount = count ?? 0;
+    }
+
+    // Recent 4 weeks summary
+    const recentDueList = (
+      [
+        ...new Set(
+          ((allRows ?? []) as any[]).map((r: any) => r.due_date as string),
+        ),
+      ] as string[]
+    )
+      .filter(Boolean)
+      .sort((a: string, b: string) => (a > b ? -1 : 1))
+      .slice(0, 4);
+
+    const perWeekCounts: string[] = [];
+    for (const due of recentDueList) {
+      const { count } = await serverDb
+        .from("submissions")
+        .select("*", { count: "exact", head: true })
+        .eq("guild_id", i.guild_id)
+        .eq("due_date", due)
+        .throwOnError();
+      perWeekCounts.push(
+        `${dayjs(due as string).format("MM/DD")}: ${count ?? 0}`,
+      );
+    }
+
+    const embeds = [
+      {
+        title: "스터디 대시보드",
+        fields: [
+          {
+            name: "내 현황",
+            value: `총 ${myTotal}회, 최근 6주 중 ${recentMy.length}회`,
+          },
+          {
+            name: "이번 주 요약",
+            value: latestDue
+              ? `${dayjs(latestDue).format("MM/DD")}: ${latestCount}회`
+              : "데이터 없음",
+          },
+          {
+            name: "최근 주차",
+            value: perWeekCounts.join("  •  ") || "데이터 없음",
+          },
+        ],
+      },
+    ];
+    return ephemeral("대시보드", embeds);
+  } catch (e: any) {
+    return ephemeral(`저장소 오류: ${e?.message ?? "다시 시도해 주세요."}`);
   }
-
-  // Recent 4 weeks summary
-  const recentDueList = (
-    [
-      ...new Set(
-        ((allRows ?? []) as any[]).map((r: any) => r.due_date as string),
-      ),
-    ] as string[]
-  )
-    .filter(Boolean)
-    .sort((a: string, b: string) => (a > b ? -1 : 1))
-    .slice(0, 4);
-
-  const perWeekCounts: string[] = [];
-  for (const due of recentDueList) {
-    const { count } = await serverDb
-      .from("submissions")
-      .select("*", { count: "exact", head: true })
-      .eq("guild_id", i.guild_id)
-      .eq("due_date", due);
-    perWeekCounts.push(
-      `${dayjs(due as string).format("MM/DD")}: ${count ?? 0}`,
-    );
-  }
-
-  const embeds = [
-    {
-      title: "스터디 대시보드",
-      fields: [
-        {
-          name: "내 현황",
-          value: `총 ${myTotal}회, 최근 6주 중 ${recentMy.length}회`,
-        },
-        {
-          name: "이번 주 요약",
-          value: latestDue
-            ? `${dayjs(latestDue).format("MM/DD")}: ${latestCount}회`
-            : "데이터 없음",
-        },
-        {
-          name: "최근 주차",
-          value: perWeekCounts.join("  •  ") || "데이터 없음",
-        },
-      ],
-    },
-  ];
-  return ephemeral("대시보드", embeds);
 }
 
 async function handleForumRegister(i: Interaction) {
@@ -446,16 +461,21 @@ async function handleForumRegister(i: Interaction) {
   // Permission: admin or configured role. Minimal: require admin (=0x8 bit in permissions). For simplicity, trust Discord to restrict command via Permission, but also check member perms if sent.
   // Skipping deep permission checks due to interaction payload limitations in webhooks.
 
-  const { data, error } = await serverDb.from("registered_forums").upsert(
-    {
-      guild_id: i.guild_id,
-      channel_id: targetChannelId,
-      channel_name: targetChannelName ?? null,
-    },
-    { onConflict: "guild_id,channel_id" },
-  );
-  if (error)
-    return ephemeral("일시적인 저장소 오류입니다. 잠시 후 다시 시도해 주세요.");
+  try {
+    await serverDb
+      .from("registered_forums")
+      .upsert(
+        {
+          guild_id: i.guild_id,
+          channel_id: targetChannelId,
+          channel_name: targetChannelName ?? null,
+        },
+        { onConflict: "guild_id,channel_id" },
+      )
+      .throwOnError();
+  } catch (e: any) {
+    return ephemeral(`저장소 오류: ${e?.message ?? "다시 시도해 주세요."}`);
+  }
 
   return ephemeral("등록 완료", [
     {
@@ -467,13 +487,18 @@ async function handleForumRegister(i: Interaction) {
 
 async function handleForumList(i: Interaction) {
   if (!i.guild_id) return ephemeral("길드 정보를 확인할 수 없습니다.");
-  const { data, error } = await serverDb
-    .from("registered_forums")
-    .select("channel_id, channel_name")
-    .eq("guild_id", i.guild_id)
-    .order("channel_name", { ascending: true });
-  if (error)
-    return ephemeral("일시적인 저장소 오류입니다. 잠시 후 다시 시도해 주세요.");
+  let data: any[] | null = null;
+  try {
+    const res = await serverDb
+      .from("registered_forums")
+      .select("channel_id, channel_name")
+      .eq("guild_id", i.guild_id)
+      .order("channel_name", { ascending: true })
+      .throwOnError();
+    data = res.data;
+  } catch (e: any) {
+    return ephemeral(`저장소 오류: ${e?.message ?? "다시 시도해 주세요."}`);
+  }
 
   const lines = (data ?? []).map(
     (r: any) => `• <#${r.channel_id}> (${r.channel_name ?? ""})`,
@@ -493,7 +518,9 @@ function isStudyNamespace(name?: string) {
 
 export const POST: APIRoute = async ({ request }) => {
   if (!DISCORD_PUBLIC_KEY) {
-    return new Response("Missing public key", { status: 500 });
+    return ephemeral(
+      "서버 설정 오류: DISCORD_PUBLIC_KEY가 설정되지 않았습니다.",
+    );
   }
   const cloned = request.clone();
   const valid = await isValidRequest(
@@ -503,7 +530,12 @@ export const POST: APIRoute = async ({ request }) => {
   );
   if (!valid) return new Response("Invalid signature", { status: 401 });
   const rawBody = await cloned.text();
-  const interaction = JSON.parse(rawBody) as Interaction;
+  let interaction: Interaction;
+  try {
+    interaction = JSON.parse(rawBody) as Interaction;
+  } catch {
+    return ephemeral("요청 본문을 파싱하는 중 오류가 발생했습니다.");
+  }
 
   if (interaction.type === INTERACTION_TYPE_PING) {
     return json({ type: 1 });
