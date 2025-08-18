@@ -1,60 +1,29 @@
 ---
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
 export function getStaticPaths() {
   return [{ params: { lang: "ko" } }];
 }
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>dunnet.ts (browser port)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        font-family:
-          ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-          monospace;
-      }
-      .wrap {
-        display: grid;
-        grid-template-rows: 1fr auto;
-        height: 100%;
-      }
-      #dun-output {
-        padding: 12px;
-        white-space: pre-wrap;
-        overflow: auto;
-        border-bottom: 1px solid #ccc;
-      }
-      .input-row {
-        display: flex;
-        padding: 8px;
-        gap: 8px;
-      }
-      #dun-input {
-        flex: 1;
-        font: inherit;
-        padding: 6px 8px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <pre id="dun-output"></pre>
-      <div class="input-row">
-        <input
-          id="dun-input"
-          placeholder="Type commands here (e.g., help, look, n, take lamp) and press Enter"
-        />
-      </div>
+<BaseLayout lang="ko">
+  <div id="wrap" class="mx-auto flex max-w-xl flex-col gap-4">
+    <div
+      id="out"
+      class="border-border h-[50vh] overflow-y-auto border p-4 font-mono leading-normal"
+    >
     </div>
-    <script>
-      import { initDunnet } from "@/lib/dunnet/dunnet";
-      window.addEventListener("DOMContentLoaded", () => initDunnet());
-    </script>
-  </body>
-</html>
+    <div id="bar" class="flex gap-2">
+      <Input
+        id="cmd"
+        placeholder="영어 명령을 입력하세요. 예: help, look, take shovel, w..."
+      />
+      <Button id="send" type="button">입력</Button>
+    </div>
+  </div>
+  <script>
+    import "@/lib/dunnet/dunnet.ts";
+  </script>
+</BaseLayout>
