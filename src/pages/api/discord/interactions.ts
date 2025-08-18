@@ -420,8 +420,26 @@ async function handleForumRegister(i: Interaction) {
     return ephemeral("채널 정보를 가져올 수 없습니다.");
   }
 
-  // Forum channel types: 15 = Guild Forum, 34 = Media (treat as forum-like if desired). We'll require 15.
-  if (channel?.type !== 15) {
+  // If invoked from a thread, resolve its parent forum
+  // Thread types: 10/11/12
+  let targetChannelId: string = i.channel_id;
+  let targetChannelName: string | null = channel?.name ?? null;
+  if (channel?.type === 10 || channel?.type === 11 || channel?.type === 12) {
+    if (!channel?.parent_id) {
+      return ephemeral("현재 채널은 Forum 타입이 아닙니다.");
+    }
+    try {
+      const parent = await discordFetch(`/channels/${channel.parent_id}`);
+      if (parent?.type !== 15) {
+        return ephemeral("현재 채널은 Forum 타입이 아닙니다.");
+      }
+      targetChannelId = parent.id as string;
+      targetChannelName = parent.name as string;
+    } catch (e) {
+      return ephemeral("부모 포럼 정보를 가져올 수 없습니다.");
+    }
+  } else if (channel?.type !== 15) {
+    // Not a forum, not a thread
     return ephemeral("현재 채널은 Forum 타입이 아닙니다.");
   }
 
@@ -431,8 +449,8 @@ async function handleForumRegister(i: Interaction) {
   const { data, error } = await serverDb.from("registered_forums").upsert(
     {
       guild_id: i.guild_id,
-      channel_id: i.channel_id,
-      channel_name: channel?.name ?? null,
+      channel_id: targetChannelId,
+      channel_name: targetChannelName ?? null,
     },
     { onConflict: "guild_id,channel_id" },
   );
@@ -442,7 +460,7 @@ async function handleForumRegister(i: Interaction) {
   return ephemeral("등록 완료", [
     {
       title: "스터디 포럼 등록",
-      description: `<#${i.channel_id}> 가 등록되었습니다.`,
+      description: `<#${targetChannelId}> 가 등록되었습니다.`,
     },
   ]);
 }
