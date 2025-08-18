@@ -299,38 +299,75 @@ async function handleStudyDashboard(i: Interaction) {
 
     // 2) 각 포럼별 집계
     const lines: string[] = [];
+    const THREADS_PER_FORUM = 5;
     for (const f of forums) {
       const forumId = f.channel_id as string;
 
-      const [{ count: totalCount }, { count: myCount }, usersRes] =
-        await Promise.all([
-          serverDb
-            .from("submissions")
-            .select("*", { count: "exact", head: true })
-            .eq("guild_id", i.guild_id)
-            .eq("forum_channel_id", forumId)
-            .throwOnError(),
-          serverDb
-            .from("submissions")
-            .select("*", { count: "exact", head: true })
-            .eq("guild_id", i.guild_id)
-            .eq("forum_channel_id", forumId)
-            .eq("user_id", userId!)
-            .throwOnError(),
-          serverDb
-            .from("submissions")
-            .select("user_id")
-            .eq("guild_id", i.guild_id)
-            .eq("forum_channel_id", forumId)
-            .throwOnError(),
-        ]);
+      const [usersRes, myThreadRes] = await Promise.all([
+        serverDb
+          .from("submissions")
+          .select("user_id")
+          .eq("guild_id", i.guild_id)
+          .eq("forum_channel_id", forumId)
+          .throwOnError(),
+        serverDb
+          .from("submissions")
+          .select("thread_id")
+          .eq("guild_id", i.guild_id)
+          .eq("forum_channel_id", forumId)
+          .eq("user_id", userId!)
+          .throwOnError(),
+      ]);
 
       const participantCount = new Set(
         (usersRes.data ?? []).map((r: any) => r.user_id),
       ).size;
 
+      // 스레드별 제출 횟수 집계
+      const { data: threadRows } = await serverDb
+        .from("submissions")
+        .select("thread_id, due_date")
+        .eq("guild_id", i.guild_id)
+        .eq("forum_channel_id", forumId)
+        .throwOnError();
+
+      const countsByThread: Record<
+        string,
+        { total: number; latestDue?: string | null }
+      > = {};
+      for (const row of threadRows ?? []) {
+        const tid = (row as any).thread_id as string;
+        const due = (row as any).due_date as string | null | undefined;
+        if (!countsByThread[tid])
+          countsByThread[tid] = { total: 0, latestDue: null };
+        countsByThread[tid].total += 1;
+        if (
+          due &&
+          (!countsByThread[tid].latestDue ||
+            due > countsByThread[tid].latestDue!)
+        ) {
+          countsByThread[tid].latestDue = due;
+        }
+      }
+      const sortedThreads = Object.entries(countsByThread)
+        .sort((a, b) => {
+          const ad = a[1].latestDue ?? "";
+          const bd = b[1].latestDue ?? "";
+          return ad > bd ? -1 : ad < bd ? 1 : 0;
+        })
+        .slice(0, THREADS_PER_FORUM);
+      const myThreadIds = new Set(
+        (myThreadRes.data ?? []).map((r: any) => r.thread_id as string),
+      );
+      const threadLines = sortedThreads.map(([tid, info]) => {
+        const mine = myThreadIds.has(tid) ? "✅ " : "";
+        return `- ${mine}<#${tid}> ${info.total}개`;
+      });
+
       lines.push(
-        `(<#${forumId}>)\n- 참여자 ${participantCount}명\n- 내 제출 횟수 ${myCount ?? 0}회\n- 전체 제출 횟수 ${totalCount ?? 0}회`,
+        `📌 <#${forumId}>
+- 참여자 ${participantCount}명
+${threadLines.join("\n")}`,
       );
     }
 
