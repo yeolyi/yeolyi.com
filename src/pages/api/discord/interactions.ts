@@ -143,11 +143,12 @@ function parseMessageLink(url: string) {
 }
 
 function parseDueDateFromThreadName(name: string): string | null {
-  const m = name.match(/^\((\d{2})\/(\d{2})\)/);
+  const m = name.match(/^\((\d{1,2})\/(\d{1,2})\)/);
   if (!m) return null;
   const thisYear = dayjs().year();
   const month = Number(m[1]);
   const day = Number(m[2]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   const d = dayjs(
     `${thisYear}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
   );
@@ -234,7 +235,9 @@ async function handleStudyLog(i: Interaction) {
   // 5. parse due date from thread name
   const dueISO = parseDueDateFromThreadName(channel.name);
   if (!dueISO) {
-    return ephemeral("스레드 제목에 (MM/DD) 형태의 주차 정보가 필요합니다.");
+    return ephemeral(
+      "스레드 제목에 (M/D) 또는 (MM/DD) 형태의 주차 정보가 필요합니다.",
+    );
   }
 
   // Upsert submission
