@@ -276,165 +276,68 @@ async function handleStudyLog(i: Interaction) {
   return ephemeral("체크인 완료", embeds);
 }
 
-async function handleStudyStats(i: Interaction) {
-  const targetUserId =
-    i.data?.options?.find((o: any) => o.name === "user")?.value ??
-    i.member?.user?.id ??
-    i.user?.id;
-  if (!targetUserId || !i.guild_id)
-    return ephemeral("요청 정보를 확인할 수 없습니다.");
-
-  // Sum submissions by forum and overall
-  let data: any[] | null = null;
-  try {
-    const res = await serverDb
-      .from("submissions")
-      .select("forum_channel_id, thread_id, due_date")
-      .eq("guild_id", i.guild_id)
-      .eq("user_id", targetUserId)
-      .throwOnError();
-    data = res.data;
-  } catch (e: any) {
-    return ephemeral(`저장소 오류: ${e?.message ?? "다시 시도해 주세요."}`);
-  }
-
-  const total = data?.length ?? 0;
-  const byForum: Record<string, number> = {};
-  const byDue: { due: string; threadId: string }[] = [];
-  for (const row of data ?? []) {
-    const forum = row.forum_channel_id as string;
-    byForum[forum] = (byForum[forum] ?? 0) + 1;
-    if (row.due_date)
-      byDue.push({
-        due: row.due_date as string,
-        threadId: row.thread_id as string,
-      });
-  }
-
-  // recent N
-  const N = 6;
-  byDue.sort(
-    (
-      a: { due: string; threadId: string },
-      b: { due: string; threadId: string },
-    ) => (a.due > b.due ? -1 : 1),
-  );
-  const recent = byDue.slice(0, N);
-  const recentLine =
-    recent.map((r) => `${dayjs(r.due).format("MM/DD")}: ✅`).join("  •  ") ||
-    "기록 없음";
-
-  const forumSummary =
-    Object.entries(byForum)
-      .map(([forumId, count]) => `${count} × <#${forumId}>`)
-      .join("\n") || "-";
-
-  const embeds = [
-    {
-      title: "스터디 통계",
-      fields: [
-        { name: "총 체크인", value: String(total), inline: true },
-        { name: "최근 주차", value: recentLine },
-        { name: "포럼별", value: forumSummary },
-      ],
-    },
-  ];
-  return ephemeral("통계", embeds);
-}
+// removed: handleStudyStats
 
 async function handleStudyDashboard(i: Interaction) {
   if (!i.guild_id) return ephemeral("길드 정보를 확인할 수 없습니다.");
 
   try {
-    // My status
     const userId = i.member?.user?.id ?? i.user?.id;
-    const { data: myRows } = await serverDb
-      .from("submissions")
-      .select("due_date")
+    // 1) 등록된 포럼 목록
+    const { data: forums } = await serverDb
+      .from("registered_forums")
+      .select("channel_id, channel_name")
       .eq("guild_id", i.guild_id)
-      .eq("user_id", userId!)
-      .throwOnError();
-    const myTotal = myRows?.length ?? 0;
-    const recentMy = (myRows ?? [])
-      .filter((r: any) => r.due_date)
-      .map((r: any) => r.due_date as string)
-      .sort((a: string, b: string) => (a > b ? -1 : 1))
-      .slice(0, 6);
-
-    // Latest week overview: pick latest due across guild
-    const { data: allRows } = await serverDb
-      .from("submissions")
-      .select("due_date")
-      .eq("guild_id", i.guild_id)
-      .not("due_date", "is", null)
+      .order("channel_name", { ascending: true })
       .throwOnError();
 
-    let latestDue: string | null = null;
-    if (allRows && allRows.length > 0) {
-      const dueList: string[] = (allRows as any[])
-        .map((r: any) => r.due_date as string)
-        .filter(Boolean);
-      latestDue =
-        [...new Set(dueList)].sort((a: string, b: string) =>
-          a > b ? -1 : 1,
-        )[0] ?? null;
+    if (!forums || forums.length === 0) {
+      return ephemeral(
+        "등록된 스터디 포럼이 없습니다. 먼저 /study forum register로 등록해 주세요.",
+      );
     }
 
-    let latestCount = 0;
-    if (latestDue) {
-      const { count } = await serverDb
-        .from("submissions")
-        .select("*", { count: "exact", head: true })
-        .eq("guild_id", i.guild_id)
-        .eq("due_date", latestDue)
-        .throwOnError();
-      latestCount = count ?? 0;
-    }
+    // 2) 각 포럼별 집계
+    const lines: string[] = [];
+    for (const f of forums) {
+      const forumId = f.channel_id as string;
 
-    // Recent 4 weeks summary
-    const recentDueList = (
-      [
-        ...new Set(
-          ((allRows ?? []) as any[]).map((r: any) => r.due_date as string),
-        ),
-      ] as string[]
-    )
-      .filter(Boolean)
-      .sort((a: string, b: string) => (a > b ? -1 : 1))
-      .slice(0, 4);
+      const [{ count: totalCount }, { count: myCount }, usersRes] =
+        await Promise.all([
+          serverDb
+            .from("submissions")
+            .select("*", { count: "exact", head: true })
+            .eq("guild_id", i.guild_id)
+            .eq("forum_channel_id", forumId)
+            .throwOnError(),
+          serverDb
+            .from("submissions")
+            .select("*", { count: "exact", head: true })
+            .eq("guild_id", i.guild_id)
+            .eq("forum_channel_id", forumId)
+            .eq("user_id", userId!)
+            .throwOnError(),
+          serverDb
+            .from("submissions")
+            .select("user_id")
+            .eq("guild_id", i.guild_id)
+            .eq("forum_channel_id", forumId)
+            .throwOnError(),
+        ]);
 
-    const perWeekCounts: string[] = [];
-    for (const due of recentDueList) {
-      const { count } = await serverDb
-        .from("submissions")
-        .select("*", { count: "exact", head: true })
-        .eq("guild_id", i.guild_id)
-        .eq("due_date", due)
-        .throwOnError();
-      perWeekCounts.push(
-        `${dayjs(due as string).format("MM/DD")}: ${count ?? 0}`,
+      const participantCount = new Set(
+        (usersRes.data ?? []).map((r: any) => r.user_id),
+      ).size;
+
+      lines.push(
+        `(<#${forumId}>)\n- 참여자 ${participantCount}명\n- 내 제출 횟수 ${myCount ?? 0}회\n- 전체 제출 횟수 ${totalCount ?? 0}회`,
       );
     }
 
     const embeds = [
       {
         title: "스터디 대시보드",
-        fields: [
-          {
-            name: "내 현황",
-            value: `총 ${myTotal}회, 최근 6주 중 ${recentMy.length}회`,
-          },
-          {
-            name: "이번 주 요약",
-            value: latestDue
-              ? `${dayjs(latestDue).format("MM/DD")}: ${latestCount}회`
-              : "데이터 없음",
-          },
-          {
-            name: "최근 주차",
-            value: perWeekCounts.join("  •  ") || "데이터 없음",
-          },
-        ],
+        description: lines.join("\n\n"),
       },
     ];
     return ephemeral("대시보드", embeds);
@@ -579,9 +482,6 @@ export const POST: APIRoute = async ({ request }) => {
           // normalize options
           interaction.data = { ...sub };
           return await handleStudyLog(interaction);
-        case "stats":
-          interaction.data = { ...sub };
-          return await handleStudyStats(interaction);
         case "dashboard":
           interaction.data = { ...sub };
           return await handleStudyDashboard(interaction);
