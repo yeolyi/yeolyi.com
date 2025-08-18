@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -190,6 +190,63 @@ export type Database = {
         }
         Relationships: []
       }
+      registered_forums: {
+        Row: {
+          channel_id: string
+          channel_name: string | null
+          created_at: string
+          guild_id: string
+        }
+        Insert: {
+          channel_id: string
+          channel_name?: string | null
+          created_at?: string
+          guild_id: string
+        }
+        Update: {
+          channel_id?: string
+          channel_name?: string | null
+          created_at?: string
+          guild_id?: string
+        }
+        Relationships: []
+      }
+      submissions: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          forum_channel_id: string
+          guild_id: string
+          message_id: string
+          message_link: string
+          message_preview: string | null
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          forum_channel_id: string
+          guild_id: string
+          message_id: string
+          message_link: string
+          message_preview?: string | null
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          forum_channel_id?: string
+          guild_id?: string
+          message_id?: string
+          message_link?: string
+          message_preview?: string | null
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -232,7 +289,7 @@ export type Database = {
     }
     Functions: {
       add_emoji_reaction: {
-        Args: { p_post_id: string; p_emoji: string; p_user_id: string }
+        Args: { p_emoji: string; p_post_id: string; p_user_id: string }
         Returns: boolean
       }
       binary_quantize: {
@@ -242,31 +299,31 @@ export type Database = {
       get_comments_with_developer_number: {
         Args: { post_id_param: string }
         Returns: {
-          id: string
-          created_at: string
-          content: string
-          github_id: string
-          developernumber: number
           author_id: string
+          content: string
+          created_at: string
+          developernumber: number
+          github_id: string
+          id: string
         }[]
       }
       get_emoji_counts: {
         Args: { p_post_id: string; p_user_id: string }
         Returns: {
-          emoji: string
           count: number
+          emoji: string
           user_reacted: boolean
         }[]
       }
       get_random_memes: {
         Args: { p_count: number }
         Returns: {
+          height: number
+          hidden: boolean
           id: string
           media_url: string
           title: string
           width: number
-          height: number
-          hidden: boolean
         }[]
       }
       get_subscriber_count: {
@@ -311,30 +368,30 @@ export type Database = {
       }
       insert_og_short_link: {
         Args:
-          | { _title: string; _description: string; _max_attempts?: number }
           | {
-              _title: string
               _description: string
-              _redirect_url: string
               _max_attempts?: number
+              _redirect_url: string
+              _title: string
             }
+          | { _description: string; _max_attempts?: number; _title: string }
         Returns: string
       }
       insert_og_short_link_v2: {
         Args: {
-          _title: string
           _description: string
-          _redirect_url: string
           _max_attempts?: number
+          _redirect_url: string
+          _title: string
         }
         Returns: string
       }
       insert_short_link: {
         Args: {
-          _title: string
           _description: string
-          _redirect_url: string
           _max_attempts?: number
+          _redirect_url: string
+          _title: string
         }
         Returns: string
       }
@@ -369,21 +426,21 @@ export type Database = {
       match_similar_meme: {
         Args:
           | {
-              query_embedding: string
-              match_threshold: number
               match_count: number
+              match_threshold: number
+              query_embedding: string
             }
           | {
-              query_embedding: string
-              match_threshold: number
               match_count: number
+              match_threshold: number
+              query_embedding: string
               query_id: string
             }
-          | { query_id: string; match_threshold: number; match_count: number }
+          | { match_count: number; match_threshold: number; query_id: string }
         Returns: {
+          distance: number
           id: string
           media_url: string
-          distance: number
         }[]
       }
       sparsevec_out: {
@@ -399,7 +456,7 @@ export type Database = {
         Returns: number
       }
       toggle_emoji_reaction: {
-        Args: { p_post_id: string; p_emoji: string }
+        Args: { p_emoji: string; p_post_id: string }
         Returns: boolean
       }
       vector_avg: {
