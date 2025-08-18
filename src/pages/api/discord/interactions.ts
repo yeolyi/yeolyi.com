@@ -154,6 +154,22 @@ function parseDueDateFromThreadName(name: string): string | null {
   return d.toISOString();
 }
 
+function isGuildAdmin(i: Interaction): boolean {
+  const member: any = (i as any).member;
+  if (!member) return false;
+  const permsStr: string | undefined = member.permissions;
+  let isAdmin = false;
+  try {
+    if (permsStr) {
+      const ADMIN = 0x8n; // ADMINISTRATOR bit
+      isAdmin = (BigInt(permsStr) & ADMIN) === ADMIN;
+    }
+  } catch {
+    isAdmin = false;
+  }
+  return isAdmin;
+}
+
 async function handleStudyLog(i: Interaction) {
   const options = i.data?.options ?? [];
   const link = options.find((o: any) => o.name === "link")?.value as
@@ -428,6 +444,11 @@ async function handleForumRegister(i: Interaction) {
   // Validate channel type via Discord API
   if (!i.channel_id || !i.guild_id)
     return ephemeral("길드/채널 정보를 확인할 수 없습니다.");
+
+  // Permission check: admin only
+  if (!isGuildAdmin(i)) {
+    return ephemeral("이 명령은 관리자만 실행할 수 있습니다.");
+  }
   let channel: any;
   try {
     channel = await discordFetch(`/channels/${i.channel_id}`);
