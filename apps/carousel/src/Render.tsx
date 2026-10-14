@@ -1,6 +1,5 @@
-// 헤드리스 크롬이 찍는 렌더 화면. 모든 장을 세로로 늘어놓고, 폰트·이미지·코드 레이어가 다 뜨면 window.__ready 를 켠다.
-//   /render-local/<폴더>  dev 전용. decks/<폴더>/deck.json 을 그린다(pnpm export).
-//   /render              서버(/api/render)가 window.__RENDER__ 로 덱과 이미지 서명 URL 을 넣어 준다. 스스로는 아무것도 읽지 않는다.
+// dev 전용: decks/<폴더>/deck.json 을 그대로 그린다(pnpm export 가 헤드리스 크롬으로 찍는다).
+// 모든 장을 세로로 늘어놓고, 폰트·이미지·코드 레이어가 다 뜨면 window.__ready 를 켠다.
 // window.__layout() 은 장마다 레이어 상자(캔버스 px)를 돌려준다. 에이전트가 배치를 짐작하지 않고 재게 하려는 것.
 import { domToJpeg } from "modern-screenshot";
 import { useEffect, useState } from "react";
@@ -65,13 +64,4 @@ export function RenderLocal({ folder }: { folder: string }) {
 			.then((raw) => setDeck(normalizeDeck(raw)));
 	}, [folder]);
 	return deck && <RenderDeck deck={deck} slug={folder} resolve={localResolve} />;
-}
-
-type Injected = { id: string; deck: unknown; urls: Record<string, string> };
-
-export function RenderInjected() {
-	const data = (window as any).__RENDER__ as Injected | undefined;
-	if (!data) return null;
-	const deck = normalizeDeck(data.deck);
-	return <RenderDeck deck={deck} slug={data.id} resolve={(_, src) => data.urls[src] ?? ""} />;
 }

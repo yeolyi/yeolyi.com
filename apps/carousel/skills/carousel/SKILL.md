@@ -5,37 +5,33 @@ description: carousel.yeolyi.com(인스타 캐러셀 편집기)의 내 덱을 �
 
 # carousel 덱 다루기
 
-덱은 1080×1350 슬라이드 여러 장을 담은 JSON 이다. 이 폴더의 `carousel.mjs` 로 받고 올린다. 올리면 사용자가 열어 둔 편집기에 바로 반영된다.
+덱은 1080×1350 슬라이드 여러 장을 담은 JSON 이다. **편집기 주인의 맥에서만 쓴다**(외부에 여는 AI 연결은 없다). 이 레포의 `apps/carousel` 에서 로컬 사본을 받아 고치고 올린다. 올리면 열어 둔 편집기에 바로 반영된다.
 
 ```sh
-node carousel.mjs list                 # 내 덱 목록: id, 장 수, 수정 시각, 제목
-node carousel.mjs get <id> deck.json   # 받기
-node carousel.mjs put deck.json        # 고친 것 올리기
-node carousel.mjs new deck.json        # 새 덱으로 올리기
-node carousel.mjs upload <id> a.png b.jpg   # 이미지 올리기 → {src, nw, nh} 를 줄마다 출력
-node carousel.mjs render <id> [폴더] [--slides 1,3] [--scale 0.5]   # 결과를 JPEG·layout.json 으로 받기
-node carousel.mjs assets <id> [--unused] [--delete]                 # 올라간 이미지 목록·안 쓰는 것 지우기
+pnpm pull                    # 내 덱 전부 → decks/<폴더>/deck.json + assets/
+pnpm export <폴더>           # 로컬 사본을 찍어 decks/<폴더>/export/ 에 JPEG·layout.json, 배치 경고 출력
+pnpm push <폴더> [--force]   # 고친 사본 올리기(새 이미지도 같이). deck.json 에 id 가 없으면 새 덱
 ```
 
-토큰이 없다고 나오면 사용자에게 웹앱 홈의 **AI 연결**에서 토큰을 발급해 `CAROUSEL_TOKEN` 환경 변수나 `~/.config/carousel/token` 파일에 넣어 달라고 한다.
+`.env.local` 의 `SUPABASE_PROJECT_REF`·`CAROUSEL_OWNER_ID` 와 Supabase CLI 로그인이 필요하다.
 
 ## 작업 순서
 
-1. `list` 로 덱을 찾고 `get` 으로 받는다. 새로 만들 땐 아래 형식으로 파일을 쓴다.
+1. `pnpm pull` 로 받는다. 새로 만들 땐 `decks/<새 폴더>/deck.json` 을 아래 형식으로 쓴다.
 2. JSON 을 고친다. `id`·`updated_at` 은 건드리지 않는다.
-3. 새 이미지가 필요하면 **먼저** `upload` 로 올리고 나온 `src`·`nw`·`nh` 를 이미지 레이어에 쓴다. 버킷에 없는 `src` 가 든 덱은 `put` 이 거절한다.
-4. `put` 으로 올린다. "다른 곳에서 바뀌었어요"가 나오면 사용자가 그사이 편집기에서 고친 것이다. 다시 `get` 해서 그 위에 고친다(덮어쓰지 않는다).
-5. `render` 로 결과를 받아 직접 본다(JPEG 을 이미지로 읽는다). `layout.json` 의 상자로 겹침·여백을 재고, 경고(워터마크 자리 침범, 오른쪽 여백 넘침, 글과 그림 겹침)가 있으면 고친다.
+3. 새 이미지는 `decks/<폴더>/assets/` 에 복사하고 `src` 에 `assets/<파일>` 과 원본 크기 `nw`·`nh` 를 적는다. 한글 파일 이름은 push 가 ASCII 로 바꿔 올린다.
+4. `pnpm export <폴더>` 로 결과를 직접 본다(JPEG 을 이미지로 읽는다). `layout.json` 의 상자로 겹침·여백을 재고, 경고(워터마크 자리 침범, 오른쪽 여백 넘침, 글과 그림 겹침)가 있으면 고친다.
+5. `pnpm push <폴더>`. "앱에서 바뀌었어요"로 거절되면 사용자가 그사이 편집기에서 고친 것이다. 다시 pull 해서 그 위에 고친다(`--force` 로 덮어쓰지 않는다).
 6. 사용자에게 무엇을 바꿨는지 알리고, 마지막 판단은 편집기에서 해 달라고 한다.
 
 ## 형식
 
 ```jsonc
 {
-  "id": "…", "updated_at": "…",       // get 이 채운다
+  "id": "…", "updated_at": "…",       // pull 이 채운다
   "title": "버스앱 리뷰 2편",           // 내보낸 파일 이름이 된다
   "caption": "게시물 본문\n\n#해시태그", // 인스타 게시물 글
-  "watermark": "@아이디",               // 읽기 전용(계정 설정). 고쳐도 반영 안 됨
+  "watermark": "@아이디",               // 읽기 전용(계정 설정). push 는 무시한다
   "slides": [                          // 장 순서대로
     {
       "layers": [                      // 앞에 있을수록 뒤에 깔린다
@@ -62,12 +58,11 @@ node carousel.mjs assets <id> [--unused] [--delete]                 # 올라간 
   - 강조는 `**굵게**`, `==빨강==`, `__밑줄__`. 빨강은 핵심 한두 곳에만 쓴다. `||블러||` 는 글자를 흐리게 가린다(스포일러·민감한 말).
   - 편집기의 배치 기준: 왼쪽 x=80, 오른쪽은 오른쪽 끝이 1000, 가운데는 중심이 540.
 - 이미지
-  - 새 이미지는 `upload` 로 올린다. 이름은 내용 해시(`assets/<16자>.png`)라 같은 파일은 다시 올라가지 않고, 내용을 바꾸면 이름도 바뀐다. PNG·JPEG·WebP·GIF, 20MB 까지.
+  - 새 이미지는 `assets/` 에 넣고 push 가 올린다. `nw`·`nh` 는 `sips -g pixelWidth -g pixelHeight <파일>` 로 잰다.
   - 옮기기(`x`·`y`), 크기(`w`·`h`, 비율 유지는 `h = w × (crop.h × nh) ÷ (crop.w × nw)`), 자르기(`crop`: 원본 대비 0~1 비율), 다른 장에 다시 쓰기는 JSON 만 고치면 된다.
   - 투명 PNG 는 장 바탕(흰색) 위에 그려진다.
-  - 덱에서 뺀 이미지는 버킷에 남는다. 정리는 `assets <id> --delete`(쓰는 중인 파일은 지우지 않는다).
-- 확인(`render`)
-  - 앱 서버가 편집기와 같은 렌더러로 찍는다. 기본은 절반 크기(540×675), `--scale 1` 이면 원본 크기. 한 번에 받는 양이 많으면 `--slides` 로 나눈다.
-  - `layout.json` 의 `layout[].boxes` 는 장마다 레이어 상자(캔버스 px, `id`·`type`·`x`·`y`·`w`·`h`)다. 텍스트 높이·폭을 짐작하지 말고 여기서 읽는다.
-  - 기기 화면 캡처에 프레임을 씌우려면 `device-frame` 스킬(같은 레포)이나 https://carousel.yeolyi.com/frame 을 쓴다.
+- 확인(`pnpm export`)
+  - 편집기와 같은 렌더러를 헤드리스 크롬으로 찍는다(원본 크기 1080×1350). 앱의 "JPEG 내보내기"와 픽셀 단위로 같다.
+  - `layout.json` 은 장마다 레이어 상자(`index`, `boxes`: 캔버스 px 의 `id`·`type`·`x`·`y`·`w`·`h`)다. 텍스트 높이·폭을 짐작하지 말고 여기서 읽는다.
+  - 기기 화면 캡처에 프레임을 씌우려면 `device-frame` 스킬이나 https://carousel.yeolyi.com/frame 을 쓴다.
 - 레이어에 `id` 가 있으면 그대로 둔다. 새 레이어엔 안 적어도 된다.

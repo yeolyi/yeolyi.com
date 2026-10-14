@@ -14,8 +14,9 @@ const addr = server.httpServer?.address();
 const base = `http://localhost:${typeof addr === "object" && addr ? addr.port : 0}`;
 try {
 	for (const f of folders) {
-		const { dir, files } = await exportLocal(base, f);
-		console.log(`${f}: ${files.length}장 → ${dir}`);
+		const { dir, files, warnings } = await exportLocal(base, f);
+		console.log(`${f}: ${files.length}장 → ${dir} (layout.json 에 레이어 상자)`);
+		for (const w of warnings) console.log(`  경고: ${w}`);
 	}
 } finally {
 	await server.close();

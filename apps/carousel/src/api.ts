@@ -68,15 +68,6 @@ export const api = {
 		if (paths.length) check(await supabase.storage.from(BUCKET).remove(paths));
 		check(await supabase.from("decks").delete().eq("id", id));
 	},
-	duplicate: async (id: string) => {
-		const deck = await api.get(id);
-		const { slug } = await api.create(`${deck.title} 사본`);
-		for (const from of await listAssets(id)) {
-			check(await supabase.storage.from(BUCKET).copy(from, from.replace(`${id}/`, `${slug}/`)));
-		}
-		await api.put(slug, { ...deck, title: `${deck.title} 사본` });
-		return { slug };
-	},
 	// 다른 덱의 이미지를 이 덱으로 복사(레이어 붙여넣기). 이미 있으면 그대로 둔다.
 	copyAsset: async (fromDeck: string, toDeck: string, src: string) => {
 		const { error } = await supabase.storage.from(BUCKET).copy(assetPath(fromDeck, src), assetPath(toDeck, src));

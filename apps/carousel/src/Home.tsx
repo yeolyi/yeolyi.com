@@ -3,9 +3,8 @@ import Button from "@yeolyi/ui/Button";
 import IconButton from "@yeolyi/ui/IconButton";
 import ServiceHeader from "@yeolyi/ui/ServiceHeader";
 import Input from "@yeolyi/ui/Input";
-import { Copy, LogOut, Plus, Trash2 } from "lucide-react";
+import { LogOut, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useId, useState } from "react";
-import { AiCard } from "./AiAccess";
 import { api, type DeckEntry } from "./api";
 import { navigate } from "./App";
 import { signOut } from "./Auth";
@@ -49,7 +48,7 @@ export function Home() {
 				name="Carousel"
 				className="border-b px-4 py-1"
 				nav={[
-					{ label: "덱", href: "/", current: true },
+					{ label: "캐러셀", href: "/", current: true },
 					{ label: "프레임", href: "/frame" },
 				]}
 			>
@@ -90,15 +89,6 @@ export function Home() {
 							<div className="mt-3 flex flex-wrap gap-2">
 								<Button
 									onClick={async () => {
-										await api.duplicate(slug);
-										load();
-									}}
-								>
-									<Copy {...ic} />
-									복제
-								</Button>
-								<Button
-									onClick={async () => {
 										if (!confirm(`'${deck.title}'을 지우겠습니까? 이미지까지 지워지며 되돌릴 수 없습니다.`)) return;
 										await api.remove(slug);
 										load();
@@ -112,7 +102,6 @@ export function Home() {
 					);
 				})}
 				{/* 덱이 다 뜬 뒤 맨 끝에 */}
-				{decks && <AiCard />}
 			</main>
 		</div>
 	);
@@ -142,7 +131,7 @@ function WatermarkSetting({ onSaved }: { onSaved: () => void }) {
 				워터마크
 			</label>
 			<p id={`${id}-desc`} className="text-muted-foreground leading-[1.4]">
-				{value === saved ? "모든 덱의 장 아래에 들어갑니다." : "Enter 를 누르면 저장합니다."}
+				{value === saved ? "모든 캐러셀의 장 아래에 들어갑니다." : "Enter 를 누르면 저장합니다."}
 			</p>
 			<Input
 				id={id}

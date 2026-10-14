@@ -2,15 +2,16 @@
 # requires-python = ">=3.10"
 # dependencies = ["pillow"]
 # ///
-"""스크린샷에 기기 프레임(아이폰·아이패드)을 씌운다. 결과는 프레임 바깥이 투명한 PNG.
+"""스크린샷에 기기 프레임(아이폰·아이패드·워치·맥북·아이맥)을 씌운다. 결과는 프레임 바깥이 투명한 PNG.
 
 uv run skills/device-frame/frame.py <스크린샷...> -o <출력 폴더> [옵션]
 
-  --device iphone|ipad          프레임. 안 주면 스크린샷 비율로 고른다(세로/가로 0.46 근처 아이폰, 0.69 근처 아이패드).
+  --device iphone|ipad|watch|macbook|imac
+                                프레임. 안 주면 방향·폭·비율로 고른다(frames.json 의 auto, 웹 /frame 과 같은 규칙).
   --highlight 파일이름:x,y,w,h   해당 스크린샷의 (스크린샷 픽셀 기준) 영역에 빨간 테두리를 그린다. 여러 번 줄 수 있다.
   --keep-dupes                  거의 같은 스크린샷도 모두 만든다(기본은 앞의 것만 남기고 알려 준다).
 
-화면 자리와 비율이 다르면 너비에 맞추고 위를 기준으로 자른다.
+화면 자리와 비율이 다르면 빈틈없이 채우고 넘치는 쪽을 자른다(위아래는 위 기준, 좌우는 가운데 기준).
 """
 
 import argparse
@@ -24,10 +25,8 @@ from PIL import Image, ImageChops, ImageDraw, ImageStat
 HERE = Path(__file__).resolve().parent
 # 기기별 프레임 PNG 와 화면 자리(투명 구멍). 웹의 /frame 도 같은 파일을 읽는다.
 # 프레임 PNG 를 바꾸면 화면 자리를 다시 재야 한다(아래 measure_hole 이 확인한다).
-DEVICES = {
-    name: (HERE / d["file"], tuple(d["screen"]))
-    for name, d in json.loads((HERE / "frames.json").read_text()).items()
-}
+FRAMES = json.loads((HERE / "frames.json").read_text())
+DEVICES = {name: (HERE / d["file"], tuple(d["screen"])) for name, d in FRAMES.items()}
 RED = (0xEE, 0x22, 0x0C, 255)
 
 
@@ -38,8 +37,22 @@ def measure_hole(frame: Image.Image):
 
 
 def pick_device(shot: Image.Image) -> str:
+    """웹 /frame 과 같은 규칙: 방향이 같고 frames.json 의 auto 조건(폭·비율 허용치)을 지키는 기기 중 비율이 가장 가까운 것.
+    맞는 게 없으면(웹은 브라우저 창으로 보낸다) 비율이 가장 가까운 기기."""
     ratio = shot.width / shot.height
-    return min(DEVICES, key=lambda d: abs(ratio - _screen_ratio(d)))
+
+    def ok(name):
+        a = FRAMES[name].get("auto", {})
+        sr = _screen_ratio(name)
+        return (
+            (sr > 1) == (ratio > 1)
+            and shot.width >= a.get("minWidth", 0)
+            and shot.width <= a.get("maxWidth", float("inf"))
+            and ("tolerance" not in a or abs(ratio / sr - 1) <= a["tolerance"])
+        )
+
+    near = lambda d: abs(ratio - _screen_ratio(d))
+    return min([d for d in DEVICES if ok(d)] or DEVICES, key=near)
 
 
 def _screen_ratio(device: str) -> float:
@@ -57,16 +70,17 @@ def near_same(a: Image.Image, b: Image.Image) -> bool:
 
 
 def frame_one(shot: Image.Image, frame: Image.Image, screen_box, highlights) -> Image.Image:
+    # 화면 자리를 빈틈없이 채우고 넘치는 쪽을 자른다(위아래는 위 기준, 좌우는 가운데 기준). 웹 /frame 과 같다.
     l, t, r, b = screen_box
     w, h = r - l, b - t
-    scale = w / shot.width
-    screen = shot.convert("RGBA").resize((w, round(shot.height * scale)), Image.LANCZOS)
-    if screen.height > h:
-        screen = screen.crop((0, 0, w, h))
+    scale = max(w / shot.width, h / shot.height)
+    full = shot.convert("RGBA").resize((round(shot.width * scale), round(shot.height * scale)), Image.LANCZOS)
+    ox = (full.width - w) // 2
+    screen = full.crop((ox, 0, ox + w, h))
     if highlights:
         d = ImageDraw.Draw(screen)
         for x, y, hw, hh in highlights:
-            box = [x * scale, y * scale, (x + hw) * scale, (y + hh) * scale]
+            box = [x * scale - ox, y * scale, (x + hw) * scale - ox, (y + hh) * scale]
             d.rounded_rectangle(box, radius=min(hw, hh) * scale / 2, outline=RED, width=max(10, round(18 * scale)))
     out = Image.new("RGBA", frame.size, (0, 0, 0, 0))
     out.alpha_composite(screen, (l, t))

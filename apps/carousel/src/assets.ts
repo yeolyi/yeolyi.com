@@ -1,5 +1,5 @@
 // 이미지 URL. 앱에서는 비공개 버킷의 서명 URL(하루짜리)을 모아서 받아 오고,
-// 렌더 화면(로컬 pnpm export·서버 /api/render)에서는 AssetResolver 가 주소를 정한다.
+// 렌더 화면(로컬 pnpm export)에서는 AssetResolver 가 주소를 정한다.
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
 import { assetPath, BUCKET, supabase } from "./supabase";
 

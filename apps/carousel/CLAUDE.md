@@ -7,8 +7,9 @@
 - 원본은 Supabase **블로그와 같이 쓰는 프로젝트(`.env.local` 의 `SUPABASE_PROJECT_REF`)의 `carousel` 스키마**(`decks` 테이블)와 비공개 Storage 버킷 `carousel`(`<deck id>/assets/...`)이다. 무료 플랜 프로젝트 수 제한 때문에 블로그 DB 에 같이 산다. **`public`·`redblue` 등 블로그 쪽은 건드리지 말 것.**
 - 로그인은 블로그와 같은 Supabase 인증(카카오·구글·GitHub). 누구나 가입하고, RLS 가 `owner_id = auth.uid()` 로 자기 덱만 보게 한다. 워터마크는 계정별(`carousel.profiles`). 스키마·정책은 `supabase/sql/` 에 있고 `supabase db query --linked --project-ref <ref> -f <파일>` 로 적용한다(블로그 레포가 마이그레이션 이력을 관리하므로 `db push` 금지). 파일의 `<OWNER_USER_ID>` 같은 자리표시는 바꿔서 넣는다.
 - 컨텐츠를 읽고 고칠 때(내 덱만, `CAROUSEL_OWNER_ID`): `pnpm pull` → `decks/<폴더>/deck.json` 을 고친다 → `pnpm push <폴더>`. 열린 편집기는 realtime 으로 바로 받는다(실행 취소 한 칸). pull 뒤 앱에서 바뀌었으면 push 가 거절한다.
-- **다른 사람의 AI 접근**: 홈 "AI 연결"에서 개인 토큰을 발급하고(해시만 저장, 폐기 가능), `skills/carousel/`(SKILL.md + 설치 없는 `carousel.mjs`)가 PostgREST RPC `carousel.api_list·api_get·api_save` 를 anon 키 + 토큰으로 부른다. 함수가 토큰으로 사용자를 찾아 그 사람 덱만 다룬다. JSON 만이고 이미지는 다루지 않는다. 함수 오류 코드는 `PTxxx`(PostgREST 가 그대로 HTTP 상태로 바꾼다). `40001` 같은 표준 코드를 쓰면 PostgREST 가 재시도하다 멈춘다.
-- 결과 확인: `pnpm export <폴더>` 가 로컬 사본을 헤드리스 크롬으로 찍는다. 앱의 "JPEG 내보내기"(브라우저 안, modern-screenshot)와 픽셀 단위로 같음을 확인해 두었다.
+- **AI 는 편집기 주인의 맥에서만 쓴다.** 외부 사람에게 여는 AI 연결(개인 토큰 RPC)·서버 렌더는 없앴다(부작용이 커서, 2026-10). 덱은 위 pull/push 로 다루고, 방법은 `skills/carousel/SKILL.md`(이 폴더의 `.claude/skills` 가 가리킨다). 서비스 자체는 브라우저에서만 쓴다.
+- **기기 프레임**: 브라우저 `/frame`(로그인 없이, 한 장씩)과 로컬 스킬 `skills/device-frame/frame.py` 둘 다 지원한다. 기기 목록·화면 자리는 `frames.json` 하나를 같이 읽는다.
+- 결과 확인: `pnpm export <폴더>` 가 로컬 사본을 헤드리스 크롬으로 찍고, 장마다 레이어 상자(`export/layout.json`)와 배치 경고(워터마크 자리·오른쪽 여백·글과 그림 겹침)를 낸다. 앱의 "JPEG 내보내기"(브라우저 안, modern-screenshot)와 픽셀 단위로 같음을 확인해 두었다.
 
 ```jsonc
 {
@@ -44,7 +45,7 @@
 ## 명령
 
 - `pnpm pull` / `pnpm push <폴더> [--force]` → Supabase 와 로컬 사본 맞추기(Supabase CLI 로그인 필요).
-- `pnpm export <폴더>` → `decks/<폴더>/export/*.jpeg`.
+- `pnpm export <폴더>` → `decks/<폴더>/export/*.jpeg` + `layout.json`, 경고는 터미널에.
 - `scripts/test-login.sh <돌아올 주소>` → 편집자 계정 1회 로그인 링크. 로그인한 화면을 Playwright 로 볼 때 쓴다. 돌아올 주소는 경로까지 줘야 허용 목록(`/**`)에 맞는다.
 - 배포: main 에 푸시하면 Vercel 이 한다(루트 CLAUDE.md). env 는 `PUBLIC_SUPABASE_URL`·`PUBLIC_SUPABASE_ANON_KEY`(로컬은 레포 루트 .env, anon 키는 공개용, 접근은 RLS 가 막는다). 새 도메인을 쓰면 Supabase 인증의 redirect 허용 목록에 추가해야 로그인이 된다.
 - `pnpm import-key <파일.key> [폴더]` → Keynote 를 덱으로 변환(uv 필요). 워터마크는 버리고, 글꼴은 Pretendard 로, 크기는 40/30 으로 맞춘다. 경고를 꼭 읽을 것.
