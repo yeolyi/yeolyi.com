@@ -1,9 +1,13 @@
 // 이미지 URL. 앱에서는 비공개 버킷의 서명 URL(하루짜리)을 모아서 받아 오고,
-// 로컬 렌더(Claude 의 pnpm export)에서는 dev 서버가 decks/ 폴더를 그대로 내준다.
+// 렌더 화면(로컬 pnpm export·서버 /api/render)에서는 AssetResolver 가 주소를 정한다.
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
 import { assetPath, BUCKET, supabase } from "./supabase";
 
-export const LocalAssets = createContext(false);
+// 있으면 Supabase 대신 이걸로 주소를 정한다(렌더 화면용).
+export type Resolve = (deckId: string, src: string) => string;
+export const AssetResolver = createContext<Resolve | null>(null);
+export const localResolve: Resolve = (deckId, src) =>
+	`/files/${encodeURIComponent(deckId)}/${src.split("/").map(encodeURIComponent).join("/")}`;
 
 const TTL = 60 * 60 * 24;
 const cache = new Map<string, { url: string; exp: number }>();
@@ -41,19 +45,18 @@ const subscribe = (fn: () => void) => {
 };
 
 export function useAssetUrl(deckId: string, src: string): string | undefined {
-	const local = useContext(LocalAssets);
+	const resolve = useContext(AssetResolver);
 	const path = assetPath(deckId, src);
-	const url = useSyncExternalStore(subscribe, () => (local ? undefined : fresh(path)));
+	const url = useSyncExternalStore(subscribe, () => (resolve ? undefined : fresh(path)));
 	useEffect(() => {
-		if (!local) request(path);
-	}, [local, path, url]);
-	if (local) return `/files/${encodeURIComponent(deckId)}/${src.split("/").map(encodeURIComponent).join("/")}`;
-	return url;
+		if (!resolve) request(path);
+	}, [resolve, path, url]);
+	return resolve ? resolve(deckId, src) : url;
 }
 
 // 코드 레이어용: 덱 이미지 주소를 바로 받는다(서명 URL 은 위 캐시를 같이 쓴다).
-export async function assetUrl(deckId: string, src: string, local: boolean): Promise<string> {
-	if (local) return `/files/${encodeURIComponent(deckId)}/${src.split("/").map(encodeURIComponent).join("/")}`;
+export async function assetUrl(deckId: string, src: string, resolve: Resolve | null): Promise<string> {
+	if (resolve) return resolve(deckId, src);
 	const path = assetPath(deckId, src);
 	const hit = fresh(path);
 	if (hit) return hit;

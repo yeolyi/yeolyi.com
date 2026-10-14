@@ -1,6 +1,6 @@
 // 슬라이드 렌더러. 편집 화면·썸네일·내보내기가 모두 이걸 쓴다(내보내기 결과 == 편집 화면).
 import { type CSSProperties, type ReactNode, type Ref, useContext, useEffect, useRef, useState } from "react";
-import { assetUrl, LocalAssets, useAssetUrl } from "./assets";
+import { AssetResolver, assetUrl, useAssetUrl } from "./assets";
 import {
 	type CodeLayer,
 	type Deck,
@@ -97,7 +97,7 @@ type LayerProps = {
 function CodeContent({ slug, l }: { slug: string; l: CodeLayer }) {
 	const ref = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState<string | null>(null);
-	const local = useContext(LocalAssets);
+	const resolve = useContext(AssetResolver);
 	const propsKey = JSON.stringify(l.props);
 	useEffect(() => {
 		const host = ref.current;
@@ -111,7 +111,7 @@ function CodeContent({ slug, l }: { slug: string; l: CodeLayer }) {
 		host.removeAttribute("data-ready");
 		const url = URL.createObjectURL(new Blob([l.code], { type: "text/javascript" }));
 		import(/* @vite-ignore */ url)
-			.then((m) => m.default(el, JSON.parse(propsKey), { asset: (src: string) => assetUrl(slug, src, local) }))
+			.then((m) => m.default(el, JSON.parse(propsKey), { asset: (src: string) => assetUrl(slug, src, resolve) }))
 			.then((c) => {
 				if (alive) cleanup = c;
 				else if (typeof c === "function") c();
@@ -126,7 +126,7 @@ function CodeContent({ slug, l }: { slug: string; l: CodeLayer }) {
 			if (typeof cleanup === "function") cleanup();
 			shadow.replaceChildren();
 		};
-	}, [l.code, propsKey, slug, local]);
+	}, [l.code, propsKey, slug, resolve]);
 	return (
 		<>
 			<div ref={ref} />

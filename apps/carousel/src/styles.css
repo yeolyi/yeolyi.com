@@ -633,3 +633,8 @@
 		cursor: inherit;
 	}
 }
+
+/* 투명 PNG 미리보기 바탕(체크무늬) */
+.frame-checker {
+	background: repeating-conic-gradient(var(--color-muted, #e5e5e5) 0 25%, transparent 0 50%) 0 0 / 16px 16px;
+}

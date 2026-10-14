@@ -12,6 +12,9 @@ node carousel.mjs list                 # 내 덱 목록: id, 장 수, 수정 시
 node carousel.mjs get <id> deck.json   # 받기
 node carousel.mjs put deck.json        # 고친 것 올리기
 node carousel.mjs new deck.json        # 새 덱으로 올리기
+node carousel.mjs upload <id> a.png b.jpg   # 이미지 올리기 → {src, nw, nh} 를 줄마다 출력
+node carousel.mjs render <id> [폴더] [--slides 1,3] [--scale 0.5]   # 결과를 JPEG·layout.json 으로 받기
+node carousel.mjs assets <id> [--unused] [--delete]                 # 올라간 이미지 목록·안 쓰는 것 지우기
 ```
 
 토큰이 없다고 나오면 사용자에게 웹앱 홈의 **AI 연결**에서 토큰을 발급해 `CAROUSEL_TOKEN` 환경 변수나 `~/.config/carousel/token` 파일에 넣어 달라고 한다.
@@ -20,8 +23,10 @@ node carousel.mjs new deck.json        # 새 덱으로 올리기
 
 1. `list` 로 덱을 찾고 `get` 으로 받는다. 새로 만들 땐 아래 형식으로 파일을 쓴다.
 2. JSON 을 고친다. `id`·`updated_at` 은 건드리지 않는다.
-3. `put` 으로 올린다. "다른 곳에서 바뀌었어요"가 나오면 사용자가 그사이 편집기에서 고친 것이다. 다시 `get` 해서 그 위에 고친다(덮어쓰지 않는다).
-4. 결과 이미지는 여기서 볼 수 없다. 올린 뒤 사용자에게 편집기에서 확인해 달라고 한다.
+3. 새 이미지가 필요하면 **먼저** `upload` 로 올리고 나온 `src`·`nw`·`nh` 를 이미지 레이어에 쓴다. 버킷에 없는 `src` 가 든 덱은 `put` 이 거절한다.
+4. `put` 으로 올린다. "다른 곳에서 바뀌었어요"가 나오면 사용자가 그사이 편집기에서 고친 것이다. 다시 `get` 해서 그 위에 고친다(덮어쓰지 않는다).
+5. `render` 로 결과를 받아 직접 본다(JPEG 을 이미지로 읽는다). `layout.json` 의 상자로 겹침·여백을 재고, 경고(워터마크 자리 침범, 오른쪽 여백 넘침, 글과 그림 겹침)가 있으면 고친다.
+6. 사용자에게 무엇을 바꿨는지 알리고, 마지막 판단은 편집기에서 해 달라고 한다.
 
 ## 형식
 
@@ -57,5 +62,12 @@ node carousel.mjs new deck.json        # 새 덱으로 올리기
   - 강조는 `**굵게**`, `==빨강==`, `__밑줄__`. 빨강은 핵심 한두 곳에만 쓴다. `||블러||` 는 글자를 흐리게 가린다(스포일러·민감한 말).
   - 편집기의 배치 기준: 왼쪽 x=80, 오른쪽은 오른쪽 끝이 1000, 가운데는 중심이 540.
 - 이미지
-  - **새 이미지는 이 스크립트로 넣을 수 없다.** 덱에 이미 있는 이미지(`src`)를 옮기거나(`x`·`y`), 크기를 바꾸거나(`w`·`h`, 비율 유지는 `h = w × (crop.h × nh) ÷ (crop.w × nw)`), 자르거나(`crop`: 원본 대비 0~1 비율), 다른 장에 다시 쓸 수 있다. 새 이미지가 필요하면 사용자에게 편집기에서 넣어 달라고 한다.
+  - 새 이미지는 `upload` 로 올린다. 이름은 내용 해시(`assets/<16자>.png`)라 같은 파일은 다시 올라가지 않고, 내용을 바꾸면 이름도 바뀐다. PNG·JPEG·WebP·GIF, 20MB 까지.
+  - 옮기기(`x`·`y`), 크기(`w`·`h`, 비율 유지는 `h = w × (crop.h × nh) ÷ (crop.w × nw)`), 자르기(`crop`: 원본 대비 0~1 비율), 다른 장에 다시 쓰기는 JSON 만 고치면 된다.
+  - 투명 PNG 는 장 바탕(흰색) 위에 그려진다.
+  - 덱에서 뺀 이미지는 버킷에 남는다. 정리는 `assets <id> --delete`(쓰는 중인 파일은 지우지 않는다).
+- 확인(`render`)
+  - 앱 서버가 편집기와 같은 렌더러로 찍는다. 기본은 절반 크기(540×675), `--scale 1` 이면 원본 크기. 한 번에 받는 양이 많으면 `--slides` 로 나눈다.
+  - `layout.json` 의 `layout[].boxes` 는 장마다 레이어 상자(캔버스 px, `id`·`type`·`x`·`y`·`w`·`h`)다. 텍스트 높이·폭을 짐작하지 말고 여기서 읽는다.
+  - 기기 화면 캡처에 프레임을 씌우려면 `device-frame` 스킬(같은 레포)이나 https://carousel.yeolyi.com/frame 을 쓴다.
 - 레이어에 `id` 가 있으면 그대로 둔다. 새 레이어엔 안 적어도 된다.

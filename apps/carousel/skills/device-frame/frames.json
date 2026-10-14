@@ -1,0 +1,14 @@
+{
+	"iphone": {
+		"label": "iPhone",
+		"file": "assets/iphone-frame.png",
+		"screen": [90, 77, 1646, 3451],
+		"capture": { "width": 393, "height": 852, "scale": 3 }
+	},
+	"ipad": {
+		"label": "iPad",
+		"file": "assets/ipad-frame.png",
+		"screen": [72, 72, 1740, 2476],
+		"capture": { "width": 820, "height": 1180, "scale": 2 }
+	}
+}

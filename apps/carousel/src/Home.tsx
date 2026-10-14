@@ -45,7 +45,14 @@ export function Home() {
 
 	return (
 		<div className="home">
-			<ServiceHeader name="Carousel" className="border-b px-4 py-1">
+			<ServiceHeader
+				name="Carousel"
+				className="border-b px-4 py-1"
+				nav={[
+					{ label: "덱", href: "/", current: true },
+					{ label: "프레임", href: "/frame" },
+				]}
+			>
 				<IconButton title="로그아웃" aria-label="로그아웃" onClick={signOut}>
 					<LogOut {...ic} />
 				</IconButton>
