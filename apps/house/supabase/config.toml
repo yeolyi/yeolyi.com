@@ -1,0 +1,10 @@
+# Edge Function 배포 설정과 로컬 확인용 스택(supabase start) 설정. 배포: apps/house 에서 supabase functions deploy --project-ref <ref>
+project_id = "house"
+
+[api]
+# 운영 프로젝트에서도 대시보드 API 설정의 Exposed schemas 에 house 를 넣어야 한다
+schemas = ["public", "graphql_public", "house"]
+
+[functions.house-collect]
+verify_jwt = false # pg_cron 이 x-cron-secret 으로 부른다
+

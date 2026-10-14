@@ -1,0 +1,52 @@
+---
+// 파일명(resume.astro)에서 생성되는 페이지 컴포넌트명 Resume 과 충돌하지 않게 별칭.
+import ResumeDoc from "@mdx/resume.mdx";
+import { mdxComponents } from "@yeolyi/post/mdx";
+import BaseLayout from "@/components/layout/BaseLayout.astro";
+---
+
+<BaseLayout title="이력서 | 이성열">
+  {
+    /* 개발자 이력서: 이름은 머리띠에 있어 따로 두지 않고(제목은 화면 읽기용만) 바로 경력 → 사이드 → 발표 → 학력.
+       GitHub·Instagram 은 머리띠에, 블로그·인스타그램은 사이드 프로젝트에 있어 따로 두지 않는다.
+       각 회사 머리는 이름 왼쪽, 기간 오른쪽(고정폭)으로 훑어 읽기 쉽게 둔다. */
+  }
+  <div class="resume measure-col mt-[2lh] pb-[5lh]">
+    <h1 class="sr-only">이성열 이력서</h1>
+    <div class="prose">
+      <ResumeDoc components={mdxComponents} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* 회사·섹션 머리: 이름은 왼쪽, 기간은 오른쪽 끝. 짧은 덩어리가 이어지는 목록이라 섹션 사이는 2줄. */
+  .resume :global(.prose h2) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: 1rem;
+    margin-top: 2lh;
+  }
+  .resume :global(.prose h2:first-child) {
+    margin-top: 0;
+  }
+  /* 기간·날짜는 기계가 붙이는 정보라 고정폭 보조 글자(제목 안에서도 굵게 하지 않는다). */
+  .resume :global(.date) {
+    margin-left: 0.5ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-muted-foreground);
+  }
+  .resume :global(h2 .date) {
+    margin-left: 0;
+  }
+  /* 직무: 회사 머리 바로 아래 보조 글자. */
+  .resume :global(.role) {
+    margin-top: 0;
+    color: var(--color-muted-foreground);
+  }
+</style>

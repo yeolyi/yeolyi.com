@@ -1,0 +1,63 @@
+---
+import { Table } from "@yeolyi/ui/Table";
+
+// 글자 단계표. 값은 @yeolyi/site/base.css(h1~h3·body)와 같아야 한다.
+const rows = [
+  {
+    name: "제목 1",
+    style:
+      "font-size:2rem;line-height:1.25;font-weight:700;letter-spacing:-0.01em",
+    size: "32",
+    lh: "1.25",
+    weight: "700",
+  },
+  {
+    name: "제목 2",
+    style:
+      "font-size:1.5rem;line-height:1.3;font-weight:700;letter-spacing:-0.01em",
+    size: "24",
+    lh: "1.3",
+    weight: "700",
+  },
+  {
+    name: "제목 3",
+    style:
+      "font-size:1.1875rem;line-height:1.5;font-weight:700;letter-spacing:-0.01em",
+    size: "19",
+    lh: "1.5",
+    weight: "700",
+  },
+  { name: "본문", style: "", size: "18 (모바일 17)", lh: "1.7", weight: "400" },
+  {
+    name: "26.10 · 조회 25",
+    style: "",
+    mono: true,
+    size: "16 (모바일 15)",
+    lh: "1.7",
+    weight: "400",
+  },
+];
+---
+
+<Table>
+  <thead>
+    <tr><th>견본</th><th>크기(px)</th><th>줄 높이</th><th>굵기</th></tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((r) => (
+        <tr>
+          <td
+            class={r.mono ? "text-muted-foreground font-mono text-base" : ""}
+            style={r.style}
+          >
+            {r.name}
+          </td>
+          <td class="font-mono text-base">{r.size}</td>
+          <td class="font-mono text-base">{r.lh}</td>
+          <td class="font-mono text-base">{r.weight}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</Table>

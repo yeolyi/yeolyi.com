@@ -1,0 +1,66 @@
+---
+// 모든 페이지의 틀: 서비스 헤더(yeolyi.com / 디자인 시스템) → 글 머리(제목·설명) → 본문(prose).
+// MDX 페이지는 frontmatter 의 layout 으로 이 파일을 부르고, 섹션 목차 페이지는 직접 감싼다.
+import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import { THEME_INIT } from "@yeolyi/ui/theme-store";
+import "../styles.css";
+
+interface Props {
+  frontmatter?: { title: string; description?: string };
+  title?: string;
+  description?: string;
+}
+const fm = Astro.props.frontmatter ?? Astro.props;
+const title = fm.title ?? "디자인 시스템";
+const description = fm.description;
+const path = Astro.url.pathname;
+const SECTIONS = [
+  { label: "스타일", href: "/styles" },
+  { label: "컴포넌트", href: "/components" },
+  { label: "패턴", href: "/patterns" },
+];
+const section = SECTIONS.find((s) => path.startsWith(s.href));
+const isHome = path === "/";
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline set:html={THEME_INIT} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{isHome ? "디자인 시스템 · yeolyi.com" : `${title} · 디자인 시스템`}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/MonoplexKR-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+  </head>
+  <body>
+    <ServiceHeader
+      client:load
+      name="디자인 시스템"
+      className="measure-col pt-[1.5lh]"
+      nav={SECTIONS.map((s) => ({ ...s, current: s === section }))}
+    />
+    <main class="measure-col mt-[2lh] pb-[5lh] [&_astro-island]:block">
+      <header class="border-border border-b pb-[0.5lh]">
+        {section && !isHome && path !== section.href && (
+          <p class="text-muted-foreground font-mono text-base">
+            <a href={section.href} class="text-muted-foreground">{section.label}</a>
+          </p>
+        )}
+        <h1>{title}</h1>
+        {description && <p class="text-muted-foreground mt-[0.25lh]">{description}</p>}
+      </header>
+      <div class="prose mt-[1.5lh]">
+        <slot />
+      </div>
+    </main>
+    <script>
+      import { startTracking } from "@yeolyi/track";
+      startTracking("design");
+    </script>
+  </body>
+</html>

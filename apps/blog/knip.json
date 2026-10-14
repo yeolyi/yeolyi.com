@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "mdx/**/*.{md,mdx}",
+    "scripts/**/*.{ts,js}",
+    "lint-staged.config.mjs"
+  ],
+  "ignore": ["src/database.types.ts"],
+  "ignoreDependencies": ["@astrojs/check", "@biomejs/biome"],
+  "ignoreBinaries": ["supabase"]
+}

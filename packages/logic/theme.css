@@ -1,0 +1,14 @@
+/* 논리 게이트 시뮬레이터(@yeolyi/logic)를 쓰는 앱의 CSS 에서 tailwindcss·@yeolyi/ui/theme.css 다음에 @import 한다.
+   이 패키지의 클래스를 앱의 Tailwind 가 스캔하게 하고, React Flow 색을 디자인 시스템 토큰에 맞춘다. */
+@source "./src";
+
+.react-flow {
+  --xy-edge-stroke: var(--color-foreground);
+  --xy-edge-stroke-selected: var(--color-foreground);
+  --xy-connectionline-stroke: var(--color-foreground);
+  --xy-handle-background-color: var(--color-background);
+  --xy-handle-border-color: var(--color-foreground);
+  --xy-node-color: var(--color-foreground);
+  --xy-node-background-color: var(--color-background);
+  --xy-node-border: 1px solid var(--color-border);
+}

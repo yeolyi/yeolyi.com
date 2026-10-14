@@ -1,0 +1,27 @@
+{
+  "name": "stats",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.93.1",
+    "@yeolyi/site": "workspace:*",
+    "@yeolyi/ui": "workspace:*",
+    "lucide-react": "^0.536.0",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3"
+  }
+}

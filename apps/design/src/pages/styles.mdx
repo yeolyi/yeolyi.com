@@ -1,0 +1,69 @@
+---
+layout: ../layouts/Page.astro
+title: "스타일"
+description: "색, 글자, 간격처럼 모든 화면의 바탕이 되는 규칙입니다."
+---
+
+import ColorTable from "../demos/ColorTable.astro";
+import TypeTable from "../demos/TypeTable.astro";
+import SpacingScale from "../demos/SpacingScale.astro";
+import FocusDemo from "../demos/FocusDemo";
+import { components as mdx } from "../components/mdx.ts";
+export const components = mdx;
+
+[색](#색) · [글자](#글자) · [간격과 폭](#간격과-폭) · [선과 모서리](#선과-모서리) · [링크와 초점](#링크와-초점) · [아이콘](#아이콘) · [움직임](#움직임) · [문구](#문구)
+
+## 색
+
+### 글자 색
+
+<ColorTable group="text" />
+
+### 면과 선
+
+<ColorTable group="surface" />
+
+상태 색(초록·빨강)은 없습니다. 통과와 실패는 기호(✓ ✗)와 굵기로 가릅니다.
+
+## 글자
+
+굵게는 제목, 표 헤더, 문장 안 강조에만. 날짜·숫자처럼 기계가 붙이는 정보는 고정폭입니다. 한글 낱말은 고정폭으로 쓰지 않습니다.
+
+| 역할      | 글꼴                | 굵기     |
+| --------- | ------------------- | -------- |
+| 제목·본문 | Pretendard Variable | 400, 700 |
+| 고정폭    | MonoplexKR          | 400      |
+
+<TypeTable />
+
+## 간격과 폭
+
+세로 간격은 본문 줄 높이(1lh, 약 31px)의 배수이고, 아래 일곱 단계만 씁니다. lh는 그 요소의 줄 높이라 작은 글씨에 걸면 짧아지니, 간격은 본문 크기 요소에 겁니다.
+
+<SpacingScale />
+
+읽는 글은 45rem(720px) 폭 한 단입니다. 화면 전체를 쓰는 도구만 예외입니다.
+
+## 선과 모서리
+
+누를 수 있는 것은 2px 굵은 선, 나누기만 하는 것은 1px 가는 선입니다. 버튼과 입력 칸은 높이 44px입니다. 모서리는 둥글리지 않고 그림자도 쓰지 않습니다. 예외는 라디오의 동그라미 하나입니다.
+
+## 링크와 초점
+
+링크는 늘 밑줄, 호버하면 반전됩니다. 헤더의 이름은 예외로 호버할 때만 밑줄을 긋습니다. 다른 사이트로 가는 링크는 끝에 화살표(↗)를 붙입니다. yeolyi.com 아래 서비스는 다른 사이트가 아닙니다.
+
+키보드 초점은 주황입니다. 링크는 글자와 밑줄을, 테두리가 있는 것은 테두리를 3px 주황으로 바꿉니다. Tab 키로 옮겨 보세요.
+
+<FocusDemo client:visible />
+
+## 아이콘
+
+lucide 하나로, 선 굵기 2, 크기 1.25em입니다. 장식용 기호는 쓰지 않습니다.
+
+## 움직임
+
+상태가 바뀌는 곳만 0.15초. 움직임 줄이기 설정이면 끕니다.
+
+## 문구
+
+합니다체. 버튼은 동사 하나(저장, 취소). 줄표는 쓰지 않고, 영어 뒤 조사는 붙여 씁니다.

@@ -1,0 +1,13 @@
+# 평소 배포는 GitHub 연동이라 쓰이지 않는다. 혹시 레포 루트에서 vercel deploy(CLI)를 하면 git 에 없는 로컬 파일(비밀값·덱 사본·빌드 산출물)이 올라가지 않게 막는 안전장치.
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+apps/carousel/decks
+apps/carousel/skills/ig-fake-feed
+**/node_modules
+**/dist
+**/.astro
+**/.vercel

@@ -1,0 +1,21 @@
+{
+  "name": "yeolyi",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.8.0",
+  "scripts": {
+    "prepare": "husky",
+    "dev": "pnpm --parallel --filter blog --filter design --filter house --filter carousel --filter logic --filter cs --filter stats dev",
+    "blog": "pnpm --filter blog",
+    "carousel": "pnpm --filter carousel",
+    "design": "pnpm --filter design",
+    "house": "pnpm --filter house",
+    "logic": "pnpm --filter logic",
+    "cs": "pnpm --filter cs",
+    "stats": "pnpm --filter stats"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  }
+}

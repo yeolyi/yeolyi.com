@@ -1,0 +1,21 @@
+---
+import Button from "@yeolyi/ui/Button";
+import Clock from "./Clock.astro";
+---
+
+<div class="flex items-center gap-2">
+  <Button id="sync-btn" className="w-fit">실행</Button>
+  <Clock />
+</div>
+
+<script>
+  const button = document.getElementById("sync-btn") as HTMLButtonElement;
+
+  button.addEventListener("click", () => {
+    const now = Date.now();
+    while (Date.now() - now < 3000) {
+      // @ts-ignore
+      window.__busy_spin__ = 0;
+    }
+  });
+</script>

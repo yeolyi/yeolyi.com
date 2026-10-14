@@ -1,0 +1,95 @@
+---
+import { Table } from "@yeolyi/ui/Table";
+
+// 색 역할표. 값은 @yeolyi/site/base.css 의 @theme 와 같아야 한다(stone 스케일 + 주황 둘).
+// group 으로 글자 색과 면·선 색을 나눠 보인다. 굵은 선은 기본 글자색과 같은 값이지만 역할이 달라 면·선 표에 따로 둔다.
+interface Props {
+  group: "text" | "surface";
+}
+const { group } = Astro.props;
+const TEXT = ["기본", "보조"];
+const all = [
+  {
+    name: "바탕",
+    token: "--color-background",
+    light: "#fafaf9",
+    dark: "#0c0a09",
+    use: "페이지 바탕",
+  },
+  {
+    name: "기본",
+    token: "--color-foreground",
+    light: "#1c1917",
+    dark: "#f5f5f4",
+    use: "글자",
+  },
+  {
+    name: "옅은 바탕",
+    token: "--color-muted",
+    light: "#e7e5e4",
+    dark: "#292524",
+    use: "코드, 호버",
+  },
+  {
+    name: "보조",
+    token: "--color-muted-foreground",
+    light: "#78716c",
+    dark: "#a8a29e",
+    use: "날짜, 설명, 인용",
+  },
+  {
+    name: "굵은 선",
+    token: "--color-foreground",
+    light: "#1c1917",
+    dark: "#f5f5f4",
+    use: "버튼·입력 칸 테두리(2px), 표 헤더 아래",
+  },
+  {
+    name: "가는 선",
+    token: "--color-border",
+    light: "#d6d3d1",
+    dark: "#44403c",
+    use: "구분선(1px)",
+  },
+  {
+    name: "주황",
+    token: "--color-accent",
+    light: "#e65817",
+    dark: "#ff6914",
+    use: "초점, 주황 버튼, 켜진 아이콘",
+  },
+];
+const rows = all.filter((r) => TEXT.includes(r.name) === (group === "text"));
+---
+
+<Table>
+  {/* 두 표의 열을 맞추려고 폭을 정해 둔다 */}
+  <colgroup>
+    <col class="w-12" />
+    <col class="w-[18%]" />
+    <col class="w-[18%]" />
+    <col class="w-[18%]" />
+    <col />
+  </colgroup>
+  <thead>
+    <tr><th></th><th>이름</th><th>밝게</th><th>어둡게</th><th>쓰는 곳</th></tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((r) => (
+        <tr>
+          <td>
+            <span
+              class="border-border inline-block size-6 border align-middle"
+              style={`background: var(${r.token})`}
+            />
+          </td>
+          <td>{r.name}</td>
+          <td class="font-mono text-base">{r.light}</td>
+          <td class="font-mono text-base">{r.dark}</td>
+          <td>{r.use}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</Table>

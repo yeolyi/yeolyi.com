@@ -1,0 +1,48 @@
+---
+import { getImage } from "astro:assets";
+import type { Work } from "@/components/work/works";
+import appleTree from "./assets/apple-tree.png";
+import chadBg from "./assets/chad-bg.png";
+import chadFace from "./assets/chad-face.png";
+import grayTree from "./assets/gray-tree.jpg";
+import CarouselBanner from "./CarouselBanner";
+import ChadBanner from "./ChadBanner";
+import CsBanner from "./CsBanner";
+import CseBanner from "./CseBanner";
+import DesignBanner from "./DesignBanner";
+import HouseBanner from "./HouseBanner";
+import JeongeumBanner from "./JeongeumBanner";
+import LogicBanner from "./LogicBanner";
+
+// 홈 작업 목록의 가로로 긴 화면. 작업마다 작게 움직이는 조각 하나(각자 보일 때 하이드레이트되는 섬).
+// 바깥 링크(Home.astro)가 높이·테두리·터치 동작을 정하고, 여기 조각은 그 칸을 채운다.
+interface Props {
+  id: Work["banner"] | "cs" | "cse" | "design";
+}
+const { id } = Astro.props;
+
+const tree = async (src: typeof grayTree) => {
+  const img = await getImage({ src, widths: [720, 1440], format: "webp" });
+  return { src: img.src, srcset: img.srcSet.attribute };
+};
+const chadImg =
+  id === "chadcn-ui"
+    ? {
+        bg: (await getImage({ src: chadBg, format: "png" })).src,
+        face: (await getImage({ src: chadFace, format: "webp" })).src,
+      }
+    : null;
+const trees =
+  id === "cs"
+    ? { gray: await tree(grayTree), apple: await tree(appleTree) }
+    : null;
+---
+
+{trees && <CsBanner client:visible {...trees} />}
+{id === "cse" && <CseBanner client:visible />}
+{id === "design" && <DesignBanner client:visible />}
+{id === "carousel" && <CarouselBanner client:visible />}
+{id === "jeongeum" && <JeongeumBanner client:visible />}
+{chadImg && <ChadBanner client:visible {...chadImg} />}
+{id === "logic-gate-simulator" && <LogicBanner client:visible />}
+{id === "house" && <HouseBanner client:visible />}

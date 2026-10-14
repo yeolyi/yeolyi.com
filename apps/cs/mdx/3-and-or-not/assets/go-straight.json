@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "input-green",
+      "type": "number",
+      "position": { "x": 0, "y": 10 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": true },
+            "label": { "init": null }
+          },
+          "id": "input-green"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "input-obstacle",
+      "type": "number",
+      "position": { "x": 0, "y": 110 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "input-obstacle"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "not-gate",
+      "type": "not",
+      "position": { "x": 120, "y": 98 },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": { "in1": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "not-gate"
+        }
+      },
+      "measured": { "width": 96, "height": 64 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "and-gate",
+      "type": "and",
+      "position": { "x": 280, "y": 40 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and-gate"
+        }
+      },
+      "measured": { "width": 96, "height": 64 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "output-label",
+      "type": "label",
+      "position": { "x": 440, "y": 52 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "output-label"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "input-obstacle",
+      "sourceHandle": "out",
+      "target": "not-gate",
+      "targetHandle": "in1",
+      "id": "xy-edge__input-obstacleout-not-gatein1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "input-green",
+      "sourceHandle": "out",
+      "target": "and-gate",
+      "targetHandle": "in1",
+      "id": "xy-edge__input-greenout-and-gatein1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "not-gate",
+      "sourceHandle": "out",
+      "target": "and-gate",
+      "targetHandle": "in2",
+      "id": "xy-edge__not-gateout-and-gatein2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and-gate",
+      "sourceHandle": "out",
+      "target": "output-label",
+      "targetHandle": "in",
+      "id": "xy-edge__and-gateout-output-labelin"
+    }
+  ],
+  "viewport": { "x": 40, "y": 30, "zoom": 1 },
+  "nodeOutputs": {
+    "input-green": { "out": true, "label": "초록불" },
+    "input-obstacle": { "out": false, "label": "장애물" },
+    "not-gate": { "out": true },
+    "and-gate": { "out": true },
+    "output-label": { "label": "직진", "out": true }
+  }
+}

@@ -1,0 +1,2216 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "type": "number",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": {
+              "init": false
+            },
+            "label": {
+              "init": "8"
+            }
+          },
+          "id": "n0"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n1",
+      "type": "number",
+      "position": {
+        "x": 0,
+        "y": 280
+      },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": {
+              "init": false
+            },
+            "label": {
+              "init": "4"
+            }
+          },
+          "id": "n1"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n2",
+      "type": "number",
+      "position": {
+        "x": 0,
+        "y": 440
+      },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": {
+              "init": false
+            },
+            "label": {
+              "init": "2"
+            }
+          },
+          "id": "n2"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n3",
+      "type": "number",
+      "position": {
+        "x": 0,
+        "y": 600
+      },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": {
+              "init": false
+            },
+            "label": {
+              "init": "1"
+            }
+          },
+          "id": "n3"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n4",
+      "type": "not",
+      "position": {
+        "x": 160,
+        "y": 660
+      },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n4"
+        }
+      },
+      "measured": {
+        "width": 48,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n5",
+      "type": "not",
+      "position": {
+        "x": 160,
+        "y": 500
+      },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n5"
+        }
+      },
+      "measured": {
+        "width": 48,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n6",
+      "type": "not",
+      "position": {
+        "x": 160,
+        "y": 340
+      },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n6"
+        }
+      },
+      "measured": {
+        "width": 48,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n7",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 0
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n7"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n8",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 130
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n8"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n9",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 260
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n9"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n10",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 390
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n10"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n11",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 520
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n11"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n12",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 650
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n12"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n13",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 780
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n13"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n14",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 910
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n14"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n15",
+      "type": "and",
+      "position": {
+        "x": 500,
+        "y": 1040
+      },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n15"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n16",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 0
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n16"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n17",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 130
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n17"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n18",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 260
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n18"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n19",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 390
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n19"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n20",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 520
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n20"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n21",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 650
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n21"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n22",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 780
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n22"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n23",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 910
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n23"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n24",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1040
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n24"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n25",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1170
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n25"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n26",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1300
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n26"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n27",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 1430
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n27"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n28",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1560
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n28"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n29",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1690
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n29"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n30",
+      "type": "or",
+      "position": {
+        "x": 1000,
+        "y": 1820
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n30"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n31",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 1950
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n31"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n32",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 2080
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n32"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n33",
+      "type": "or",
+      "position": {
+        "x": 800,
+        "y": 2210
+      },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": {
+            "in1": {
+              "init": null
+            },
+            "in2": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n33"
+        }
+      },
+      "measured": {
+        "width": 96,
+        "height": 64
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n34",
+      "type": "label",
+      "position": {
+        "x": 1430,
+        "y": 200
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "a"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n34"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n35",
+      "type": "label",
+      "position": {
+        "x": 1510,
+        "y": 280
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "b"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n35"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n36",
+      "type": "label",
+      "position": {
+        "x": 1510,
+        "y": 440
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "c"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n36"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n37",
+      "type": "label",
+      "position": {
+        "x": 1430,
+        "y": 520
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "d"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n37"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n38",
+      "type": "label",
+      "position": {
+        "x": 1350,
+        "y": 440
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "e"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n38"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n39",
+      "type": "label",
+      "position": {
+        "x": 1350,
+        "y": 280
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "f"
+            },
+            "out": {
+              "init": true
+            }
+          },
+          "effectAtom": {},
+          "id": "n39"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "n40",
+      "type": "label",
+      "position": {
+        "x": 1430,
+        "y": 360
+      },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": {
+            "in": {
+              "init": null
+            }
+          },
+          "outputAtoms": {
+            "label": {
+              "init": "g"
+            },
+            "out": {
+              "init": false
+            }
+          },
+          "effectAtom": {},
+          "id": "n40"
+        }
+      },
+      "measured": {
+        "width": 40,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n3",
+      "sourceHandle": "out",
+      "target": "n4",
+      "targetHandle": "in1",
+      "id": "e0",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n2",
+      "sourceHandle": "out",
+      "target": "n5",
+      "targetHandle": "in1",
+      "id": "e1",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n1",
+      "sourceHandle": "out",
+      "target": "n6",
+      "targetHandle": "in1",
+      "id": "e2",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n1",
+      "sourceHandle": "out",
+      "target": "n7",
+      "targetHandle": "in1",
+      "id": "e3",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n3",
+      "sourceHandle": "out",
+      "target": "n7",
+      "targetHandle": "in2",
+      "id": "e4",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n6",
+      "sourceHandle": "out",
+      "target": "n8",
+      "targetHandle": "in1",
+      "id": "e5",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n4",
+      "sourceHandle": "out",
+      "target": "n8",
+      "targetHandle": "in2",
+      "id": "e6",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n2",
+      "sourceHandle": "out",
+      "target": "n9",
+      "targetHandle": "in1",
+      "id": "e7",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n3",
+      "sourceHandle": "out",
+      "target": "n9",
+      "targetHandle": "in2",
+      "id": "e8",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n5",
+      "sourceHandle": "out",
+      "target": "n10",
+      "targetHandle": "in1",
+      "id": "e9",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n4",
+      "sourceHandle": "out",
+      "target": "n10",
+      "targetHandle": "in2",
+      "id": "e10",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n2",
+      "sourceHandle": "out",
+      "target": "n11",
+      "targetHandle": "in1",
+      "id": "e11",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n4",
+      "sourceHandle": "out",
+      "target": "n11",
+      "targetHandle": "in2",
+      "id": "e12",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n1",
+      "sourceHandle": "out",
+      "target": "n12",
+      "targetHandle": "in1",
+      "id": "e13",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n5",
+      "sourceHandle": "out",
+      "target": "n12",
+      "targetHandle": "in2",
+      "id": "e14",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n6",
+      "sourceHandle": "out",
+      "target": "n13",
+      "targetHandle": "in1",
+      "id": "e15",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n2",
+      "sourceHandle": "out",
+      "target": "n13",
+      "targetHandle": "in2",
+      "id": "e16",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n1",
+      "sourceHandle": "out",
+      "target": "n14",
+      "targetHandle": "in1",
+      "id": "e17",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n4",
+      "sourceHandle": "out",
+      "target": "n14",
+      "targetHandle": "in2",
+      "id": "e18",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n12",
+      "sourceHandle": "out",
+      "target": "n15",
+      "targetHandle": "in1",
+      "id": "e19",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n3",
+      "sourceHandle": "out",
+      "target": "n15",
+      "targetHandle": "in2",
+      "id": "e20",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n0",
+      "sourceHandle": "out",
+      "target": "n16",
+      "targetHandle": "in1",
+      "id": "e21",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n2",
+      "sourceHandle": "out",
+      "target": "n16",
+      "targetHandle": "in2",
+      "id": "e22",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n16",
+      "sourceHandle": "out",
+      "target": "n17",
+      "targetHandle": "in1",
+      "id": "e23",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n7",
+      "sourceHandle": "out",
+      "target": "n17",
+      "targetHandle": "in2",
+      "id": "e24",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n17",
+      "sourceHandle": "out",
+      "target": "n18",
+      "targetHandle": "in1",
+      "id": "e25",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n8",
+      "sourceHandle": "out",
+      "target": "n18",
+      "targetHandle": "in2",
+      "id": "e26",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n6",
+      "sourceHandle": "out",
+      "target": "n19",
+      "targetHandle": "in1",
+      "id": "e27",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n9",
+      "sourceHandle": "out",
+      "target": "n19",
+      "targetHandle": "in2",
+      "id": "e28",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n19",
+      "sourceHandle": "out",
+      "target": "n20",
+      "targetHandle": "in1",
+      "id": "e29",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n10",
+      "sourceHandle": "out",
+      "target": "n20",
+      "targetHandle": "in2",
+      "id": "e30",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n1",
+      "sourceHandle": "out",
+      "target": "n21",
+      "targetHandle": "in1",
+      "id": "e31",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n5",
+      "sourceHandle": "out",
+      "target": "n21",
+      "targetHandle": "in2",
+      "id": "e32",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n21",
+      "sourceHandle": "out",
+      "target": "n22",
+      "targetHandle": "in1",
+      "id": "e33",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n3",
+      "sourceHandle": "out",
+      "target": "n22",
+      "targetHandle": "in2",
+      "id": "e34",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n0",
+      "sourceHandle": "out",
+      "target": "n23",
+      "targetHandle": "in1",
+      "id": "e35",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n8",
+      "sourceHandle": "out",
+      "target": "n23",
+      "targetHandle": "in2",
+      "id": "e36",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n23",
+      "sourceHandle": "out",
+      "target": "n24",
+      "targetHandle": "in1",
+      "id": "e37",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n13",
+      "sourceHandle": "out",
+      "target": "n24",
+      "targetHandle": "in2",
+      "id": "e38",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n24",
+      "sourceHandle": "out",
+      "target": "n25",
+      "targetHandle": "in1",
+      "id": "e39",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n11",
+      "sourceHandle": "out",
+      "target": "n25",
+      "targetHandle": "in2",
+      "id": "e40",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n25",
+      "sourceHandle": "out",
+      "target": "n26",
+      "targetHandle": "in1",
+      "id": "e41",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n15",
+      "sourceHandle": "out",
+      "target": "n26",
+      "targetHandle": "in2",
+      "id": "e42",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n8",
+      "sourceHandle": "out",
+      "target": "n27",
+      "targetHandle": "in1",
+      "id": "e43",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n11",
+      "sourceHandle": "out",
+      "target": "n27",
+      "targetHandle": "in2",
+      "id": "e44",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n0",
+      "sourceHandle": "out",
+      "target": "n28",
+      "targetHandle": "in1",
+      "id": "e45",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n12",
+      "sourceHandle": "out",
+      "target": "n28",
+      "targetHandle": "in2",
+      "id": "e46",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n28",
+      "sourceHandle": "out",
+      "target": "n29",
+      "targetHandle": "in1",
+      "id": "e47",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n14",
+      "sourceHandle": "out",
+      "target": "n29",
+      "targetHandle": "in2",
+      "id": "e48",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n29",
+      "sourceHandle": "out",
+      "target": "n30",
+      "targetHandle": "in1",
+      "id": "e49",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n10",
+      "sourceHandle": "out",
+      "target": "n30",
+      "targetHandle": "in2",
+      "id": "e50",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n0",
+      "sourceHandle": "out",
+      "target": "n31",
+      "targetHandle": "in1",
+      "id": "e51",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n11",
+      "sourceHandle": "out",
+      "target": "n31",
+      "targetHandle": "in2",
+      "id": "e52",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n31",
+      "sourceHandle": "out",
+      "target": "n32",
+      "targetHandle": "in1",
+      "id": "e53",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n13",
+      "sourceHandle": "out",
+      "target": "n32",
+      "targetHandle": "in2",
+      "id": "e54",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n32",
+      "sourceHandle": "out",
+      "target": "n33",
+      "targetHandle": "in1",
+      "id": "e55",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n12",
+      "sourceHandle": "out",
+      "target": "n33",
+      "targetHandle": "in2",
+      "id": "e56",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n18",
+      "sourceHandle": "out",
+      "target": "n34",
+      "targetHandle": "in",
+      "id": "e57",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n20",
+      "sourceHandle": "out",
+      "target": "n35",
+      "targetHandle": "in",
+      "id": "e58",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n22",
+      "sourceHandle": "out",
+      "target": "n36",
+      "targetHandle": "in",
+      "id": "e59",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n26",
+      "sourceHandle": "out",
+      "target": "n37",
+      "targetHandle": "in",
+      "id": "e60",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n27",
+      "sourceHandle": "out",
+      "target": "n38",
+      "targetHandle": "in",
+      "id": "e61",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n30",
+      "sourceHandle": "out",
+      "target": "n39",
+      "targetHandle": "in",
+      "id": "e62",
+      "selected": false
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "n33",
+      "sourceHandle": "out",
+      "target": "n40",
+      "targetHandle": "in",
+      "id": "e63",
+      "selected": false
+    }
+  ],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 0.5
+  },
+  "nodeOutputs": {
+    "n0": {
+      "out": false,
+      "label": "8"
+    },
+    "n1": {
+      "out": false,
+      "label": "4"
+    },
+    "n2": {
+      "out": false,
+      "label": "2"
+    },
+    "n3": {
+      "out": false,
+      "label": "1"
+    },
+    "n4": {
+      "out": true
+    },
+    "n5": {
+      "out": true
+    },
+    "n6": {
+      "out": true
+    },
+    "n7": {
+      "out": false
+    },
+    "n8": {
+      "out": true
+    },
+    "n9": {
+      "out": false
+    },
+    "n10": {
+      "out": true
+    },
+    "n11": {
+      "out": false
+    },
+    "n12": {
+      "out": false
+    },
+    "n13": {
+      "out": false
+    },
+    "n14": {
+      "out": false
+    },
+    "n15": {
+      "out": false
+    },
+    "n16": {
+      "out": false
+    },
+    "n17": {
+      "out": false
+    },
+    "n18": {
+      "out": true
+    },
+    "n19": {
+      "out": true
+    },
+    "n20": {
+      "out": true
+    },
+    "n21": {
+      "out": true
+    },
+    "n22": {
+      "out": true
+    },
+    "n23": {
+      "out": true
+    },
+    "n24": {
+      "out": true
+    },
+    "n25": {
+      "out": true
+    },
+    "n26": {
+      "out": true
+    },
+    "n27": {
+      "out": true
+    },
+    "n28": {
+      "out": false
+    },
+    "n29": {
+      "out": false
+    },
+    "n30": {
+      "out": true
+    },
+    "n31": {
+      "out": false
+    },
+    "n32": {
+      "out": false
+    },
+    "n33": {
+      "out": false
+    },
+    "n34": {
+      "label": "a",
+      "out": true
+    },
+    "n35": {
+      "label": "b",
+      "out": true
+    },
+    "n36": {
+      "label": "c",
+      "out": true
+    },
+    "n37": {
+      "label": "d",
+      "out": true
+    },
+    "n38": {
+      "label": "e",
+      "out": true
+    },
+    "n39": {
+      "label": "f",
+      "out": true
+    },
+    "n40": {
+      "label": "g",
+      "out": false
+    }
+  }
+}

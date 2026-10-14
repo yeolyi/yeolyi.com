@@ -1,0 +1,40 @@
+---
+import { Table } from "@yeolyi/ui/Table";
+
+// 세로 간격 단계표. 값은 줄 높이(lh) 배수이고, 견본 막대 높이가 실제 간격이다.
+// 쓰는 곳(mt-[…lh]·pb-[…lh])과 같아야 한다.
+const rows = [
+  { step: "0.25", use: "제목에 붙는 메타(날짜·조회)" },
+  { step: "0.5", use: "제목과 목록, 라벨과 칸, 메타와 구분선" },
+  { step: "1", use: "문단 사이" },
+  { step: "1.5", use: "글 헤더와 본문, 사이트 헤더 위" },
+  {
+    step: "2",
+    use: "사이트 헤더와 페이지 내용, 목록 페이지(홈·/cs)의 섹션 사이",
+  },
+  { step: "3", use: "글 속 섹션 사이(제목 앞)" },
+  { step: "5", use: "페이지 끝" },
+];
+---
+
+<Table>
+  <thead>
+    <tr><th>견본</th><th>단계(줄)</th><th>쓰는 곳</th></tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((r) => (
+        <tr>
+          <td class="py-3">
+            <span
+              class="bg-foreground block w-10"
+              style={`height: ${r.step}lh`}
+            />
+          </td>
+          <td class="font-mono text-base">{r.step}</td>
+          <td>{r.use}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</Table>

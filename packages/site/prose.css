@@ -1,0 +1,123 @@
+/* 본문(prose) — 요소 스타일은 아일랜드에서 잘리고, 아일랜드 안에서 필요한
+   부분만 .prose 로 감싸 재진입한다. 표는 ui/Table 소유(.md-table). */
+
+.prose {
+  /* 인터랙티브 데모 프레이밍 — 코드블록과 같은 상하 보더. */
+  astro-island {
+    display: block !important;
+  }
+
+  /* 데모 — 1px 가는 선 상자, 왼쪽 위에 고정폭 "데모". 아일랜드는 자동, 정적(.astro)
+     데모는 .demo 로 opt-in. */
+  & > :is(astro-island, .demo) {
+    position: relative;
+    padding: 1.75rem 1.5rem 1.5rem;
+    border: 1px solid var(--color-border);
+
+    &::before {
+      content: "데모";
+      position: absolute;
+      top: -0.75em;
+      left: 1rem;
+      padding: 0 0.375rem;
+      @apply bg-background text-muted-foreground font-mono text-base leading-normal;
+    }
+  }
+}
+
+:where(.prose) > * + * {
+  @apply mt-[1lh];
+}
+
+:where(.prose) > :first-child {
+  @apply mt-0;
+}
+
+@scope (.prose) to (astro-island) {
+  /* 인라인 코드 — 옅은 바탕만. */
+  :not(pre) > code {
+    @apply bg-muted px-1 font-mono;
+  }
+
+  /* 코드 블록 — 옅은 바탕 + 왼쪽 2px 굵은 선, 긴 줄은 줄바꿈. 색은 shiki 인라인(여기선 구조만). */
+  .astro-code {
+    @apply bg-muted! border-foreground block border-l-2 px-[2ch] py-[0.5lh] font-mono text-base leading-normal wrap-break-word whitespace-pre-wrap;
+  }
+
+  /* 헤딩 — 크기·굵기는 global.css. 위 여백은 h2 3lh·h3 1lh(섹션 경계). */
+  h2,
+  h3 {
+    @apply scroll-mt-24;
+  }
+  h2 {
+    @apply mt-[3lh];
+  }
+  h3 {
+    @apply mt-[1lh];
+  }
+
+  /* 링크 — 모양은 global.css(늘 밑줄, 색은 글자색). 인용 안 링크도 글자색을 따른다. */
+
+  /* 인용 — 왼쪽 2px 잉크 선, 글자는 보조 색. */
+  blockquote {
+    @apply border-foreground text-muted-foreground border-l-2 pl-5;
+
+    * + * {
+      @apply mt-[1lh];
+    }
+  }
+
+  /* 리스트 — mono * 불릿 / 번호(중첩은 "-" 로 이어 1-1.). 마커는 li 안쪽 인라인
+     prefix 라 접힌 줄의 행잉 정렬은 맞추지 않는다(간략). 최상위는 본문과
+     flush(좌측 여백 0), 중첩만 들여쓴다. */
+  ul,
+  ol {
+    @apply list-none;
+    padding-inline-start: 0;
+
+    > li::before {
+      font-family: var(--font-mono);
+    }
+  }
+  li ul,
+  li ol {
+    padding-inline-start: 1.5em;
+  }
+  ul > li::before {
+    content: "* ";
+    color: var(--color-muted-foreground);
+  }
+  /* 머리 기호 없는 목록(날짜가 머리 역할을 하는 글 목록 등). */
+  ul.plain > li::before {
+    content: none;
+  }
+  ol {
+    counter-reset: li;
+
+    > li {
+      counter-increment: li;
+
+      &::before {
+        content: counters(li, "-") ". ";
+      }
+    }
+  }
+}
+
+/* 표 — 가로 스크롤 래퍼가 필요해 ui/Table(React) 이 .md-table 를 단다. 마크다운 표
+   override·MDX JSX 표·React 데모가 전부 이 컴포넌트 하나. 셀(<th>/<td>)은 native 라
+   아래 셀렉터가 칠한다. */
+.md-table-wrap {
+  @apply overflow-x-auto;
+}
+/* 세로선 없이 가로 가는 선, 머리 아래만 2px 잉크. 숫자는 자리를 맞춘다. */
+.md-table {
+  @apply border-collapse tabular-nums;
+}
+.md-table th,
+.md-table td {
+  @apply border-border border-b py-2 pr-6 text-left align-middle;
+}
+.md-table th {
+  @apply border-foreground border-b-2 font-bold;
+}

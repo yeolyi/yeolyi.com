@@ -1,0 +1,215 @@
+---
+title: "허리케인과 함께한 하와이 신혼여행"
+date: 2026-08-23
+description: "신혼여행의 계획부터 실행까지 개발자의 후기"
+hidden: true
+---
+
+import qi2 from "./assets/qi2.png";
+import opentable from "./assets/opentable.png";
+import bustago2 from "./assets/bustago2.jpeg";
+import uber from "./assets/uber.jpeg";
+import haleakala from "./assets/haleakala.jpeg";
+import kualoa from "./assets/kualoa.png";
+import popcorners from "./assets/popcorners.jpeg";
+
+import metaapp_toss from "./assets/metaapp_toss.jpeg";
+import metaapp_googlemap_1 from "./assets/metaapp_googlemap_1.jpeg";
+import metaapp_googlemap_2 from "./assets/metaapp_googlemap_2.jpeg";
+
+import { Image } from "astro:assets";
+
+8월 10일부터 20일까지 신혼여행을 다녀왔습니다 💍 💐 🎉
+
+해외여행 경험이 더 많은 아내가 여행 계획을 세우기로 했었지만 아내의 업무량 증가
+이슈로 제가 세웠습니다.
+
+헉 해외여행 경험이라고는 동남아뿐인 제가 여행 2달 남은 시점에 9박 10일
+신혼여행을 잘 계획할 수 있을까요?
+
+## 계획
+
+저는 데이터가 뒷받침되어야 마음이 편합니다. 미국 숙소의 경우 구글 지도에 아주
+많은 리뷰가 있습니다.
+
+<iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14929.731166942107!2d-156.45271613257916!3d20.692642893980533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7954dac4dcde4cef%3A0x457ec73d508ccb37!2z7JWI64uk7IqkIOuniOyasOydtCDslbMg7JmA7J2866CI7JWEIOumrOyhsO2KuCwg67CU7J20IO2VmOyWj-2KuA!5e0!3m2!1sko!2skr!4v1787530620516!5m2!1sko!2skr"
+  width="600"
+  height="450"
+  style={{ width: "100%", height: "auto", aspectRatio: "4 / 3", border: 0 }}
+  allowfullscreen=""
+  loading="lazy"
+  referrerpolicy="strict-origin-when-cross-origin"
+></iframe>
+
+짧게 찾아봤을 떄는 구글 지도의 리뷰를 긁어보는 api는 없는 것으로 보여 클로드에게
+브라우저 띄워 크롤링하라고 요청했습니다. 가격정보같은 경우는 구글 지도 외에 실제
+호텔 예약 사이트도 참고하도록 지시했습니다.
+
+그럼 아래처럼 요약을 얻을 수도 있고...
+
+| 호텔 | 섬/위치         | 종합★ | **최신평균** | 최신5★ | 기본가(USD/박) | 핵심                                   |
+| ---- | --------------- | ----- | ------------ | ------ | -------------- | -------------------------------------- |
+| -    | 마우이 와일레아 | 4.7   | **4.73**     | 85%    | ~$1,000 (9/4)  | 전실 스위트·풀·서비스 압도적           |
+| -    | 오아후(항구뷰)  | 4.5   | **4.54**     | 73%    | ~$333 ★near    | 가성비·청결·넓음 / 비치 아님           |
+| -    | 마우이 와일레아 | 4.6   | **4.49**     | 78%    | ~$1,097 (7/18) | 비치프론트·풀 최다 언급                |
+| -    | 오아후 와이키키 | 4.6   | **4.47**     | 75%    | ~$302 (7/20)   | 리조트피 없음·청결·위치 / 풀·비치 작음 |
+
+아래처럼 호텔별로 자세한 설명을 요청할 수도 있습니다.
+
+- ⭐ 하와이의*어떤*호텔: 4.7 / 최신 4.73 (마우이 1순위)
+  - 최신 분포: 5★85·4★9·3★2·2★2·1★2. 이슈: 친절/서비스 **140**, 수영장 70, 조식
+    30, 청결 26. 노후·소음·좁음 거의 없음.
+  - **전실 스위트**(넓음)·성인풀·비치. 신혼 1호텔 4박에 가장 안정적.
+  - 호평: "별 관측 체험 최고"(3개월) / "전실 스위트, 발코니 넓고 바다 보임"
+  - 혹평: "단골인데 작년·올해 실망, 풀바 서비스 느림"(3개월), "신혼인데 페어몬트
+    기준 미달"(6개월), 소수지만 존재
+  - **결론: 마우이 4박 단일 호텔 최우선 후보.** 오션뷰 정확가 확인 필요.
+
+이렇게 장단점과 함께 후보군들을 꾸린 뒤 유튜브 후기들을 아내와 찾아보며 호텔의
+이미지가 예상한 것과 동일한지 비교했습니다. 이후 저희의 취향과 여행 테마에 맞는
+호텔을 선택했습니다.
+
+9박 10일 여행은 처음이라 계획할게 많을지 고민했는데 호텔 예약, 웨이팅 있는 식당
+예약, 액티비티 예약 정도라서 예상한 것보다 빠르게 끝났습니다.
+
+아래부터는 여행 후기를 들려드릴게요.
+
+## 최고의 음식
+
+<iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d59482.5137641624!2d-157.86666187831275!3d21.28503633969439!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7c006df069b6bfe7%3A0x97b85431fa5178f5!2z7JWE7J28656c65OcIOu5iO2LsOyngCDsiZDsnbTruIwg7JWE7J207Iqk!5e0!3m2!1sko!2skr!4v1787533245335!5m2!1sko!2skr"
+  width="600"
+  height="450"
+  style={{ width: "100%", height: "auto", aspectRatio: "4 / 3", border: 0 }}
+  allowfullscreen=""
+  loading="lazy"
+  referrerpolicy="strict-origin-when-cross-origin"
+></iframe>
+
+1등은 쉐이즈 아이스(얼음 빙수)입니다. 와이키키 있으면서 세 번 먹었고 마지막에는
+커스텀해서 먹었어요. 얼음 빙수에 과일 조합이 상큼 시원해서 하와이 분위기와
+날씨에 정말 잘어울렸습니다.
+
+2등으로는 roy's waikiki에서 디저트로 준 초코 퍼지입니다. 무료인 것처럼 A or
+B식으로 물어봐서 골랐는데 나중에 보니 유료더라고요? 하지만 그게 용서될만큼
+맛있었습니다. 배불러서 둔감해진 미각을 뚫고 들어올만큼 단맛으로 가득한
+디저트였어요.
+
+## 최악의 음식
+
+매일 사람들이 줄 서있는 쉐이브 아이스 옆에 줄이 하나도 없는 사탕수수 음료 가게가
+있는데요, 나트랑에서 맛있게 먹었던 기억으로 샀지만 그냥 설탕물이었습니다 ㅎ 줄이
+없는 이유가 있었던걸로...
+
+## 최고의 액티비티
+
+하와이의 자연 관련된 액티비티 - 마우이 할레아칼라 국립공원에서 본 일출과 쥬라기
+공원 촬용지로 유명한 쿠알로아 랜치가 가장 기억에 남습니다.
+
+<Image src={haleakala} alt="" class="w-full" />
+
+할레아칼라는 생각보다 훨씬 더 추웠습니다. 리뷰에서 경량 패딩 챙겨갔다, 가디건
+챙겨갔다 그랬는데 패딩입고 갈 걸 그랬어요. 출신 나라 별로 반바지 입고 계신 분도
+있고 패딩에 담요까지 걸치고 쭈그려 앉아계신 분도 계셨네요.
+
+<Image src={kualoa} alt="" class="w-full" />
+
+쿠알로아 랜치도 그 산의 웅장함이 기억에 남습니다. 가이드분이 하와이 로컬
+분이셨는데 설명을 열정적으로 하셔서 기억에남아요. 거의 100개의 영화가 이곳에서
+촬영되었다는데 오키나와 배경도 여기서 찍었다고 합니다 (...)
+
+이곳 식당이 한국으로 치면 고속도로 휴게소 느낌이었는데 모코로코(함박 스테이크)가
+정말 맛있어서 기억에 남습니다. 커피 사려고 컵 결제했는데 아이스가 없었던 것도
+충격이었네요. 아아를 잘 안마시나봐요. 카페에서도 아아 마시고 있으면 거의
+한국인이었습니다.
+
+## 최고의 과자
+
+<Image src={popcorners} alt="" class="mx-auto w-full max-w-sm" />
+
+브레이킹 배드 광고로 유명한 popcorners 과자를 먹어보았습니다.
+
+미국 음식에서 만나기 쉽지 않은 담백하고 슴슴한 맛에 놀랐습니다.
+
+<iframe
+  width="560"
+  height="315"
+  style={{ width: "100%", height: "auto", aspectRatio: "16 / 9" }}
+  src="https://www.youtube.com/embed/PFHKifxEzMc?si=9jempflCP3O7Qdig"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
+
+## 최고의 준비물
+
+<Image src={qi2} alt="" class="mx-auto w-full max-w-sm" />
+
+[아트뮤 Qi2 15W 맥세이프 초슬림 고속 보조배터리 5000mAh](https://artmu.co.kr/product/qi2-15w-%EB%A7%A5%EC%84%B8%EC%9D%B4%ED%94%84-%EC%B4%88%EC%8A%AC%EB%A6%BC-%EA%B3%A0%EC%86%8D-%EB%B3%B4%EC%A1%B0%EB%B0%B0%ED%84%B0%EB%A6%AC-5000mah-qb310-%EB%B8%94%EB%9E%99/2475/)
+
+이리저리 다니며 사진을 많이 찍을거라 배터리가 부족할까 걱정했고, 신혼집에
+보조배터리가 없어서 이참에 하나 구입했습니다.
+
+보조배터리 본체와 선을 함께 들고다녀야하는 유선 보조배터리와 편의성이 차원이
+다르게 달랐습니다.
+
+## 최고의 앱
+
+[OpenTable](https://www.opentable.com/)
+
+식당 예약할 때 모두 이 서비스로 진행했습니다. 예약금도 없는데 어떻게 관리가
+되는지 신기할 따름입니다. UI도 직관적이어서 사용하는 과정에서 불편함이 전혀
+없었네요.
+
+<Image src={opentable} alt="" class="mx-auto w-full max-w-sm" />
+
+어떻게 했는지 모르겠는데 캘린더에 일정 추가도 알아서 해줬습니다. 캐치테이블도
+해줬으면...
+
+여담으로 애플 기기에는
+[app clip](https://developer.apple.com/kr/design/human-interface-guidelines/app-clips)이라는
+기능이 있는데요, 설치 과정이 필요하다는 앱의 단점을 극복하기 위한 경량 앱입니다.
+이게 2020년인가 나왔는데 이거 쓰는 서비스는 이번에 처음 봤네요. 그냥 웹으로
+보내도 사용성은 똑같은거 같은데 왜 만들었는지는 모르겠어요. 애플이 눈치줬나?
+
+찾아보니 app clip을 지원하는 몇 안되는 서비스인가봅니다.
+
+> ... I used one for the second time when my mom of all people shared a
+> restaurant reservation with me via OpenTable. I actually really enjoyed the
+> experiences and I wish more apps could do this for those apps you don’t really
+> want installed all the time like a random parking app or dinner reservation
+> app.
+>
+> https://www.reddit.com/r/apple/comments/wscqjo/has_anyone_actually_seen_app_clips_out_in_the_wild/
+
+## 기억에 남는 앱
+
+공항으로 우버를 부르면 항공편 따라서 어느 터미널인지 알려주는 기능이 있더라고요.
+편리해서 기억에 남았습니다.
+
+<Image src={uber} alt="" class="mx-auto w-full max-w-sm" />
+
+## 최악의 앱
+
+[버스타고](https://apps.apple.com/kr/app/%EC%A0%84%EA%B5%AD-%EC%8B%9C%EC%99%B8%EB%B2%84%EC%8A%A4-%EC%8A%B9%EC%B0%A8%EA%B6%8C-%ED%86%B5%ED%95%A9-%EC%98%88%EB%A7%A4-%EB%B2%84%EC%8A%A4%ED%83%80%EA%B3%A0/id966782397)
+
+승차권에 버스 번호와 탑승 장소 정보가 없어 눈치껏 탔습니다. 아래 사진에 있는게
+모든 정보에요.
+
+<Image src={bustago2} alt="" class="mx-auto w-full max-w-xs" />
+
+앱 리뷰 보니 저 노선만 그런 것도 아니어보입니다. 비밀번호 입력은 쓸데없이
+보안키보드로 떠서 자동생성한 비밀번호를 직접 타이핑했네요.
+
+## 앱 경험
+
+앱을 진입하지 않은 상태에서도 서비스를 제공하는 앱들이 많아 인상깊었습니다.
+
+<Image src={metaapp_toss} alt="" class="mx-auto w-full max-w-sm" />
+<Image src={metaapp_googlemap_1} alt="" class="mx-auto w-full max-w-sm" />
+<Image src={metaapp_googlemap_2} alt="" class="mx-auto w-full max-w-sm" />
+
+(작성중... 쓰다보니 할 말이 많네요 ㅎ)

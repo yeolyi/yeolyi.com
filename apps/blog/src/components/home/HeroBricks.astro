@@ -1,0 +1,173 @@
+---
+import { Image } from "astro:assets";
+import me from "@/assets/main-me.avif";
+
+// 홈 사진. 링크 한 줄 크기(높이 1lh, 너비 약 4em) 칸으로 사진을 나누고, 마우스(또는
+// 손가락)가 지나는 칸을 그 영역의 평균색으로 채운다. 떠난 칸은 0.15초에 걸쳐 사진으로
+// 돌아온다(움직임 줄이기면 바로). 높이는 줄 높이의 배수라 칸이 세로로 딱 떨어지고,
+// 가로 칸 수는 폭에 맞춰 정해 칸 너비가 남지 않게 나눈다. 칸은 반듯한 격자로 나란히 놓는다.
+---
+
+<div
+  class="relative h-[4lh] w-full touch-pan-y overflow-hidden select-none sm:h-[7lh]"
+  data-hero-bricks
+>
+  <Image
+    src={me}
+    alt="블로그 주인의 어렸을 적 사진. 노트북에 손을 올린채 화면을 뚫어져라 바라보고 있다."
+    class="block h-full w-full object-cover object-[50%_40%]"
+    widths={[720, 1440]}
+    sizes="(max-width: 45rem) 100vw, 45rem"
+    loading="eager"
+    priority
+  />
+  <canvas
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 h-full w-full"></canvas>
+</div>
+
+<script>
+  const FADE_MS = 150;
+  const BRICK_EM = 4.2; // 링크 하나 정도의 너비
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    "[data-hero-bricks]",
+  )) {
+    const img = root.querySelector("img")!;
+    const canvas = root.querySelector("canvas")!;
+    const ctx = canvas.getContext("2d")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+    type Brick = {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      color: string;
+      t: number;
+    };
+    let bricks: Brick[] = [];
+    let raf = 0;
+    let hovered: Brick | null = null;
+
+    // object-cover + object-position(50% 40%) 와 같은 자리로 사진을 그려 평균색을 잰다.
+    const layout = () => {
+      const { width, height } = root.getBoundingClientRect();
+      if (!width || !height || !img.naturalWidth) return;
+      const dpr = devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const off = document.createElement("canvas");
+      off.width = Math.round(width);
+      off.height = Math.round(height);
+      const octx = off.getContext("2d", { willReadFrequently: true })!;
+      const scale = Math.max(
+        width / img.naturalWidth,
+        height / img.naturalHeight,
+      );
+      const dw = img.naturalWidth * scale;
+      const dh = img.naturalHeight * scale;
+      octx.drawImage(img, (width - dw) * 0.5, (height - dh) * 0.4, dw, dh);
+      const data = octx.getImageData(0, 0, off.width, off.height).data;
+
+      const lh = parseFloat(getComputedStyle(root).lineHeight);
+      const rows = Math.max(1, Math.round(height / lh));
+      const h = height / rows;
+      const em = parseFloat(getComputedStyle(root).fontSize);
+      const cols = Math.max(2, Math.round(width / (BRICK_EM * em)));
+      const w = width / cols;
+
+      const average = (x: number, y: number, bw: number, bh: number) => {
+        let r = 0,
+          g = 0,
+          b = 0,
+          n = 0;
+        const x0 = Math.max(0, Math.floor(x)),
+          x1 = Math.min(off.width, Math.ceil(x + bw));
+        const y0 = Math.max(0, Math.floor(y)),
+          y1 = Math.min(off.height, Math.ceil(y + bh));
+        for (let yy = y0; yy < y1; yy += 2)
+          for (let xx = x0; xx < x1; xx += 2) {
+            const i = (yy * off.width + xx) * 4;
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            n++;
+          }
+        return n
+          ? `rgb(${Math.round(r / n)} ${Math.round(g / n)} ${Math.round(b / n)})`
+          : "transparent";
+      };
+
+      bricks = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const x = col * w;
+          bricks.push({
+            x,
+            y: row * h,
+            w,
+            h,
+            color: average(x, row * h, w, h),
+            t: Number.NEGATIVE_INFINITY,
+          });
+        }
+      }
+      draw();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let active = false;
+      const now = performance.now();
+      for (const b of bricks) {
+        const alpha =
+          b === hovered
+            ? 1
+            : reduce.matches
+              ? 0
+              : Math.max(0, 1 - (now - b.t) / FADE_MS);
+        if (b !== hovered && alpha > 0) active = true;
+        if (alpha <= 0) continue;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+      }
+      ctx.globalAlpha = 1;
+      raf = active ? requestAnimationFrame(draw) : 0;
+    };
+
+    const point = (e: PointerEvent) => {
+      const rect = root.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const next =
+        bricks.find(
+          (b) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h,
+        ) ?? null;
+      if (next === hovered) return;
+      if (hovered) hovered.t = performance.now();
+      hovered = next;
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
+    const leave = () => {
+      if (hovered) hovered.t = performance.now();
+      hovered = null;
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
+
+    root.addEventListener("pointermove", point);
+    root.addEventListener("pointerdown", point);
+    root.addEventListener("pointerleave", leave);
+    root.addEventListener("pointercancel", leave);
+    root.addEventListener("pointerup", (e) => {
+      if (e.pointerType !== "mouse") leave();
+    });
+
+    if (img.complete) layout();
+    else img.addEventListener("load", layout, { once: true });
+    new ResizeObserver(() => layout()).observe(root);
+  }
+</script>

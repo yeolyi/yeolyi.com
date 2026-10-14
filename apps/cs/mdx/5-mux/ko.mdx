@@ -1,0 +1,77 @@
+---
+part: 3
+title: "멀티플렉서"
+description: "여러 입력 중 하나를 골라 내보내는 멀티플렉서를 만들어봅니다"
+order: 50
+---
+
+import TruthTable from "@mdx/components/TruthTable";
+import Flow from "@yeolyi/logic";
+import mux from "./assets/mux.json";
+
+AND, OR, NOT, 그리고 이 모두를 대신할 수 있는
+[NAND 게이트](/nand-is-all-you-need)만 있으면 어떤 논리 회로든 만들 수
+있습니다.
+
+지금까지 만든 회로는 입력이 들어오면 항상 같은 방식으로 처리합니다. 하지만 실제
+컴퓨터는 상황에 따라 다르게 동작해야 합니다. 덧셈을 할 때는 덧셈 회로에 데이터를
+보내고, 뺄셈을 할 때는 뺄셈 회로에 보내야 합니다. 네 개의 저장소 중 하나를 골라
+읽어야 할 때도 있습니다. 이런 **선택**이 가능하려면 어떤 회로가 필요할까요?
+
+## 멀티플렉서
+
+리모컨의 채널 버튼을 생각해봅시다. 여러 방송 중 하나를 골라 TV 화면에
+보여줍니다. **멀티플렉서(MUX)**가 바로 이 리모컨입니다. 여러 입력 중 하나를 골라
+출력하는 회로입니다.
+
+가장 간단한 MUX는 입력 두 개 중 하나를 고르는 **2-to-1 MUX**입니다. 선택 신호
+**S**가 0이면 A를, 1이면 B를 출력합니다.
+
+<TruthTable
+  labels={[
+    { label: "S", type: "input" },
+    { label: "A", type: "input" },
+    { label: "B", type: "input" },
+    { label: "Out", type: "output" },
+  ]}
+  data={[
+    [false, false, false, false],
+    [false, false, true, false],
+    [false, true, false, true],
+    [false, true, true, true],
+    [true, false, false, false],
+    [true, false, true, true],
+    [true, true, false, false],
+    [true, true, true, true],
+  ]}
+  client:idle
+/>
+
+1. S가 0인 행만 살펴봅시다. Out이 항상 A와 같습니다.
+2. S가 1인 행만 살펴봅시다. Out이 항상 B와 같습니다.
+
+즉 S가 0이면 A를, 1이면 B를 그대로 출력합니다. 논리식으로 쓰면
+`(NOT S AND A) OR (S AND B)`. [AND, OR, NOT](/and-or-not)으로 만들 수
+있습니다.
+
+<Flow id="mux" initialJSON={mux} hideNodeButtons client:idle />
+
+1. S를 0으로 두고 A를 바꿔봅시다. A의 값이 그대로 Out에 나옵니다. 반면 B를
+   바꿔도 Out은 바뀌지 않습니다.
+2. S를 1로 바꿔봅시다. 이번에는 B의 값이 Out에 나옵니다.
+3. S가 어떤 입력을 고를지 정하는 **선택 신호** 역할을 하는 것입니다.
+
+입력이 네 개라면? 선택 신호를 2비트(S1, S0)로 늘리면 됩니다. **4-to-1 MUX**는
+`00`이면 첫 번째, `01`이면 두 번째, `10`이면 세 번째, `11`이면 네 번째 입력을
+고릅니다. 2-to-1 MUX 세 개를 조합하면 만들 수 있습니다. S1으로 두 개의 MUX가
+각각 후보 둘씩을 고르고, S0으로 세 번째 MUX가 그 결과 중 하나를 최종 선택하는
+구조입니다.
+
+네 개의 데이터 소스 중 하나를 골라 읽어야 할 때 바로 이 4-to-1 MUX가 사용됩니다.
+2비트 선택 신호가 데이터 소스의 번호에 해당하는 것입니다.
+
+## 마무리
+
+여러 입력 중 하나를 골라 출력하는 **MUX**는 선택 신호 몇 비트만으로 여러 데이터
+소스 가운데 하나를 고릅니다. 반대로 하나의 입력으로 여러 출력 중 하나를
+활성화하는 회로는 [디코더](/decoder)입니다.

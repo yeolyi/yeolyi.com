@@ -1,0 +1,96 @@
+---
+import Button from "@yeolyi/ui/Button";
+import Input from "@yeolyi/ui/Input";
+---
+
+<!-- 상하 간격은 부모(목록 머리)의 0.5lh 격자가 관장한다 — 여기선 자체 세로 마진을 두지
+     않는다. 폼 자체의 형제 리듬만 필요하면 부모에서 `[&>*+*]:mt-[0.5lh]` 로 준다. --><!-- 라벨은 칸 위에 좁게 붙인다(입력 규칙: 줄 높이 1.4 + 칸 위 4px). -->
+<div class="flex flex-col">
+  <label for="subscribe-email" class="leading-[1.4]">이메일</label>
+  <div class="mt-1 flex w-full max-w-sm gap-2">
+    <Input
+      id="subscribe-email"
+      type="email"
+      required
+      placeholder="name@example.com"
+    />
+    <Button id="subscribe-button" className="shrink-0">
+      <span id="icon-send">구독</span>
+      <span id="icon-loading" class="hidden">전송 중</span>
+      <span id="icon-check" class="hidden">완료</span>
+    </Button>
+  </div>
+</div>
+<p
+  id="subscribe-error"
+  class="text-foreground hidden"
+  data-invalid-email="올바른 이메일 주소를 입력해주세요."
+>
+</p>
+
+<script>
+  import { actions, isInputError } from "astro:actions";
+
+  // 구독자 수 표기(#subscriber-count)는 이 폼 밖(목록 머리)에 있다 — 없으면 건너뛴다.
+  const countEl = document.getElementById("subscriber-count");
+  const errorEl = document.getElementById("subscribe-error")!;
+  const emailInput = document.getElementById(
+    "subscribe-email",
+  ) as HTMLInputElement;
+  const button = document.getElementById(
+    "subscribe-button",
+  ) as HTMLButtonElement;
+  const iconSend = document.getElementById("icon-send")!;
+  const iconLoading = document.getElementById("icon-loading")!;
+  const iconCheck = document.getElementById("icon-check")!;
+
+  const setIcon = (icon: "send" | "loading" | "check") => {
+    iconSend.classList.toggle("hidden", icon !== "send");
+    iconLoading.classList.toggle("hidden", icon !== "loading");
+    iconCheck.classList.toggle("hidden", icon !== "check");
+  };
+
+  const refreshCount = async () => {
+    if (!countEl) return;
+    const { data } = await actions.subscriber.getCount();
+    if (data != null) countEl.textContent = data.toString();
+  };
+
+  refreshCount();
+
+  const subscribe = async () => {
+    // Enter 키는 버튼 disabled 를 우회하므로 전송 중 중복 제출을 여기서 막는다.
+    if (button.disabled) return;
+    if (!emailInput.reportValidity()) return;
+    errorEl.classList.add("hidden");
+    setIcon("loading");
+    button.disabled = true;
+
+    const { error } = await actions.subscriber.subscribe({
+      email: emailInput.value,
+    });
+
+    if (error) {
+      setIcon("send");
+      button.disabled = false;
+      errorEl.textContent = isInputError(error)
+        ? errorEl.dataset.invalidEmail!
+        : error.message;
+      errorEl.classList.remove("hidden");
+      return;
+    }
+
+    setIcon("check");
+    emailInput.value = "";
+    refreshCount();
+    setTimeout(() => {
+      setIcon("send");
+      button.disabled = false;
+    }, 2000);
+  };
+
+  button.addEventListener("click", subscribe);
+  emailInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") subscribe();
+  });
+</script>

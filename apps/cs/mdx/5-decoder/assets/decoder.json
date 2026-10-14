@@ -1,0 +1,345 @@
+{
+  "nodes": [
+    {
+      "id": "a",
+      "type": "number",
+      "position": { "x": -120, "y": 60 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "a"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "b",
+      "type": "number",
+      "position": { "x": -120, "y": 200 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "b"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "notA",
+      "type": "not",
+      "position": { "x": 0, "y": 0 },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": { "in1": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "notA"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "notB",
+      "type": "not",
+      "position": { "x": 0, "y": 200 },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": { "in1": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "notB"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and0",
+      "type": "and",
+      "position": { "x": 200, "y": -40 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and0"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and1",
+      "type": "and",
+      "position": { "x": 200, "y": 60 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and1"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and2",
+      "type": "and",
+      "position": { "x": 200, "y": 160 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and2"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and3",
+      "type": "and",
+      "position": { "x": 200, "y": 260 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and3"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "out0",
+      "type": "label",
+      "position": { "x": 360, "y": -28 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "out0"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "out1",
+      "type": "label",
+      "position": { "x": 360, "y": 72 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "out1"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "out2",
+      "type": "label",
+      "position": { "x": 360, "y": 172 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "out2"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "out3",
+      "type": "label",
+      "position": { "x": 360, "y": 272 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "out3"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "a",
+      "sourceHandle": "out",
+      "target": "notA",
+      "targetHandle": "in1",
+      "id": "e-a-notA"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "b",
+      "sourceHandle": "out",
+      "target": "notB",
+      "targetHandle": "in1",
+      "id": "e-b-notB"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "notA",
+      "sourceHandle": "out",
+      "target": "and0",
+      "targetHandle": "in1",
+      "id": "e-notA-and0"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "notB",
+      "sourceHandle": "out",
+      "target": "and0",
+      "targetHandle": "in2",
+      "id": "e-notB-and0"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "notA",
+      "sourceHandle": "out",
+      "target": "and1",
+      "targetHandle": "in1",
+      "id": "e-notA-and1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "b",
+      "sourceHandle": "out",
+      "target": "and1",
+      "targetHandle": "in2",
+      "id": "e-b-and1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "a",
+      "sourceHandle": "out",
+      "target": "and2",
+      "targetHandle": "in1",
+      "id": "e-a-and2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "notB",
+      "sourceHandle": "out",
+      "target": "and2",
+      "targetHandle": "in2",
+      "id": "e-notB-and2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "a",
+      "sourceHandle": "out",
+      "target": "and3",
+      "targetHandle": "in1",
+      "id": "e-a-and3"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "b",
+      "sourceHandle": "out",
+      "target": "and3",
+      "targetHandle": "in2",
+      "id": "e-b-and3"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and0",
+      "sourceHandle": "out",
+      "target": "out0",
+      "targetHandle": "in",
+      "id": "e-and0-out0"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and1",
+      "sourceHandle": "out",
+      "target": "out1",
+      "targetHandle": "in",
+      "id": "e-and1-out1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and2",
+      "sourceHandle": "out",
+      "target": "out2",
+      "targetHandle": "in",
+      "id": "e-and2-out2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and3",
+      "sourceHandle": "out",
+      "target": "out3",
+      "targetHandle": "in",
+      "id": "e-and3-out3"
+    }
+  ],
+  "viewport": { "x": 200, "y": 100, "zoom": 0.8 },
+  "nodeOutputs": {
+    "a": { "out": false, "label": "A" },
+    "b": { "out": false, "label": "B" },
+    "notA": { "out": true },
+    "notB": { "out": true },
+    "and0": { "out": true },
+    "and1": { "out": false },
+    "and2": { "out": false },
+    "and3": { "out": false },
+    "out0": { "label": "O0", "out": true },
+    "out1": { "label": "O1", "out": false },
+    "out2": { "label": "O2", "out": false },
+    "out3": { "label": "O3", "out": false }
+  }
+}

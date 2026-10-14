@@ -1,0 +1,25 @@
+---
+import Button from "@yeolyi/ui/Button";
+---
+
+<script>
+  // 명령형 DOM API - 어떻게(HOW) 변경할지 단계별로 명령
+  let count = 0;
+
+  const counter = document.getElementById("counter")!;
+  const counterButton = document.getElementById("counter-button")!;
+
+  function increment() {
+    count++;
+    counter.textContent = count.toString();
+  }
+
+  counterButton.addEventListener("click", increment);
+</script>
+
+<div class="demo">
+  <p class="mx-auto flex w-fit items-center gap-[2ch] py-[1lh]">
+    <span id="counter">0</span>
+    <Button id="counter-button">+1</Button>
+  </p>
+</div>

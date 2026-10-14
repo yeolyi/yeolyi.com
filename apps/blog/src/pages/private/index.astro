@@ -1,0 +1,28 @@
+---
+export const prerender = false;
+
+import PrivateView from "@/components/private/PrivateView.astro";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+
+// 소유자만 접근 가능한 비공개 영역. 서버에서 세션·소유자를 검증하고, 미인증/
+// 비소유자에겐 콘텐츠를 아예 렌더하지 않는다(하드코딩 데이터가 번들로 새지 않게).
+const OWNER_GITHUB_ID = "yeolyi";
+
+const supabase = createSupabaseServerClient(Astro.request, Astro.cookies);
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+let githubId: string | null = null;
+if (user) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("github_id")
+    .eq("id", user.id)
+    .single();
+  githubId = data?.github_id ?? null;
+}
+const isOwner = githubId === OWNER_GITHUB_ID;
+---
+
+<PrivateView isAuthed={!!user} isOwner={isOwner} githubId={githubId} />

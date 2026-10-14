@@ -1,0 +1,129 @@
+---
+title: "최적화를 하긴 했는데요"
+date: 2025-07-20
+description: "보람없는 최적화 피하기, 그리고 암달의 법칙"
+---
+
+import Flow from "@yeolyi/logic";
+import not from "./assets/not.json";
+import AmdahlLawExample from "./components/AmdahlLawExample";
+
+컴퓨터 공학 강의 페이지 내용에 비해 로딩 UI가 지나치게 오래 보여 최적화를 하기로
+했습니다.
+
+저는 가장 복잡한 컴포넌트인 **논리 게이트 시뮬레이터**가 원인이라고
+생각했습니다. 이를 제외하고는 단순 텍스트이거나 조금의 JS가 포함된
+컴포넌트들뿐이었습니다.
+
+<Flow id="/cs" initialJSON={not} height={200} hideNodeButtons client:idle />
+
+따라서 해당 컴포넌트에 대한 최적화를 시작했습니다. 기존 구현은 아래와
+같았습니다.
+
+```tsx
+// flow.tsx
+'use client';
+
+// ...무지하게 많은 import들
+
+export function Flow(props) {
+  ...
+}
+```
+
+우선 컴포넌트의 로딩이 전체 페이지 로딩에 영향을 주지 않도록 dynamic import과
+suspense를 적용했습니다:
+
+```tsx
+// 별도 파일 생성
+// dynamic-flow.tsx
+"use client";
+
+const Flow = dynamic(() => import("./flow"));
+
+export function DynamicFlow(props) {
+  return (
+    <Suspense>
+      <Flow {...props} />
+    </Suspense>
+  );
+}
+```
+
+하지만 이대로면 로드된 이후에 [CLS](https://web.dev/articles/cls?hl=ko)가
+발생할테니 원본 컴포넌트와 동일한 높이의 fallback을 추가했습니다:
+
+```tsx
+// dynamic-flow.tsx
+"use client";
+
+const Flow = dynamic(() => import("./flow"));
+
+export function DynamicFlow(props) {
+  return (
+    <Suspense fallback={<Fallback height={props.height} />}>
+      <Flow {...props} />
+    </Suspense>
+  );
+}
+```
+
+## 진짜 원인
+
+슬프게도 페이지 로드 시간에 개선은 없었습니다.
+
+그제서야 이상함을 느낀 저는 시뮬레이터 컴포넌트를 아예 지우고 페이지를 다시
+로드해봤습니다. 하지만 페이지는 똑같이 느리게 로드되었습니다. **이는 시뮬레이터
+컴포넌트 로드 시간을 0초로 만든다해도 페이지 진입 시간은 똑같이 느릴 것임을
+의미합니다.**
+
+저 단순한 페이지에 느릴게 뭐가 있다고... 고민하던 와중 next.js에서 무시무시한
+로그를 보게 됩니다:
+
+```txt
+GET /cs 200 in 1400ms
+ │ GET https://api.resend.com/audiences/.. 200 in 1358ms (cache skip)
+ │ │ Cache skipped reason: (auto no cache)
+```
+
+뉴스레터 구독자수를 알아내기 위해 <a href="https://resend.com">resend</a>에 보낸
+api 요청이 1초가 넘게 걸렸습니다. 즉 아래 텍스트가 원인이었던 것입니다:
+
+> 366명과 함께합니다.
+
+SPA였다면 이런 네트워크 요청은 초기 렌더가 끝나고 `useEffect`등의 훅에서
+진행하니 문제가 없었겠지만 안타깝게도 저는 서버 컴포넌트를 사용중이었습니다.
+
+```tsx
+export default async function Page() {
+	const data = await getSubscriberCount();
+	...
+}
+```
+
+서버에서 `getSubscriberCount`가 fulfill되어 렌더링이 끝나기 전까지
+브라우저에서는 전체 페이지에 로딩 fallback을 보여줄 수밖에 없었던 것입니다.
+
+원인을 알고 나서 해결은 쉬웠습니다. 시뮬레이터 컴포넌트에서 한 것과 마찬가지로
+구독자수 부분만 별도 컴포넌트로 꺼내 Suspense로 감싸주었습니다.
+
+## 암달의 법칙
+
+컴퓨터 구조에서 멀티프로세서를 배울 떄 암달의 법칙이 언급됩니다.
+
+> 암달의 법칙(Amdahl's law)은 컴퓨터 시스템의 일부를 개선할 때 전체적으로
+> 얼마만큼의 최대 성능 향상이 있는지 계산하는 데 사용된다.
+> [위키피디아](https://ko.wikipedia.org/wiki/%EC%95%94%EB%8B%AC%EC%9D%98_%EB%B2%95%EC%B9%99)
+
+<AmdahlLawExample client:load />
+
+'컴퓨터 시스템'을 '렌더링 프로세스'로만 바꾸면 오늘 상황에 딱 맞지 않나요? 전체
+작업에서 별 비중이 없는 시뮬레이터 컴포넌트를 개선해도 전체 성능이 별로 개선되지
+않았던 것처럼요.
+
+## 결론
+
+- 최적화 이전에 원인을 찾자
+- 보람없이 코드의 복잡성만 높이는걸 피하자
+- 인터넷에서 찾은 최적화 방법을 그냥 적용하지 말자
+- 렌더링 결과만 보지 말고 그 결과가 나오기까지의 과정을 살펴보자

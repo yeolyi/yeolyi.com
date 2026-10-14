@@ -1,0 +1,84 @@
+/* 디자인 시스템 토큰과 상태 유틸리티. 정본은 design.yeolyi.com(apps/design).
+   앱의 CSS 에서 tailwindcss 다음에 @import 한다. 글꼴 이름(--font-sans·--font-mono)과 @font-face 는 앱이 정한다. */
+
+/* 이 패키지의 컴포넌트 클래스도 앱의 Tailwind 가 스캔하게 한다 */
+@source "./";
+
+@theme {
+  /* 무채색(stone)에 주황 하나. */
+  /* 바탕 */
+  --color-background: light-dark(var(--color-stone-50), var(--color-stone-950));
+  /* 기본: 글자·굵은 선 */
+  --color-foreground: light-dark(
+    var(--color-stone-900),
+    var(--color-stone-100)
+  );
+  /* 옅은 바탕: 코드·호버 */
+  --color-muted: light-dark(var(--color-stone-200), var(--color-stone-800));
+  /* 보조: 날짜·설명 */
+  --color-muted-foreground: light-dark(
+    var(--color-stone-500),
+    var(--color-stone-400)
+  );
+  /* 가는 선 */
+  --color-border: light-dark(var(--color-stone-300), var(--color-stone-700));
+  /* 주황: 바탕·테두리로만. 밝은 모드는 바탕 대비 3:1 을 넘게 조금 짙게(3.5 / 6.9). */
+  --color-accent: light-dark(#e65817, #ff6914);
+  /* 주황 위 글자: 두 모드 모두 짙은 글자(4.8 / 6.1) */
+  --color-on-accent: var(--color-stone-900);
+
+  /* 버튼·입력 칸·세그먼트 높이 하나(44px, 누를 자리 최소 크기) */
+  --spacing-control: 2.75rem;
+
+}
+
+/* 데모의 지금 상태(현재 칸·적중 등) 표시: 반전(잉크 바탕 + 바탕색 글자). 문장 안 강조는 굵게. */
+@utility mark {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+/* 테두리가 있는 컨트롤의 초점: 테두리를 3px 주황으로(늘어난 1px 는 안쪽 그림자). */
+@utility focus-border {
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+}
+
+/* 테두리 없는 컨트롤(아이콘 버튼·링크)의 초점: 주황 바탕. */
+@utility focus-fill {
+  &:focus-visible {
+    outline: none;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+}
+
+/* 누르는 순간: 테두리·바탕은 그대로, 내용물만 1px 내려간다. 버튼류는 높이가 정해져 있고(가운데 정렬)
+   위아래 여백이 0 이라, 위 여백만 2px 주면 내용이 1px 내려간다(레이아웃은 그대로). */
+@utility press-down {
+  &:active:not(:disabled) {
+    padding-top: 2px;
+  }
+}
+
+
+/* 테마: 기본은 OS 설정, 고른 값은 <html data-theme> (themeStore.ts 가 쿠키로 기억하고 페인트 전에 붙인다). */
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* 테마 전환: 버튼에서 원이 퍼진다(cycleTheme 가 WAAPI 로 clip-path 를 돌린다). 기본 크로스페이드는 끈다. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

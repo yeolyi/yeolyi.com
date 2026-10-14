@@ -1,0 +1,24 @@
+diff --git a/lib/attention.js b/lib/attention.js
+index 1040eb0498e88cae2a24997296689f56add69a0c..26f284e320ef0b3128ef90dbb2cff8cf4c5a63b2 100644
+--- a/lib/attention.js
++++ b/lib/attention.js
+@@ -213,8 +213,17 @@ function tokenizeAttention(effects, ok) {
+ 
+     // Always populated by defaults.
+ 
+-    const open = !after || after === 2 && before || attentionMarkers.includes(code);
+-    const close = !before || before === 2 && after || attentionMarkers.includes(previous);
++    // PATCHED: CommonMark spec requires that when a delimiter is adjacent to
++    // punctuation, the other side must be whitespace or punctuation too.
++    // This breaks CJK languages where particles attach directly to closing
++    // punctuation, e.g. **볼드(text)**한글 — the `)` is punctuation but `한`
++    // is neither whitespace nor punctuation, so `**` is not recognized as a
++    // closing delimiter. We remove the `&& before` / `&& after` guard so
++    // that adjacency to punctuation alone is sufficient for open/close.
++    // Original: !after || (after === 2 && before) || attentionMarkers...
++    // Original: !before || (before === 2 && after) || attentionMarkers...
++    const open = !after || after === 2 || attentionMarkers.includes(code);
++    const close = !before || before === 2 || attentionMarkers.includes(previous);
+     token._open = Boolean(marker === 42 ? open : open && (before || !close));
+     token._close = Boolean(marker === 42 ? close : close && (after || !open));
+     return ok(code);

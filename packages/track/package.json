@@ -1,0 +1,8 @@
+{
+  "name": "@yeolyi/track",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -1,0 +1,41 @@
+---
+import Img from "@yeolyi/post/Img.astro";
+import extensions from "@/components/jeongeum/assets/extensions.png";
+import Playground from "@/components/jeongeum/Playground";
+import BaseLayout from "@/components/layout/BaseLayout.astro";
+
+// 정음 소개: 같은 엔진으로 바로 써 보기, 그리고 설치. 설치 그림은 정음 캐러셀(10/9)의 것으로, 번호가 아래 단계와 맞는다.
+---
+
+<BaseLayout
+  title="정음"
+  description="웹페이지의 외국어를 한글 소리로 바꿔 보여 주는 크롬 확장"
+>
+  <div class="measure-col mt-[2lh] pb-[5lh]">
+    <h1>정음</h1>
+    <p class="mt-[0.5lh]">
+      웹페이지의 영어·일본어·중국어를 한글 소리로 바꿔 보여 주는 크롬
+      확장입니다. 모든 변환은 브라우저 안에서 하고, 수집하는 정보는 없습니다.
+    </p>
+
+    <div class="prose mt-[2lh]">
+      <h2>써 보기</h2>
+      <p>확장과 같은 엔진입니다. 아무 글이나 넣어 보세요.</p>
+      <Playground client:visible />
+
+      <h2>설치</h2>
+      <ol>
+        <li>
+          <a href="/d/정음.zip" download>정음.zip</a>을 내려받아 압축을 풉니다.
+        </li>
+        <li>크롬 주소창에 <code>chrome://extensions</code>를 엽니다.</li>
+        <li>오른쪽 위 <strong>개발자 모드</strong>를 켭니다.</li>
+        <li>
+          <strong>압축해제된 확장 프로그램 로드</strong>를 눌러 푼 폴더를
+          고릅니다.
+        </li>
+      </ol>
+      <Img src={extensions} alt="" class="border-border border" />
+    </div>
+  </div>
+</BaseLayout>

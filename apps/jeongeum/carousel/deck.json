@@ -1,0 +1,290 @@
+{
+  "title": "정음 — 한글날 크롬 확장",
+  "caption": "한글날 기념으로 만든 크롬 확장 '정음' 🇰🇷\n\n켜 두면 웹페이지의 영어·일본어·중국어가 전부 한글 소리로 바뀌어요.\nHello, world! → 헬로, 월드!\n\n영어는 철자만으론 발음을 알 수 없어서 CMU 발음사전으로 6만 단어를 미리 변환했고, 일본어 가나·중국어 병음은 외래어 표기법 표를 따랐어요.\n\n크롬 웹 스토어 심사 중이에요. 통과하면 프로필 링크에 올려 둘게요!\n\n#한글날 #크롬확장프로그램 #프론트엔드 #개발자 #사이드프로젝트 #javascript #외래어표기법",
+  "slides": [
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 540,
+          "y": 470,
+          "style": "body",
+          "color": "black",
+          "align": "center",
+          "text": "한글날 기념으로\n**인터넷의 모든 외국어를**\n**한글로 바꾸는**\n크롬 확장을 만들었어요"
+        },
+        {
+          "type": "text",
+          "x": 540,
+          "y": 780,
+          "style": "body",
+          "color": "black",
+          "align": "center",
+          "text": "Hello, world!\n↓\n==헬로, 월드!=="
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**켜 두면 이렇게 보여요**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 290,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "GitHub → ==깃허브==\nYouTube → ==유튜브==\nAPI → 에이피아이\n\n東京タワー → 동경다와\n北京欢迎你 → 베이징환잉니"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 760,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "끄면 페이지가\n원래대로 돌아와요"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 1200,
+          "style": "caption",
+          "color": "black",
+          "align": "left",
+          "text": "실제 화면 캡처는 편집기에서 넣어 주세요"
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**문제: 영어는 철자로**\n**발음을 알 수 없어요**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 380,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "though → 도\nthrough → 스루\ntough → 터프"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 640,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "생김새는 비슷한데\n==발음은 전부 달라요==\n\n그래서 규칙 대신\n**발음사전**을 쓰기로 했어요"
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**발음기호 → 한글 조합**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 290,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "computer\nK AH M · P Y UW · T ER\n→ ==컴 · 퓨 · 터=="
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 560,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "외래어 표기법 규칙을 코드로\n짧은 모음 뒤 t는 받침: cat → __캣__\n모음 앞 l은 겹쳐서: melon → __멜론__\n어말 -le은 '을': google → __구글__"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 900,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "많이 쓰는 영어 단어 **6만 개**를\n빌드할 때 미리 바꿔 넣었어요"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 1080,
+          "style": "caption",
+          "color": "black",
+          "align": "left",
+          "text": "발음: CMU Pronouncing Dictionary · 단어 빈도: wordfreq"
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**그런데 발음대로만 적으면**\n**어색해요**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 380,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "political → 펄리터컬 🤔\nfamily → 패멀리 🤔"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 560,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "약하게 읽는 모음(schwa)이\n전부 '어'가 돼서 그래요\n\n철자의 모음 글자와 짝지어서\n원래 글자대로 적게 했더니"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 920,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "political → ==폴리티컬==\nfamily → ==패밀리=="
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**일본어·중국어도 돼요**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 290,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "가나는 표기법 표대로\nラーメン → 라멘\nコーヒー → 고히"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 560,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "한자는 페이지 언어를 보고\n일본어면 **우리 한자음**: 東京 → 동경\n중국어면 **중국어 발음**: 北京 → 베이징"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 820,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "한국인이 많이 가는 외국 사이트가\n대부분 영어고, 그다음이\n일본어·중국어라서 이 셋부터!"
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "**끄면 원래대로**"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 290,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "바꾼 텍스트 노드마다\n원문을 WeakMap에 기억해 두고\n끄면 그대로 돌려놔요\n\n유튜브처럼 계속 바뀌는 페이지는\n__MutationObserver__로 따라가고\n입력창·코드 블록은 건드리지 않아요"
+        },
+        {
+          "type": "text",
+          "x": 80,
+          "y": 790,
+          "style": "body",
+          "color": "black",
+          "align": "left",
+          "text": "변환은 전부 내 브라우저 안에서만.\n서버로 보내는 건 ==하나도 없어요=="
+        }
+      ]
+    },
+    {
+      "layers": [
+        {
+          "type": "text",
+          "x": 540,
+          "y": 500,
+          "style": "body",
+          "color": "black",
+          "align": "center",
+          "text": "오늘 하루만큼은\n인터넷을 **한글로** 읽어 보세요"
+        },
+        {
+          "type": "text",
+          "x": 540,
+          "y": 700,
+          "style": "body",
+          "color": "black",
+          "align": "center",
+          "text": "크롬 웹 스토어\n==정음=="
+        },
+        {
+          "type": "text",
+          "x": 540,
+          "y": 880,
+          "style": "caption",
+          "color": "black",
+          "align": "center",
+          "text": "심사 통과하면 프로필 링크에 올려 둘게요"
+        }
+      ]
+    }
+  ]
+}

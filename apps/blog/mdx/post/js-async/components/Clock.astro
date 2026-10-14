@@ -1,0 +1,18 @@
+<span class="clock font-mono">00:00:00</span>
+
+<script>
+  // 한 페이지에 Clock이 여러 개 있어도 setInterval은 하나만 돌린다
+  if (!document.documentElement.dataset.clockStarted) {
+    document.documentElement.dataset.clockStarted = "true";
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+
+    setInterval(() => {
+      const now = new Date();
+      const text = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      document.querySelectorAll(".clock").forEach((clock) => {
+        clock.textContent = text;
+      });
+    }, 1000);
+  }
+</script>

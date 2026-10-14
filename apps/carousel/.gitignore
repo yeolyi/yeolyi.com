@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+.env*.local
+supabase/.temp
+decks/
+.vercel
+dist
+.env*
+.env
+!.env.example
+
+# 로컬 전용 스킬(개인 캡처·실험 스크립트 포함)
+skills/ig-fake-feed/

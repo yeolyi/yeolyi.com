@@ -1,0 +1,47 @@
+---
+import { Image } from "astro:assets";
+
+// 마크다운 이미지(![캡션](./assets/x.png)) — 본문 폭(--measure 720px) 기준
+// 1x/2x 로 최적화해 내보낸다. alt 텍스트가 있으면 그대로 아래 muted 캡션
+// (figcaption)이 되고, 없으면 장식 이미지로 보고 캡션을 달지 않는다.
+// Astro 는 로컬 이미지의 src 를 ImageMetadata 객체로, 원격 이미지는 문자열로
+// 넘긴다 — 원격은 최적화 없이 <img> 그대로.
+const { class: cls, alt, src, ...rest } = Astro.props;
+const isLocal = typeof src === "object" && src !== null;
+const widths = [720, 1440];
+const sizes = "(max-width: 45rem) 100vw, 45rem";
+---
+
+{
+  isLocal ? (
+    alt ? (
+      <figure>
+        <Image
+          class:list={["w-full", cls]}
+          src={src}
+          alt={alt}
+          widths={widths}
+          sizes={sizes}
+          {...rest}
+        />
+        <figcaption class="text-muted-foreground mt-3">{alt}</figcaption>
+      </figure>
+    ) : (
+      <Image
+        class:list={["w-full", cls]}
+        src={src}
+        alt=""
+        widths={widths}
+        sizes={sizes}
+        {...rest}
+      />
+    )
+  ) : alt ? (
+    <figure>
+      <img class:list={["w-full", cls]} src={src} alt={alt} {...rest} />
+      <figcaption class="text-muted-foreground mt-3">{alt}</figcaption>
+    </figure>
+  ) : (
+    <img class:list={["w-full", cls]} src={src} alt="" {...rest} />
+  )
+}

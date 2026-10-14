@@ -1,0 +1,12 @@
+# 빌드 산출물(Biome 가 이 파일을 무시 목록으로 읽는다. 루트 .gitignore 와 겹쳐도 둔다)
+dist/
+.astro/
+.vercel/
+node_modules/
+.env
+
+# local reference material (instagram export 등, 코드 아님)
+reference/
+
+scripts/sillok-full.txt
+scripts/.gpt_resume.pt

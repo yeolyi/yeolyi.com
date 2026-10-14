@@ -1,0 +1,16 @@
+{
+  "name": "@yeolyi/site",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.css": "./base.css",
+    "./prose.css": "./prose.css",
+    "./markdown/*": "./markdown/*.ts"
+  },
+  "dependencies": {
+    "prettier": "^3.8.1"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.4"
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "nodes": [
+    {
+      "id": "d0",
+      "type": "number",
+      "position": { "x": -100, "y": 20 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "d0"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "d1",
+      "type": "number",
+      "position": { "x": -100, "y": 90 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "d1"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "d2",
+      "type": "number",
+      "position": { "x": -100, "y": 160 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "d2"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "d3",
+      "type": "number",
+      "position": { "x": -100, "y": 230 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "d3"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "s0",
+      "type": "number",
+      "position": { "x": -100, "y": 330 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "s0"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "s1",
+      "type": "number",
+      "position": { "x": -100, "y": 400 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "s1"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "mux1",
+      "type": "mux",
+      "position": { "x": 100, "y": 0 },
+      "data": {
+        "atoms": {
+          "type": "mux",
+          "inputAtoms": {
+            "d0": { "init": null },
+            "d1": { "init": null },
+            "d2": { "init": null },
+            "d3": { "init": null },
+            "s0": { "init": null },
+            "s1": { "init": null }
+          },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "mux1"
+        }
+      },
+      "measured": { "width": 128, "height": 240 }
+    },
+    {
+      "id": "dec1",
+      "type": "decoder",
+      "position": { "x": 100, "y": 300 },
+      "data": {
+        "atoms": {
+          "type": "decoder",
+          "inputAtoms": {
+            "a0": { "init": null },
+            "a1": { "init": null }
+          },
+          "outputAtoms": {
+            "o0": { "init": null },
+            "o1": { "init": null },
+            "o2": { "init": null },
+            "o3": { "init": null }
+          },
+          "effectAtom": {},
+          "id": "dec1"
+        }
+      },
+      "measured": { "width": 128, "height": 160 }
+    },
+    {
+      "id": "readOut",
+      "type": "label",
+      "position": { "x": 320, "y": 100 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "readOut"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "w0",
+      "type": "label",
+      "position": { "x": 320, "y": 312 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "w0"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "w1",
+      "type": "label",
+      "position": { "x": 320, "y": 344 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "w1"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "w2",
+      "type": "label",
+      "position": { "x": 320, "y": 376 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "w2"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "w3",
+      "type": "label",
+      "position": { "x": 320, "y": 408 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "w3"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "d0",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "d0",
+      "id": "e-d0-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "d1",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "d1",
+      "id": "e-d1-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "d2",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "d2",
+      "id": "e-d2-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "d3",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "d3",
+      "id": "e-d3-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s0",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "s0",
+      "id": "e-s0-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s1",
+      "sourceHandle": "out",
+      "target": "mux1",
+      "targetHandle": "s1",
+      "id": "e-s1-mux"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s0",
+      "sourceHandle": "out",
+      "target": "dec1",
+      "targetHandle": "a0",
+      "id": "e-s0-dec"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s1",
+      "sourceHandle": "out",
+      "target": "dec1",
+      "targetHandle": "a1",
+      "id": "e-s1-dec"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "mux1",
+      "sourceHandle": "out",
+      "target": "readOut",
+      "targetHandle": "in",
+      "id": "e-mux-read"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "dec1",
+      "sourceHandle": "o0",
+      "target": "w0",
+      "targetHandle": "in",
+      "id": "e-dec-w0"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "dec1",
+      "sourceHandle": "o1",
+      "target": "w1",
+      "targetHandle": "in",
+      "id": "e-dec-w1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "dec1",
+      "sourceHandle": "o2",
+      "target": "w2",
+      "targetHandle": "in",
+      "id": "e-dec-w2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "dec1",
+      "sourceHandle": "o3",
+      "target": "w3",
+      "targetHandle": "in",
+      "id": "e-dec-w3"
+    }
+  ],
+  "viewport": { "x": 180, "y": 30, "zoom": 0.75 },
+  "nodeOutputs": {
+    "d0": { "out": true, "label": "D0" },
+    "d1": { "out": false, "label": "D1" },
+    "d2": { "out": true, "label": "D2" },
+    "d3": { "out": false, "label": "D3" },
+    "s0": { "out": false, "label": "S0" },
+    "s1": { "out": false, "label": "S1" },
+    "mux1": { "out": true },
+    "dec1": { "o0": true, "o1": false, "o2": false, "o3": false },
+    "readOut": { "label": "Read", "out": true },
+    "w0": { "label": "W0", "out": true },
+    "w1": { "label": "W1", "out": false },
+    "w2": { "label": "W2", "out": false },
+    "w3": { "label": "W3", "out": false }
+  }
+}

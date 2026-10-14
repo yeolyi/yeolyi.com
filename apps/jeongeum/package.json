@@ -1,0 +1,11 @@
+{
+  "name": "jeongeum",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "zip": "sh scripts/zip.sh"
+  },
+  "exports": {
+    "./web": "./web.js"
+  }
+}

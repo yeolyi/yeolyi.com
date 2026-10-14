@@ -1,0 +1,61 @@
+---
+import { getImage, Image } from "astro:assets";
+import appleTree from "./assets/apple-tree.png";
+import grayTree from "./assets/gray-tree.jpg";
+import ImageCompareSlider from "./ImageCompareSlider";
+
+const { class: className } = Astro.props;
+
+// --measure(45rem=720px) 폭으로 뜨는 첫 화면 이미지 — 원본 폭 그대로 내보내면
+// 수백 kB라 표시 폭 기준 1x/2x만 생성하고 lazy 대신 eager 로 바로 받는다.
+// 본 이미지가 오는 동안엔 32px 프리뷰를 배경에 깔아 저해상도로 먼저 보인다.
+const sizes = "(max-width: 45rem) 100vw, 45rem";
+const widths = [720, 1440];
+const grayPreview = await getImage({ src: grayTree, width: 32, quality: 40 });
+const applePreview = await getImage({ src: appleTree, width: 32, quality: 40 });
+const previewStyle = (src: string) =>
+  `background-image:url(${src});background-size:cover;`;
+---
+
+<div
+  class:list={[
+    "relative aspect-2/1 w-full overflow-hidden select-none",
+    className,
+  ]}
+  data-image-compare
+  style={previewStyle(grayPreview.src)}
+>
+  <Image
+    src={grayTree}
+    alt="Gray Tree by Piet Mondrian"
+    width={1440}
+    widths={widths}
+    sizes={sizes}
+    loading="eager"
+    fetchpriority="high"
+    class="block h-full w-full object-cover"
+  />
+  <div
+    class="absolute inset-0"
+    data-compare-clip
+    style={`clip-path: inset(0 67% 0 0);${previewStyle(applePreview.src)}`}
+  >
+    <Image
+      src={appleTree}
+      alt="Apple Tree by Piet Mondrian"
+      width={1440}
+      widths={widths}
+      sizes={sizes}
+      loading="eager"
+      fetchpriority="high"
+      class="h-full w-full object-cover"
+    />
+  </div>
+  <div
+    class="bg-background [&.focused]:bg-accent pointer-events-none absolute inset-y-0 z-10 w-1 -translate-x-1/2 transition-[width,background-color] [&.focused]:w-1.5"
+    style="left: 33%;"
+    data-compare-handle
+  >
+  </div>
+  <ImageCompareSlider client:idle />
+</div>

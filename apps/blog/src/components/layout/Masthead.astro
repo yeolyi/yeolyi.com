@@ -1,0 +1,88 @@
+---
+import IconButton from "@yeolyi/ui/IconButton";
+import { Moon, Sun, SunMoon } from "lucide-react";
+import GitHub from "@/assets/brand/github.svg";
+import Instagram from "@/assets/brand/instagram.svg";
+
+const brandLink =
+  "focus-fill min-h-control min-w-control hover:bg-foreground hover:text-background press-down inline-flex items-center justify-center no-underline transition-colors [&_svg]:size-[1.25em]";
+---
+
+<div class="bg-background pt-[1.5lh]">
+  {
+    /* 왼쪽 한 줄: 이름은 왼쪽, 바깥 링크(브랜드 로고)와 테마는 오른쪽. 글 머리와 같은 왼쪽 선(measure-col).
+       좁아지면 아이콘 줄은 그대로 두고 이름이 줄바꿈한다(아이콘이 다음 줄로 가면 안쪽 여백 때문에 왼쪽 선이 어긋난다). */
+  }
+  <header class="measure-col flex items-center justify-between gap-x-4">
+    <a href="/" class="min-w-0 leading-snug no-underline hover:underline"
+      ><span class="whitespace-nowrap">이성열</span>{" "}<span
+        class="whitespace-nowrap">Seongyeol Yi</span
+      ></a
+    >
+    <nav class="-mr-2 flex shrink-0 items-center">
+      {
+        /* 브랜드 로고는 lucide 의 github·instagram 사본(선 아이콘이라 다른 아이콘과 굵기가 같다).
+         아이콘 버튼과 같은 자리·크기·호버·초점(주황 바탕). */
+      }
+      <a
+        href="https://github.com/yeolyi"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub (새 창)"
+        class={brandLink}
+      >
+        <GitHub />
+      </a>
+      <a
+        href="https://instagram.com/yeol.dev"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram (새 창)"
+        class={brandLink}
+      >
+        <Instagram />
+      </a>
+      {
+        /* 테마 토글 — 바깥 링크와 성격이 달라 1px 세로선으로 나눈다. 자동 → 라이트 → 다크 순환. 아이콘은 "현재 상태"를 보여준다.
+         React IconButton 을 정적 렌더하고 바닐라 스크립트로 조작. */
+      }
+      <span aria-hidden="true" class="bg-border mx-2 h-6 w-px"></span>
+      <IconButton id="theme-toggle" aria-label="테마: 시스템 설정">
+        <span data-icon="auto" class="contents"><SunMoon aria-hidden /></span>
+        <span data-icon="light" class="contents" hidden
+          ><Sun aria-hidden /></span
+        >
+        <span data-icon="dark" class="contents" hidden
+          ><Moon aria-hidden /></span
+        >
+      </IconButton>
+    </nav>
+  </header>
+</div>
+
+<script>
+  import {
+    cycleTheme,
+    readTheme,
+    THEME_LABEL,
+    type Theme,
+  } from "@yeolyi/ui/theme-store";
+
+  // 테마 저장·전환은 서비스 헤더의 버튼과 같은 코드(@yeolyi/ui/theme-store). 여기선 아이콘만 바꾼다.
+  const button = document.getElementById("theme-toggle")!;
+  // 연달아 누를 때 두 번째부터는 더블·트리플 클릭으로 옆 글·사진이 선택되지 않게 기본 동작만 막는다.
+  button.addEventListener("mousedown", (e) => {
+    if (e.detail > 1) e.preventDefault();
+  });
+  const icons = button.querySelectorAll<HTMLElement>("[data-icon]");
+  const show = (t: Theme) => {
+    for (const icon of icons) icon.hidden = icon.dataset.icon !== t;
+    button.setAttribute("aria-label", THEME_LABEL[t]);
+    button.setAttribute("title", THEME_LABEL[t]);
+  };
+  let theme = readTheme();
+  show(theme);
+  button.addEventListener("click", () => {
+    theme = cycleTheme(theme, button, show);
+  });
+</script>

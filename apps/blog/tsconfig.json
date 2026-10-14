@@ -1,0 +1,19 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    // Use explicit type imports and exports whenever possible.
+    "verbatimModuleSyntax": true,
+
+    // import alias
+    "paths": {
+      "@/*": ["./src/*"],
+      "@mdx/*": ["./mdx/*"]
+    },
+
+    // @astrojs/react
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
+}

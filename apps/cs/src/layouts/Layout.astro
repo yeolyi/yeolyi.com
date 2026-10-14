@@ -1,0 +1,63 @@
+---
+import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import { THEME_INIT } from "@yeolyi/ui/theme-store";
+import og from "@/og.jpg";
+import "@/style/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+}
+
+const NAME = "성열의 컴퓨터공학";
+const {
+  title,
+  description = "예비 컴공생, 비전공자를 위한 인터랙티브 컴퓨터공학 시리즈",
+  ogType = "website",
+} = Astro.props;
+const fullTitle = title ? `${title} · ${NAME}` : NAME;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// OG 이미지는 절대 URL 이어야 크롤러(카톡·트위터 등)가 읽는다.
+const ogImage = new URL(og.src, Astro.site);
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={THEME_INIT} />
+    <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/MonoplexKR-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <link rel="canonical" href={canonical} />
+    <meta name="description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={NAME} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <ServiceHeader client:load name={NAME} className="measure-col pt-[1.5lh]" />
+    <slot />
+    <script>
+      import { startTracking } from "@yeolyi/track";
+      startTracking("cs");
+    </script>
+  </body>
+</html>

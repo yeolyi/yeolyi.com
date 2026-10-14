@@ -1,0 +1,23 @@
+---
+import { VonNeumannSimulator } from "@mdx/13-cpu/components/simulator";
+import Layout from "@/layouts/Layout.astro";
+---
+
+<!-- CS 글과 같은 문서형 페이지 — measure-col 폭, 헤더(제목+muted 설명) 뒤 1lh 띄우고
+     본문(시뮬레이터)만. 데모 프레이밍(가는 선 상자)은 prose 스코프의 아일랜드 규칙이 건다. -->
+<Layout title="폰 노이만 시뮬레이터">
+  <div class="measure-col mt-[2lh] pb-[5lh]">
+    <header>
+      <h1>폰 노이만 시뮬레이터</h1>
+      <p class="text-muted-foreground mt-[0.25lh]">
+        16바이트 메모리에 명령어를 배치하고 프로그램을 로드해봅시다. 명령어가
+        없는 주소는 NOOP(No Operation)으로, 아무 동작도 하지 않습니다. PC는 0번
+        주소에서 시작하여 Fetch-Decode-Execute 사이클을 반복합니다.
+      </p>
+    </header>
+
+    <div class="prose mt-[1lh]">
+      <VonNeumannSimulator client:idle />
+    </div>
+  </div>
+</Layout>

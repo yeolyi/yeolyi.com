@@ -1,0 +1,213 @@
+{
+  "nodes": [
+    {
+      "id": "d-input",
+      "type": "number",
+      "position": { "x": -80, "y": 12 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "d-input"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "e-input",
+      "type": "number",
+      "position": { "x": -80, "y": 76 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": true },
+            "label": { "init": null }
+          },
+          "id": "e-input"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "latch-a",
+      "type": "dLatch",
+      "position": { "x": 60, "y": 0 },
+      "data": {
+        "atoms": {
+          "type": "dLatch",
+          "inputAtoms": {
+            "d": { "init": null },
+            "e": { "init": null }
+          },
+          "outputAtoms": {
+            "q": { "init": null },
+            "qBar": { "init": null }
+          },
+          "effectAtom": {},
+          "id": "latch-a"
+        }
+      },
+      "measured": { "width": 128, "height": 128 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "latch-b",
+      "type": "dLatch",
+      "position": { "x": 260, "y": 0 },
+      "data": {
+        "atoms": {
+          "type": "dLatch",
+          "inputAtoms": {
+            "d": { "init": null },
+            "e": { "init": null }
+          },
+          "outputAtoms": {
+            "q": { "init": null },
+            "qBar": { "init": null }
+          },
+          "effectAtom": {},
+          "id": "latch-b"
+        }
+      },
+      "measured": { "width": 128, "height": 128 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "latch-c",
+      "type": "dLatch",
+      "position": { "x": 460, "y": 0 },
+      "data": {
+        "atoms": {
+          "type": "dLatch",
+          "inputAtoms": {
+            "d": { "init": null },
+            "e": { "init": null }
+          },
+          "outputAtoms": {
+            "q": { "init": null },
+            "qBar": { "init": null }
+          },
+          "effectAtom": {},
+          "id": "latch-c"
+        }
+      },
+      "measured": { "width": 128, "height": 128 },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "q-output",
+      "type": "label",
+      "position": { "x": 640, "y": 12 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "q-output"
+        }
+      },
+      "measured": { "width": 40, "height": 40 },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "d-input",
+      "sourceHandle": "out",
+      "target": "latch-a",
+      "targetHandle": "d",
+      "id": "e-d-to-a"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "e-input",
+      "sourceHandle": "out",
+      "target": "latch-a",
+      "targetHandle": "e",
+      "id": "e-e-to-a"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "e-input",
+      "sourceHandle": "out",
+      "target": "latch-b",
+      "targetHandle": "e",
+      "id": "e-e-to-b"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "e-input",
+      "sourceHandle": "out",
+      "target": "latch-c",
+      "targetHandle": "e",
+      "id": "e-e-to-c"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "latch-a",
+      "sourceHandle": "q",
+      "target": "latch-b",
+      "targetHandle": "d",
+      "id": "e-a-to-b"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "latch-b",
+      "sourceHandle": "q",
+      "target": "latch-c",
+      "targetHandle": "d",
+      "id": "e-b-to-c"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "latch-c",
+      "sourceHandle": "q",
+      "target": "q-output",
+      "targetHandle": "in",
+      "id": "e-c-to-out"
+    }
+  ],
+  "viewport": {
+    "x": 80,
+    "y": 40,
+    "zoom": 0.5
+  },
+  "nodeOutputs": {
+    "d-input": { "out": false, "label": "D" },
+    "e-input": { "out": true, "label": "E" },
+    "latch-a": { "q": false, "qBar": true },
+    "latch-b": { "q": false, "qBar": true },
+    "latch-c": { "q": false, "qBar": true },
+    "q-output": { "label": "Q", "out": false }
+  }
+}

@@ -1,0 +1,9 @@
+---
+import Hub from "@/components/Hub.astro";
+import { getVisibleParts } from "@/lib/content";
+
+// 파트 구분·제목은 프런트매터 part 필드와 lib/content 의 PARTS 가 관장한다.
+const parts = await getVisibleParts();
+---
+
+<Hub parts={parts} />

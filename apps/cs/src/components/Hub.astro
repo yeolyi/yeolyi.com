@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ImageCompare from "@/components/ImageCompare.astro";
+import SubscribeForm from "@/components/SubscribeForm.astro";
+import Layout from "@/layouts/Layout.astro";
+import { postSlug } from "@/lib/content";
+
+interface Props {
+  parts: { title: string; posts: CollectionEntry<"post">[] }[];
+}
+const { parts } = Astro.props;
+---
+
+<Layout>
+  <div class="measure-col prose mt-[2lh] pb-[5lh]">
+    <ImageCompare />
+
+    <p>
+      예비 컴공생, 비전공자를 위한 인터랙티브 컴퓨터공학 시리즈. <span
+        id="subscriber-count">-</span
+      >명이 구독 중입니다.
+    </p>
+    <SubscribeForm />
+
+    {
+      parts.map(({ title, posts: partPosts }) => (
+        <>
+          <h2 class="mt-[2lh]">{title}</h2>
+          {partPosts.length > 0 ? (
+            <ol class="mt-[0.5lh]">
+              {partPosts.map((p) => (
+                <li>
+                  <a class="py-1.5" href={`/${postSlug(p.id)}`}>
+                    {p.data.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p class="text-muted-foreground mt-[0.5lh]">준비 중</p>
+          )}
+        </>
+      ))
+    }
+  </div>
+</Layout>

@@ -1,0 +1,33 @@
+{
+  "name": "house",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit && deno check supabase/functions/*/index.ts",
+    "test": "node --test 'tests/unit/*.test.ts'"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.9.0",
+    "@supabase/supabase-js": "^2.117.3",
+    "@tanstack/react-query": "^5.102.8",
+    "@yeolyi/site": "workspace:*",
+    "@yeolyi/track": "workspace:*",
+    "@yeolyi/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.52.0",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^26.6.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3"
+  }
+}

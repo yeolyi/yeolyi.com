@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>판교 아포칼립스</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Black+Han+Sans&family=Gothic+A1:wght@500;800&family=Do+Hyeon&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @font-face {
+        font-family: "KyoboHand";
+        src: url("/pangyo/fonts/KyoboHandwriting2025lyb.otf") format("opentype");
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+      #strip {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 24px 0 80px;
+      }
+      .panel {
+        position: relative;
+        margin: 0 8px 42px;
+      }
+      .panel img {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #fff;
+      }
+      .b {
+        position: absolute;
+        box-sizing: border-box;
+        line-height: 1.28;
+        word-break: keep-all;
+        cursor: move;
+        user-select: none;
+        touch-action: none;
+      }
+      .b.dragging {
+        outline: 2px dashed #09f;
+        opacity: 0.85;
+      }
+      .speech,
+      .thought,
+      .shout,
+      .sys {
+        background: #fff;
+        border: 2.5px solid #111;
+        color: #111;
+        padding: 8px 12px;
+        font-family: "KyoboHand", "Nanum Pen Script", cursive;
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      .speech {
+        border-radius: 20px;
+      }
+      .thought {
+        border-radius: 2px;
+      } /* 속마음/나레이션: 손글씨 사각 박스 */
+      .shout {
+        /* 외침: 대사와 같은 굵기/크기, 두꺼운 보더로만 구분 */
+        border-width: 4px;
+        border-radius: 6px;
+        transform: none;
+        box-shadow: none;
+        font-family: "Pretendard", sans-serif;
+        font-weight: 500;
+        font-size: 1.02rem;
+      }
+      .sys {
+        border-radius: 2px;
+        font-family: "Gothic A1", sans-serif;
+        font-weight: 800;
+        font-size: 1.05rem;
+      }
+      .sfx {
+        color: #111;
+        font-family: "KyoboHand", "Nanum Pen Script", cursive;
+        font-weight: bold;
+        -webkit-text-stroke: 1.5px #111;
+        background: none;
+        border: none;
+        text-shadow:
+          2px 2px 0 #fff,
+          -2px -2px 0 #fff,
+          2px -2px 0 #fff,
+          -2px 2px 0 #fff;
+      }
+      .sign {
+        /* 간판/환경 문자 */
+        color: #111;
+        background: none;
+        border: none;
+        text-align: center;
+        font-family: "Pretendard", sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+      .lcd {
+        /* 전광판 디지털 숫자 */
+        color: #fff;
+        background: none;
+        border: none;
+        text-align: center;
+        font-family: "VT323", monospace;
+        letter-spacing: 0.06em;
+      }
+      .credit {
+        color: #888;
+        font-family: "Gothic A1", sans-serif;
+        font-size: 0.85rem;
+        text-align: center;
+        margin-top: 30px;
+      }
+      .missing {
+        color: #f66;
+        font-family: monospace;
+        padding: 40px;
+        text-align: center;
+        border: 1px dashed #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="strip"></div>
+    <div class="credit">
+      원작: 판교 아포칼립스.Manhwa — 미애
+      <a
+        href="https://www.instagram.com/crazycaterpill/"
+        target="_blank"
+        rel="noopener"
+        style="color: #aaa"
+        >@crazycaterpill</a
+      >
+      <br />본 만화는 원작을 오마주하여 각색한 2차 창작물입니다.
+    </div>
+    <script>
+      // 각 컷: img + bubbles[{t:타입, x,y,w(%), s:추가스타일, text}]
+      const P = [
+        {
+          n: 1,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 52,
+              text: `나에게는 판교 회사에 다니는 친구가 있다.`,
+            },
+          ],
+        },
+        {
+          n: 2,
+          pw: 70,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 3,
+              w: 60,
+              text: `하루는 그 친구가 청첩장을 주겠다며 회사 근처로 놀러오라고 했다.`,
+            },
+            {
+              t: "speech",
+              x: 30,
+              y: 38,
+              w: 42,
+              s: "font-size:1.15rem;background:none;border:none",
+              text: `나 결혼한다ㅋㅋ`,
+            },
+            {
+              t: "speech",
+              x: 24,
+              y: 55,
+              w: 56,
+              s: "font-size:1.15rem;background:none;border:none",
+              text: `청첩장 줄 겸 밥 살게.<br>회사 근처로 와`,
+            },
+          ],
+        },
+        {
+          n: 3,
+          b: [
+            {
+              t: "thought",
+              x: 40,
+              y: 6,
+              w: 55,
+              text: `나는 기쁜 마음으로 판교에 놀러갔지만...`,
+            },
+          ],
+        },
+        {
+          n: 4,
+          b: [
+            { t: "thought", x: 4, y: 4, w: 40, text: `알아챘어야 했다.` },
+            {
+              t: "thought",
+              x: 38,
+              y: 64,
+              w: 58,
+              text: `쾌활하고 웃기던 친구가 '크루'가 되기 시작한 이후로 로봇이 되고 있었다는 사실을...`,
+            },
+          ],
+        },
+        {
+          n: 5,
+          b: [
+            {
+              t: "thought",
+              x: 6,
+              y: 5,
+              w: 56,
+              text: `처음으로 와본 판교역은 그야말로 신세계였다.`,
+            },
+            {
+              t: "sign",
+              x: 22,
+              y: 48,
+              w: 44,
+              s: "font-size:2.4rem;transform:rotate(-2deg)",
+              text: `판교역`,
+            },
+          ],
+        },
+        {
+          n: 6,
+          b: [
+            {
+              t: "thought",
+              x: 42,
+              y: 72,
+              w: 52,
+              text: `IT 회사의 집합체라는 명성답게...`,
+            },
+          ],
+        },
+        {
+          n: 7,
+          b: [
+            {
+              t: "thought",
+              x: 3,
+              y: 5,
+              w: 44,
+              text: `감시드론과 로봇들이 거리를 지배하고 있었다.`,
+            },
+          ],
+        },
+        {
+          n: 8,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 56,
+              text: `그 사이에 로봇... 인 줄 알았던 내 친구가 날 부르고 있었다.`,
+            },
+          ],
+        },
+        { n: 9, b: [{ t: "speech", x: 62, y: 56, w: 28, text: `여어.` }] },
+        {
+          n: 10,
+          b: [
+            { t: "speech", x: 8, y: 8, w: 32, text: `...싼 거 먹자.` },
+            {
+              t: "thought",
+              x: 36,
+              y: 74,
+              w: 60,
+              text: `이때까지도 난 무슨 일이 일어날지 짐작하지 못했다.`,
+            },
+          ],
+        },
+        {
+          n: 11,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 52,
+              text: `근데 여긴 분위기가 이상한데... 왜 길거리에 로봇이 이렇게 많이 돌아다니는 거지?`,
+            },
+          ],
+        },
+        {
+          n: 12,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 56,
+              text: `넌 모를 수도 있겠군. 저들은 모두 판교에서 일하는 노동자들이다.`,
+            },
+            {
+              t: "sfx",
+              x: 78,
+              y: 62,
+              w: 18,
+              s: "font-size:2.6rem",
+              text: `!!`,
+            },
+          ],
+        },
+        {
+          n: 13,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 60,
+              text: `저들은 모두 본래 인간이었다... 과도한 노동과 반복되는 패턴에 점차 기계화가 진행된 거지.`,
+            },
+          ],
+        },
+        {
+          n: 14,
+          b: [
+            {
+              t: "speech",
+              x: 58,
+              y: 8,
+              w: 38,
+              text: `"크루"라는 신인류, 아니 신기종이 탄생한 거다!`,
+            },
+            {
+              t: "sfx",
+              x: 16,
+              y: 58,
+              w: 24,
+              s: "font-size:1.05rem;-webkit-text-stroke:0;transform:rotate(-4deg)",
+              text: `세커티를 데벨롭...`,
+            },
+            {
+              t: "sfx",
+              x: 42,
+              y: 74,
+              w: 28,
+              s: "font-size:1.05rem;-webkit-text-stroke:0;transform:rotate(3deg)",
+              text: `브랜치 따서 머지하시고...`,
+            },
+            {
+              t: "sfx",
+              x: 68,
+              y: 56,
+              w: 28,
+              s: "font-size:1.05rem;-webkit-text-stroke:0;transform:rotate(-3deg)",
+              text: `스테이징에서 QA 돌리고 프로덕션에...`,
+            },
+          ],
+        },
+        {
+          n: 15,
+          pw: 66,
+          b: [
+            {
+              t: "speech",
+              x: 8,
+              y: 6,
+              w: 48,
+              text: `지금은 "에너지 충전시간"으로...`,
+            },
+            {
+              t: "speech",
+              x: 44,
+              y: 70,
+              w: 50,
+              text: `유일하게 크루들의 외부활동이 허용되는 시간이지.`,
+            },
+          ],
+        },
+        {
+          n: 16,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 4,
+              w: 58,
+              text: `이곳에서 "자유"니 "워라밸"이니 하는 얘기는 꺼내지 않는 게 좋아...`,
+            },
+            {
+              t: "speech",
+              x: 44,
+              y: 74,
+              w: 52,
+              text: `뭐, 대부분은 그 말의 의미도 잊었겠지만 말야...`,
+            },
+          ],
+        },
+        {
+          n: 17,
+          b: [
+            { t: "speech", x: 8, y: 6, w: 42, text: `큭...크크큭...!!` },
+            {
+              t: "sfx",
+              x: 54,
+              y: 60,
+              w: 40,
+              s: "font-size:2.4rem;transform:rotate(-6deg)",
+              text: `덜그럭 덜그럭`,
+            },
+          ],
+        },
+        {
+          n: 18,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 58,
+              text: `치...친구가 로봇이라고...?! 그럴 리 없어! 내 친구는 인간이야!`,
+            },
+            {
+              t: "speech",
+              x: 50,
+              y: 74,
+              w: 46,
+              text: `아...알았어. 그럼 밥은 어디서 먹을까?!`,
+            },
+          ],
+        },
+        {
+          n: 19,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 40,
+              text: `"진스키얔" 충전소로 가자.`,
+            },
+            {
+              t: "sign",
+              x: 28,
+              y: 36,
+              w: 44,
+              s: "font-size:2.1rem;transform:rotate(-1.5deg)",
+              text: `진스키얔`,
+            },
+            {
+              t: "speech",
+              x: 56,
+              y: 64,
+              w: 40,
+              text: `그곳이 에너지효율이 좋거든...`,
+            },
+          ],
+        },
+        {
+          n: 20,
+          b: [
+            { t: "shout", x: 8, y: 6, w: 48, text: `그냥 스키야키 집이잖아!!` },
+            {
+              t: "speech",
+              x: 52,
+              y: 74,
+              w: 44,
+              text: `이곳의 바이오연료는 최상급이지...`,
+            },
+          ],
+        },
+        {
+          n: 21,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 54,
+              text: `마음대로 주문해도 좋아.... 올해 "베네핏 카드"가 아직 남았거든.`,
+            },
+            {
+              t: "sfx",
+              x: 76,
+              y: 70,
+              w: 18,
+              s: "font-size:2.6rem",
+              text: `!?`,
+            },
+          ],
+        },
+        {
+          n: 22,
+          pw: 72,
+          b: [
+            { t: "thought", x: 8, y: 8, w: 44, text: `베네핏... 즉, "이익"!!` },
+            {
+              t: "sign",
+              x: 26,
+              y: 46,
+              w: 48,
+              s: "font-size:2rem;font-family:'Gothic A1',sans-serif;font-weight:800;letter-spacing:.2em;transform:rotate(-7deg)",
+              text: `BENEFIT`,
+            },
+          ],
+        },
+        {
+          n: 23,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 64,
+              text: `이곳의 노동자들은 "개인의 이익"이라는 당연한 권리조차 이 플라스틱 조각이 없으면 보장받지 못한다는 건가?!`,
+            },
+            {
+              t: "thought",
+              x: 38,
+              y: 78,
+              w: 56,
+              text: `이것이 진정 "노동 로봇"의 삶!?`,
+            },
+          ],
+        },
+        {
+          n: 24,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 56,
+              text: `아니야!! 요즘 친구가 좀 삭막해졌다 해도 친구는 아직 인간성을 잃지 않았을 거야!`,
+            },
+            {
+              t: "speech",
+              x: 56,
+              y: 72,
+              w: 40,
+              s: "font-size:1.2rem",
+              text: `바이오연료 2인분 나왔습니다.`,
+            },
+          ],
+        },
+        {
+          n: 25,
+          b: [
+            {
+              t: "thought",
+              x: 4,
+              y: 4,
+              w: 60,
+              text: `다행히 메뉴는 평범한 스키야키야... 역시 친구는 아직 로봇화가 진행되지 않은 게 분명...`,
+            },
+          ],
+        },
+        {
+          n: 26,
+          b: [
+            {
+              t: "sfx",
+              x: 62,
+              y: 14,
+              w: 30,
+              s: "font-size:2.8rem;transform:rotate(8deg)",
+              text: `위잉`,
+            },
+          ],
+        },
+        {
+          n: 27,
+          b: [
+            {
+              t: "sfx",
+              x: 8,
+              y: 10,
+              w: 26,
+              s: "font-size:3.4rem;transform:rotate(-8deg)",
+              text: `텁`,
+            },
+          ],
+        },
+        {
+          n: 28,
+          b: [
+            { t: "speech", x: 6, y: 6, w: 44, text: `바이오연료 충전 완료.` },
+            {
+              t: "sfx",
+              x: 64,
+              y: 66,
+              w: 30,
+              s: "font-size:2rem;transform:rotate(4deg)",
+              text: `삐삐삐`,
+            },
+          ],
+        },
+        {
+          n: 29,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 44,
+              text: `아 맞다. 이거 주려고 불렀다.`,
+            },
+            {
+              t: "thought",
+              x: 48,
+              y: 72,
+              w: 48,
+              text: `청첩장...! 역시 인간성이 남아있었어!`,
+            },
+          ],
+        },
+        {
+          n: 30,
+          pw: 74,
+          b: [
+            {
+              t: "sys",
+              x: 16,
+              y: 34,
+              w: 68,
+              s: "font-size:1.15rem;padding:14px;background:none;border:none",
+              text: `두 기종의 병합(Merge)을 알려드립니다.<br>부디 참석하시어 방명록에<br>"LGTM"을 남겨 주십시오.`,
+            },
+          ],
+        },
+        {
+          n: 31,
+          pw: 70,
+          b: [
+            {
+              t: "thought",
+              x: 30,
+              y: 76,
+              w: 52,
+              text: `하객이 아니라 리뷰어였다.`,
+            },
+          ],
+        },
+        {
+          n: 32,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 52,
+              text: `다 먹었으니 이제 액체연료를 충전하러 가보실까.`,
+            },
+            {
+              t: "speech",
+              x: 56,
+              y: 72,
+              w: 40,
+              text: `으...응... 근데 액체연료라니?`,
+            },
+          ],
+        },
+        {
+          n: 33,
+          b: [
+            { t: "shout", x: 52, y: 10, w: 42, text: `또 그냥 카페잖아...!` },
+            {
+              t: "sign",
+              x: 30,
+              y: 38,
+              w: 40,
+              s: "font-size:1.7rem;transform:rotate(-1.5deg)",
+              text: `블링크 커피`,
+            },
+          ],
+        },
+        {
+          n: 34,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 54,
+              text: `난 바이오 연료와 더불어 액체연료까지 필요로 하는 기종이다.`,
+            },
+            {
+              t: "shout",
+              x: 52,
+              y: 74,
+              w: 44,
+              text: `그냥 아아 마시러 온 거잖아!`,
+            },
+          ],
+        },
+        {
+          n: 35,
+          b: [
+            {
+              t: "speech",
+              x: 4,
+              y: 4,
+              w: 58,
+              text: `충전에 필요한 에너지는 기종마다 달라서, 바이오, 액체에 천연가스까지 필요로 하는 기종들도 있지.`,
+            },
+          ],
+        },
+        {
+          n: 36,
+          b: [
+            { t: "thought", x: 8, y: 8, w: 40, text: `그냥 흡연자잖아.` },
+            {
+              t: "thought",
+              x: 50,
+              y: 70,
+              w: 46,
+              text: `천연가스가 아니라 니코틴가스겠지.`,
+            },
+          ],
+        },
+        {
+          n: 37,
+          b: [
+            {
+              t: "sfx",
+              x: 6,
+              y: 8,
+              w: 34,
+              s: "font-size:2.4rem;transform:rotate(-6deg)",
+              text: `쭙쭙쭙`,
+            },
+            {
+              t: "speech",
+              x: 56,
+              y: 12,
+              w: 38,
+              text: `아.아.아. 충전 완료. 100%.`,
+            },
+            {
+              t: "thought",
+              x: 44,
+              y: 76,
+              w: 52,
+              text: `그럴 리 없어... 이건 말도 안 돼...!!`,
+            },
+          ],
+        },
+        {
+          n: 38,
+          b: [
+            {
+              t: "speech",
+              x: 6,
+              y: 5,
+              w: 52,
+              text: `충전이 끝났으니 이만 회사로 돌아가볼까.`,
+            },
+            { t: "speech", x: 62, y: 70, w: 32, text: `어...응...` },
+          ],
+        },
+        {
+          n: 39,
+          b: [
+            {
+              t: "shout",
+              x: 8,
+              y: 8,
+              w: 52,
+              text: `거리에 사람... 아니 로봇이 한 기도 없어!!`,
+            },
+            { t: "shout", x: 58, y: 64, w: 36, text: `어떻게 된 거지?!` },
+          ],
+        },
+        {
+          n: 40,
+          pw: 66,
+          b: [
+            { t: "shout", x: 6, y: 6, w: 44, text: `이런 젠장!!` },
+            {
+              t: "lcd",
+              x: 30,
+              y: 38,
+              w: 40,
+              s: "font-size:3.4rem",
+              text: `12:55`,
+            },
+            {
+              t: "shout",
+              x: 48,
+              y: 68,
+              w: 48,
+              text: `노동시간까지 고작 5분밖에 안 남았어!!`,
+            },
+          ],
+        },
+        {
+          n: 41,
+          b: [
+            {
+              t: "sfx",
+              x: 8,
+              y: 14,
+              w: 34,
+              s: "font-size:2.4rem;transform:rotate(-8deg)",
+              text: `철컹 철컹`,
+            },
+            {
+              t: "thought",
+              x: 34,
+              y: 82,
+              w: 44,
+              s: "text-align:center",
+              text: `기동성 강화 모듈 ship-82`,
+            },
+          ],
+        },
+        {
+          n: 42,
+          b: [
+            {
+              t: "shout",
+              x: 6,
+              y: 6,
+              w: 50,
+              text: `5분 안에 회사로 들어가야 한다!! 뛰어!!`,
+            },
+            { t: "shout", x: 62, y: 70, w: 32, text: `나는 왜?!` },
+          ],
+        },
+        {
+          n: 43,
+          b: [
+            { t: "sys", x: 8, y: 8, w: 44, text: `코어타임이 임박했습니다.` },
+            {
+              t: "sys",
+              x: 50,
+              y: 66,
+              w: 46,
+              text: `모든 크루는 포지션으로 얼라인하십시오.`,
+            },
+          ],
+        },
+        {
+          n: 44,
+          b: [
+            {
+              t: "sys",
+              x: 6,
+              y: 5,
+              w: 46,
+              text: `지정된 시간 외의 외부 활동은...`,
+            },
+            {
+              t: "sys",
+              x: 48,
+              y: 76,
+              w: 48,
+              text: `근무태만 이슈로 처형 프로세스가 트리거될 수 있습니다.`,
+            },
+          ],
+        },
+        {
+          n: 45,
+          b: [
+            {
+              t: "thought",
+              x: 26,
+              y: 6,
+              w: 58,
+              text: `안돼...! 역시 기획자의 체력으론 로봇을 따라잡을 수가...!`,
+            },
+          ],
+        },
+        {
+          n: 46,
+          pw: 66,
+          b: [
+            {
+              t: "lcd",
+              x: 28,
+              y: 36,
+              w: 44,
+              s: "font-size:3.8rem",
+              text: `13:00`,
+            },
+            {
+              t: "sfx",
+              x: 56,
+              y: 64,
+              w: 38,
+              s: "font-size:2.2rem;transform:rotate(-5deg)",
+              text: `삐삐삐삑`,
+            },
+          ],
+        },
+        {
+          n: 47,
+          b: [
+            {
+              t: "sys",
+              x: 6,
+              y: 6,
+              w: 44,
+              text: `에너지 충전시간이 끝났습니다.`,
+            },
+            { t: "sys", x: 54, y: 70, w: 40, text: `게이트가 클로즈됩니다.` },
+          ],
+        },
+        {
+          n: 48,
+          b: [
+            {
+              t: "shout",
+              x: 24,
+              y: 6,
+              w: 52,
+              s: "font-size:1.8rem",
+              text: `두고 가지 마!!!`,
+            },
+          ],
+        },
+        {
+          n: 49,
+          b: [
+            { t: "sys", x: 6, y: 6, w: 36, text: `미등록 로봇이군.` },
+            { t: "sys", x: 58, y: 14, w: 36, text: `소속을 밝혀라.` },
+          ],
+        },
+        {
+          n: 50,
+          b: [
+            {
+              t: "shout",
+              x: 28,
+              y: 8,
+              w: 50,
+              text: `나...난 이곳의 노동자가 아니야!!`,
+            },
+          ],
+        },
+        {
+          n: 51,
+          b: [
+            {
+              t: "shout",
+              x: 18,
+              y: 8,
+              w: 64,
+              s: "font-size:1.9rem",
+              text: `난 그저... "기획자"일 뿐이라고!`,
+            },
+          ],
+        },
+        {
+          n: 52,
+          b: [
+            { t: "sys", x: 8, y: 10, w: 30, text: `기획자?` },
+            { t: "sys", x: 60, y: 56, w: 32, text: `기획자...` },
+          ],
+        },
+        {
+          n: 53,
+          b: [
+            { t: "sys", x: 6, y: 8, w: 34, text: `기획... 변경...?` },
+            { t: "sys", x: 58, y: 20, w: 36, text: `스펙... 변경......?` },
+            {
+              t: "sys",
+              x: 26,
+              y: 76,
+              w: 48,
+              s: "background:#111;color:#fff;text-align:center",
+              text: `-시스템 오류-&nbsp;&nbsp;-시스템 오류-`,
+            },
+          ],
+        },
+        {
+          n: 54,
+          b: [
+            { t: "sys", x: 6, y: 8, w: 28, text: `아니야...` },
+            {
+              t: "sys",
+              x: 60,
+              y: 6,
+              w: 34,
+              s: "font-size:1.3rem",
+              text: `아-니-야-!!!`,
+            },
+            {
+              t: "sfx",
+              x: 30,
+              y: 70,
+              w: 44,
+              s: "font-size:2.6rem;transform:rotate(-4deg)",
+              text: `두드드드드`,
+            },
+          ],
+        },
+        {
+          n: 55,
+          b: [
+            {
+              t: "sfx",
+              x: 56,
+              y: 56,
+              w: 38,
+              s: "font-size:2.8rem;transform:rotate(-8deg)",
+              text: `퍼퍼퍽`,
+            },
+          ],
+        },
+        {
+          n: 56,
+          pw: 84,
+          b: [
+            { t: "thought", x: 6, y: 6, w: 26, text: `얼마 후.` },
+            {
+              t: "sfx",
+              x: 60,
+              y: 10,
+              w: 34,
+              s: "font-size:1.9rem;transform:rotate(3deg)",
+              text: `짹짹짹`,
+            },
+          ],
+        },
+        {
+          n: 57,
+          b: [
+            {
+              t: "sfx",
+              x: 10,
+              y: 26,
+              w: 30,
+              s: "font-size:3rem;transform:rotate(-8deg)",
+              text: `벌떡`,
+            },
+          ],
+        },
+        {
+          n: 58,
+          b: [
+            {
+              t: "sfx",
+              x: 54,
+              y: 8,
+              w: 42,
+              s: "font-size:2.4rem;transform:rotate(5deg)",
+              text: `꿀럭꿀럭`,
+            },
+            {
+              t: "sign",
+              x: 70,
+              y: 66,
+              w: 16,
+              s: "font-size:1.3rem;transform:rotate(6deg)",
+              text: `진순`,
+            },
+          ],
+        },
+        {
+          n: 59,
+          b: [
+            {
+              t: "sys",
+              x: 8,
+              y: 10,
+              w: 30,
+              s: "font-size:1.2rem",
+              text: `충전 완료.`,
+            },
+            {
+              t: "sys",
+              x: 48,
+              y: 44,
+              w: 42,
+              s: "font-size:1.35rem",
+              text: `위클리 쓰러 간다.`,
+            },
+            {
+              t: "sfx",
+              x: 40,
+              y: 86,
+              w: 56,
+              s: "font-size:2rem;-webkit-text-stroke:1px #111",
+              text: `판교 아포칼립스 (完)`,
+            },
+          ],
+        },
+      ];
+
+      const AR = {
+        1: "1254/1254",
+        2: "1254/1254",
+        3: "1254/1254",
+        4: "1254/1254",
+        5: "1254/1254",
+        6: "1254/1254",
+        7: "1718/915",
+        8: "1254/1254",
+        9: "1254/1254",
+        10: "1254/1254",
+        11: "1254/1254",
+        12: "1254/1254",
+        13: "1254/1254",
+        14: "1755/896",
+        15: "1254/1254",
+        16: "1254/1254",
+        17: "1254/1254",
+        18: "1254/1254",
+        19: "1254/1254",
+        20: "1254/1254",
+        21: "1254/1254",
+        22: "1254/1254",
+        23: "887/1774",
+        24: "1254/1254",
+        25: "1254/1254",
+        26: "1254/1254",
+        27: "887/1774",
+        28: "1254/1254",
+        29: "1254/1254",
+        30: "1254/1254",
+        31: "1254/1254",
+        32: "1254/1254",
+        33: "1254/1254",
+        34: "1254/1254",
+        35: "1254/1254",
+        36: "1254/1254",
+        37: "1254/1254",
+        38: "1254/1254",
+        39: "1693/929",
+        40: "1254/1254",
+        41: "1254/1254",
+        42: "1254/1254",
+        43: "1254/1254",
+        44: "887/1774",
+        45: "1254/1254",
+        46: "1254/1254",
+        47: "1254/1254",
+        48: "887/1774",
+        49: "1254/1254",
+        50: "1254/1254",
+        51: "863/1823",
+        52: "1254/1254",
+        53: "1254/1254",
+        54: "1254/1254",
+        55: "1254/1254",
+        56: "1254/1254",
+        57: "925/1701",
+        58: "1254/1254",
+        59: "1254/1254",
+      }; // 컷별 종횡비 (CLS 방지)
+      const FSCALE = 1.44; // 말풍선 폰트 배율
+      const strip = document.getElementById("strip");
+      const BAKED = {
+        "1:0": { x: 37.5, y: 18 },
+        "3:0": { x: 23.2, y: 42.5 },
+        "5:1": { x: 19.3, y: 43.6 },
+        "2:1": { x: 23.1, y: 22.9 },
+        "2:2": { x: 18, y: 47.2 },
+        "4:1": { x: 37.6, y: 72.3 },
+        "4:0": { x: 10, y: 52.7 },
+        "7:1": { x: 61.1, y: 69.2 },
+        "7:0": { x: 38.5, y: 36.2 },
+        "11:0": { x: -8.7, y: 38.9 },
+        "12:0": { x: 5.7, y: -4.1 },
+        "13:0": { x: 43, y: 3.2 },
+        "14:0": { x: 76.5, y: -3.9 },
+        "16:0": { x: -17.9, y: 54.3 },
+        "16:1": { x: 11.4, y: 77.2 },
+        "19:1": { x: 32.3, y: 35.2 },
+        "22:0": { x: 5.4, y: 5.1 },
+        "22:1": { x: 30, y: 35.9 },
+        "2:0": { x: 65.8, y: 16.9 },
+        "6:0": { x: 26.2, y: 7.4 },
+        "8:0": { x: 20.5, y: 2.8 },
+        "9:0": { x: 11.4, y: 9.9 },
+        "10:0": { x: 64.5, y: 37.7 },
+        "10:1": { x: 20.7, y: 71.6 },
+        "15:1": { x: 68.1, y: 70.8 },
+        "18:0": { x: 6.3, y: 12.1 },
+        "18:1": { x: 48.8, y: 80.6 },
+        "20:0": { x: 3.3, y: 1 },
+        "20:1": { x: 62.3, y: 27.5 },
+        "21:0": { x: 5.1, y: 71 },
+        "23:0": { x: 50.6, y: 14.8 },
+        "23:1": { x: 35.5, y: 82.9 },
+        "24:0": { x: 11.1, y: 58.6 },
+        "24:1": { x: 55.3, y: -1.1 },
+        "25:0": { x: 52.6, y: 39.7 },
+        "29:0": { x: 6.4, y: 50.2 },
+        "29:1": { x: 50.3, y: 67.9 },
+        "30:0": { x: 17.8, y: 30.7 },
+        "31:0": { x: 80.6, y: 36.6 },
+        "32:0": { x: 43.6, y: 6.2 },
+        "32:1": { x: 57.3, y: 67.5 },
+        "33:1": { x: 31.3, y: 23.2 },
+        "33:0": { x: 53.1, y: 5.6 },
+        "34:0": { x: -16.2, y: 4.9 },
+        "34:1": { x: 67.7, y: 84.9 },
+        "35:2": { x: 66, y: 64 },
+        "36:0": { x: 15.3, y: 3.6 },
+        "36:1": { x: 49.4, y: 78.1 },
+        "19:0": { x: 6.5, y: 6.9 },
+        "27:0": { x: 74.8, y: 52.6 },
+        "35:0": { x: 5.5, y: 4.2 },
+        "37:1": { x: 5.9, y: 5.7 },
+        "37:0": { x: 46.4, y: 47.8 },
+        "37:2": { x: 52.6, y: 65.1 },
+        "38:0": { x: 3.9, y: 62.9 },
+        "38:1": { x: 63.8, y: 79.1 },
+        "40:2": { x: 47.8, y: 70.9 },
+        "40:1": { x: 35.5, y: 39.4 },
+        "41:1": { x: 35.5, y: 77.4 },
+        "41:0": { x: 76.1, y: 58.4 },
+        "42:1": { x: 7.6, y: 51.8 },
+        "42:0": { x: 18.1, y: 4.2 },
+        "44:0": { x: 5.3, y: 29.1 },
+        "44:1": { x: 43.4, y: 69 },
+        "45:0": { x: 37.9, y: 66.2 },
+        "46:0": { x: 29.9, y: 41.8 },
+        "47:0": { x: 48.4, y: 8.3 },
+        "59:2": { x: 50.4, y: 88.5 },
+        "43:0": { x: 9.5, y: 44 },
+        "43:1": { x: 54.5, y: 65.2 },
+        "47:1": { x: 51.6, y: 72.7 },
+        "17:1": { x: 53.9, y: 63.7 },
+        "28:1": { x: 38.2, y: 45 },
+        "48:0": { x: 43.6, y: 45.2 },
+        "50:0": { x: 46.9, y: 35.2 },
+        "51:0": { x: 16.9, y: 11.9 },
+        "17:0": { x: -7.3, y: 14.5 },
+        "49:1": { x: 60.1, y: 39.8 },
+        "49:0": { x: 6, y: 6 },
+        "52:1": { x: 49.9, y: 71.1 },
+        "52:0": { x: 8.3, y: 42.1 },
+        "53:0": { x: 7.4, y: 8.6 },
+        "53:1": { x: 57.9, y: 24.2 },
+        "55:0": { x: 73.4, y: 37.8 },
+        "54:0": { x: 3.5, y: 35.5 },
+        "54:1": { x: 61.3, y: 64.3 },
+        "56:1": { x: 31.7, y: 33.3 },
+        "57:0": { x: 13.9, y: 26.2 },
+        "58:0": { x: 77.8, y: 35.6 },
+        "58:1": { x: 103.9, y: 86.3 },
+        "59:0": { x: 14.1, y: 20.7 },
+        "59:1": { x: 49.1, y: 48.8 },
+        "15:0": { x: 0.3, y: 1.1 },
+        "14:2": { x: 42.7, y: 75.5 },
+      };
+      const saved = Object.assign(
+        {},
+        BAKED,
+        JSON.parse(localStorage.getItem("bubblePos") || "{}"),
+      );
+
+      for (const p of P) {
+        const id = String(p.n).padStart(3, "0");
+        const div = document.createElement("div");
+        div.className = "panel";
+        if (p.pw) {
+          div.style.width = p.pw + "%";
+          div.style.margin = "0 auto 42px";
+        }
+        const img = document.createElement("img");
+        if (AR[p.n]) img.style.aspectRatio = AR[p.n];
+        img.src = `/pangyo/panels/panel_${id}.webp`;
+        img.onerror = () => {
+          img.replaceWith(
+            Object.assign(document.createElement("div"), {
+              className: "missing",
+              textContent: `panel_${id} 렌더 대기중`,
+            }),
+          );
+        };
+        div.appendChild(img);
+        (p.b || []).forEach((b, bi) => {
+          const el = document.createElement("div");
+          el.className = "b " + b.t;
+          const key = p.n + ":" + bi;
+          const pos = saved[key] || b;
+          el.style.left = pos.x + "%";
+          el.style.top = pos.y + "%";
+          el.style.width = b.w + "%";
+          if (b.s) el.style.cssText += ";" + b.s;
+          el.innerHTML = b.text;
+          el.dataset.key = key;
+          div.appendChild(el);
+          // 폰트 2배 (인라인 크기 포함 일괄 배율)
+          requestAnimationFrame(() => {
+            el.style.fontSize =
+              parseFloat(getComputedStyle(el).fontSize) * FSCALE + "px";
+          });
+          // 드래그로 위치 조정 → localStorage 저장
+          el.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            el.setPointerCapture(e.pointerId);
+            el.classList.add("dragging");
+            const r0 = div.getBoundingClientRect();
+            const startX = e.clientX,
+              startY = e.clientY;
+            const x0 = parseFloat(el.style.left),
+              y0 = parseFloat(el.style.top);
+            const move = (ev) => {
+              el.style.left =
+                (x0 + ((ev.clientX - startX) / r0.width) * 100).toFixed(1) +
+                "%";
+              el.style.top =
+                (y0 + ((ev.clientY - startY) / r0.height) * 100).toFixed(1) +
+                "%";
+            };
+            const up = () => {
+              el.classList.remove("dragging");
+              el.removeEventListener("pointermove", move);
+              el.removeEventListener("pointerup", up);
+              saved[key] = {
+                x: parseFloat(el.style.left),
+                y: parseFloat(el.style.top),
+              };
+              localStorage.setItem("bubblePos", JSON.stringify(saved));
+            };
+            el.addEventListener("pointermove", move);
+            el.addEventListener("pointerup", up);
+          });
+        });
+        strip.appendChild(div);
+      }
+    </script>
+  </body>
+</html>

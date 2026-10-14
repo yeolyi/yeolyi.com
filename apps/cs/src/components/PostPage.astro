@@ -1,0 +1,76 @@
+---
+import { type CollectionEntry, render } from "astro:content";
+import HeartButton from "@yeolyi/post/HeartButton";
+import { mdxComponents } from "@yeolyi/post/mdx";
+import PostMeta from "@yeolyi/post/PostMeta";
+import Layout from "@/layouts/Layout.astro";
+import { getVisibleParts, postSlug } from "@/lib/content";
+
+interface Props {
+  page: CollectionEntry<"post">;
+}
+
+const { page } = Astro.props;
+const slug = postSlug(page.id);
+const { Content } = await render(page);
+
+// 이전·다음 글은 목록 순서(파트 → order). 숨김 글은 건너뛰고, 숨김 글 자신에게는 잇지 않는다.
+const order = (await getVisibleParts()).flatMap((p) => p.posts);
+const index = order.findIndex((p) => p.id === page.id);
+const prev = index > 0 ? order[index - 1] : undefined;
+const next = index >= 0 ? order[index + 1] : undefined;
+const href = (p: CollectionEntry<"post">) => `/${postSlug(p.id)}`;
+---
+
+<Layout title={page.data.title} description={page.data.description} ogType="article">
+  {
+    /* 글 머리(제목, 조회·추천, 가는 선) → 본문 → 글 끝(추천, 이전·다음 글). 블로그 글과 같은 틀.
+       추천 아이콘의 안쪽 여백은 -mr-2·-ml-2 로 상쇄해 선을 맞춘다. 상·하단 추천은 스토어로 동기화. */
+  }
+  <div class="measure-col mt-[2lh] pb-[5lh] [&_astro-island]:block">
+    <header class="border-border border-b pb-[0.5lh]">
+      <h1>{page.data.title}</h1>
+      <div class="mt-[0.25lh] flex items-center justify-between gap-4">
+        <PostMeta site="cs" client:idle />
+        <div class="-my-2 -mr-2">
+          <HeartButton postId={slug} client:idle />
+        </div>
+      </div>
+    </header>
+
+    <div class="prose mt-[1.5lh]">
+      <Content components={mdxComponents} />
+    </div>
+
+    <footer class="border-border mt-[2lh] border-t pt-[0.5lh]">
+      <div class="-my-2 -ml-2 w-fit">
+        <HeartButton postId={slug} client:idle />
+      </div>
+      {
+        (prev || next) && (
+          <nav
+            aria-label="이전·다음 글"
+            class="mt-[0.5lh] grid grid-cols-[auto_1fr] items-baseline gap-x-4"
+          >
+            {prev && (
+              <>
+                <span class="text-muted-foreground">이전 글</span>
+                <a class="w-fit" href={href(prev)} rel="prev">
+                  {prev.data.title}
+                </a>
+              </>
+            )}
+            {next && (
+              <>
+                <span class="text-muted-foreground">다음 글</span>
+                <a class="w-fit" href={href(next)} rel="next">
+                  {next.data.title}
+                </a>
+              </>
+            )}
+          </nav>
+        )
+      }
+    </footer>
+  </div>
+</Layout>

@@ -1,0 +1,116 @@
+---
+import { THEME_INIT } from "@yeolyi/ui/theme-store";
+import ogMain from "@/assets/main-opengraph.jpg";
+import Masthead from "@/components/layout/Masthead.astro";
+
+import "@/style/global.css";
+
+interface Props {
+  title?: string;
+  // 검색 스니펫·공유 미리보기용 설명. 없으면 사이트 공통 문구를 쓴다.
+  description?: string;
+  // og:type — 글은 "article", 그 외는 "website"(기본).
+  ogType?: "website" | "article";
+  opengraph?: { image: string } | false;
+  // 글 페이지는 Masthead(사이트 크롬) 없이 문서 자체로 보여주려 false 로 넘긴다.
+  masthead?: boolean;
+  // 비공개/보호 라우트는 검색 색인에서 제외한다.
+  noindex?: boolean;
+}
+
+const defaults = {
+  title: "이성열",
+  // 전 페이지 공통 설명 — 검색 스니펫·공유 미리보기용.
+  description:
+    "가치 있고 쓰기 좋은 무언가를 만듭니다. 인스타그램 계정에서 개발 이야기를 합니다.",
+};
+
+const {
+  title: _title,
+  description: _description,
+  ogType = "website",
+  opengraph: _opengraph,
+  masthead: _masthead = true,
+  noindex = false,
+} = Astro.props;
+
+const title = _title ?? defaults.title;
+const description = _description ?? defaults.description;
+
+// OG 이미지는 절대 URL 이어야 크롤러(카톡·트위터 등)가 읽는다.
+const opengraphImage =
+  _opengraph === false
+    ? null
+    : new URL(_opengraph?.image ?? ogMain.src, Astro.site);
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {
+      /* 저장된 테마를 페인트 전에 복원한다(FOUC 방지). 값이 없으면 OS 자동. 서비스들과 같은 쿠키(@yeolyi/ui/theme-store). */
+    }
+    <script is:inline set:html={THEME_INIT} />
+
+    {
+      /* 본문 Pretendard·고정폭 MonoplexKR 은 스택 맨 앞이라 바로 쓰여 프리로드한다
+       (Pretendard 가 폴백이 아닌 기본 폰트라 지연 시 시스템 폰트→Pretendard FOUT). */
+    }
+    <link
+      rel="preload"
+      href="/fonts/PretendardVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/MonoplexKR-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={defaults.title} />
+    <meta property="og:locale" content="ko_KR" />
+    {opengraphImage && <meta property="og:image" content={opengraphImage} />}
+
+    <meta
+      name="twitter:card"
+      content={opengraphImage ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {opengraphImage && <meta name="twitter:image" content={opengraphImage} />}
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    {_masthead && <Masthead />}
+    <slot />
+    <script>
+      import { startTracking } from "@yeolyi/track";
+      startTracking("blog");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "정음 — 외국어를 한글 소리로",
+  "short_name": "정음",
+  "version": "1.0.0",
+  "description": "웹페이지의 영어·일본어·중국어를 모두 한글 소리로 바꿔 보여 줍니다. Hello → 헬로, 東京 → 동경, 北京 → 베이징",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_title": "정음",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "data.js",
+        "engine.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

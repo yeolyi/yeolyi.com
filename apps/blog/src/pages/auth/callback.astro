@@ -1,0 +1,23 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@/components/layout/BaseLayout.astro";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+
+const { url, cookies, request } = Astro;
+const code = url.searchParams.get("code");
+
+if (!code) return Astro.redirect("/404");
+
+const supabase = createSupabaseServerClient(request, cookies);
+const { error } = await supabase.auth.exchangeCodeForSession(code);
+if (!error) return Astro.redirect("/private");
+---
+
+<BaseLayout title="로그인 실패" noindex opengraph={false}>
+  <div class="measure-col prose mt-[2lh] pb-[5lh]">
+    <h1>로그인 실패</h1>
+    <p>{error?.message}</p>
+    <p><a href="/private">다시 시도</a></p>
+  </div>
+</BaseLayout>

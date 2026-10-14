@@ -1,0 +1,223 @@
+{
+  "nodes": [
+    {
+      "id": "s",
+      "type": "number",
+      "position": { "x": -120, "y": 100 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "s"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "a",
+      "type": "number",
+      "position": { "x": -120, "y": -20 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "a"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "b",
+      "type": "number",
+      "position": { "x": -120, "y": 220 },
+      "data": {
+        "atoms": {
+          "type": "boolean",
+          "inputAtoms": {},
+          "outputAtoms": {
+            "out": { "init": false },
+            "label": { "init": null }
+          },
+          "id": "b"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    },
+    {
+      "id": "not1",
+      "type": "not",
+      "position": { "x": 0, "y": 10 },
+      "data": {
+        "atoms": {
+          "type": "not",
+          "inputAtoms": { "in1": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "not1"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and1",
+      "type": "and",
+      "position": { "x": 140, "y": -20 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and1"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "and2",
+      "type": "and",
+      "position": { "x": 140, "y": 180 },
+      "data": {
+        "atoms": {
+          "type": "and",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "and2"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "or1",
+      "type": "or",
+      "position": { "x": 300, "y": 80 },
+      "data": {
+        "atoms": {
+          "type": "or",
+          "inputAtoms": { "in1": { "init": null }, "in2": { "init": null } },
+          "outputAtoms": { "out": { "init": null } },
+          "effectAtom": {},
+          "id": "or1"
+        }
+      },
+      "measured": { "width": 96, "height": 64 }
+    },
+    {
+      "id": "out",
+      "type": "label",
+      "position": { "x": 460, "y": 92 },
+      "data": {
+        "atoms": {
+          "type": "label",
+          "inputAtoms": { "in": { "init": null } },
+          "outputAtoms": { "label": { "init": null }, "out": { "init": null } },
+          "effectAtom": {},
+          "id": "out"
+        }
+      },
+      "measured": { "width": 40, "height": 40 }
+    }
+  ],
+  "edges": [
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s",
+      "sourceHandle": "out",
+      "target": "not1",
+      "targetHandle": "in1",
+      "id": "e-s-not1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "not1",
+      "sourceHandle": "out",
+      "target": "and1",
+      "targetHandle": "in1",
+      "id": "e-not1-and1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "a",
+      "sourceHandle": "out",
+      "target": "and1",
+      "targetHandle": "in2",
+      "id": "e-a-and1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "s",
+      "sourceHandle": "out",
+      "target": "and2",
+      "targetHandle": "in1",
+      "id": "e-s-and2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "b",
+      "sourceHandle": "out",
+      "target": "and2",
+      "targetHandle": "in2",
+      "id": "e-b-and2"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and1",
+      "sourceHandle": "out",
+      "target": "or1",
+      "targetHandle": "in1",
+      "id": "e-and1-or1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "and2",
+      "sourceHandle": "out",
+      "target": "or1",
+      "targetHandle": "in2",
+      "id": "e-and2-or1"
+    },
+    {
+      "type": "default",
+      "animated": true,
+      "selectable": true,
+      "source": "or1",
+      "sourceHandle": "out",
+      "target": "out",
+      "targetHandle": "in",
+      "id": "e-or1-out"
+    }
+  ],
+  "viewport": { "x": 200, "y": 60, "zoom": 0.85 },
+  "nodeOutputs": {
+    "s": { "out": false, "label": "S" },
+    "a": { "out": false, "label": "A" },
+    "b": { "out": false, "label": "B" },
+    "not1": { "out": true },
+    "and1": { "out": false },
+    "and2": { "out": false },
+    "or1": { "out": false },
+    "out": { "label": "Out", "out": false }
+  }
+}

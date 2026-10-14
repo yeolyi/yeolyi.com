@@ -1,0 +1,9 @@
+정음 — 사용한 데이터
+
+- CMU Pronouncing Dictionary (Carnegie Mellon University, BSD-style license) — 영어 발음
+- wordfreq (Robyn Speer, 데이터 CC BY-SA 4.0) — 영어 단어 빈도 순위로 사전에 넣을 단어 선택
+- pypinyin (MIT) — 한자의 중국어 병음
+- hanja (Sumin Byeon, BSD) — 한자의 한국 한자음
+
+표기는 국립국어원 외래어 표기법(영어·일본어·중국어)을 바탕으로 단순화했고,
+굳어진 표기가 있는 단어는 직접 고쳐 넣었습니다.

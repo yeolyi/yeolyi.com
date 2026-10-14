@@ -1,0 +1,68 @@
+---
+import Button from "@yeolyi/ui/Button";
+---
+
+<div
+  id="simple-cart-root"
+  class="demo"
+  data-product="상품 A"
+  data-add="+"
+  data-remove="-"
+>
+  <div class="grid gap-[1lh] py-[1lh] sm:grid-cols-2 sm:gap-0">
+    <div class="border-border sm:border-r sm:pe-6">
+      <h3 class="mt-0">상품 목록</h3>
+      <p class="mt-[0.5lh] flex items-center gap-[1ch]">
+        상품 A
+        <span class="text-muted-foreground ms-auto">₩5,000</span>
+        <Button id="toggle-cart-btn-simple">+</Button>
+      </p>
+    </div>
+    <div class="sm:ps-6">
+      <h3 class="mt-0">장바구니</h3>
+      <ul id="cart-items-simple" class="mt-[0.5lh]"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const init = () => {
+    const root = document.getElementById("simple-cart-root")!;
+    const toggleBtn = document.getElementById(
+      "toggle-cart-btn-simple",
+    ) as HTMLButtonElement;
+    const cartItemsList = document.getElementById("cart-items-simple");
+
+    if (!toggleBtn || !cartItemsList) return;
+
+    if (toggleBtn.dataset.listenerAttached) return;
+    toggleBtn.dataset.listenerAttached = "true";
+
+    const productName = root.dataset.product!;
+    const addLabel = root.dataset.add!;
+    const removeLabel = root.dataset.remove!;
+
+    let isInCart = false;
+
+    toggleBtn.addEventListener("click", () => {
+      if (isInCart) {
+        const itemToRemove = Array.from(cartItemsList.children).find(
+          (item) => item.textContent === productName,
+        );
+        if (itemToRemove) {
+          cartItemsList.removeChild(itemToRemove);
+        }
+        toggleBtn.textContent = `[ ${addLabel} ]`;
+        isInCart = false;
+      } else {
+        const cartItem = document.createElement("li");
+        cartItem.textContent = productName;
+        cartItemsList.appendChild(cartItem);
+        toggleBtn.textContent = `[ ${removeLabel} ]`;
+        isInCart = true;
+      }
+    });
+  };
+
+  init();
+</script>

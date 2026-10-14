@@ -1,0 +1,26 @@
+---
+import Button from "@yeolyi/ui/Button";
+import Clock from "./Clock.astro";
+---
+
+<div class="flex items-center gap-2">
+  <Button id="async-btn" className="w-fit" data-done="완료!">실행</Button>
+  <Clock />
+  <span id="async-status"></span>
+</div>
+
+<script>
+  const button = document.getElementById("async-btn") as HTMLButtonElement;
+  const status = document.getElementById("async-status") as HTMLSpanElement;
+
+  if (button && status) {
+    button.addEventListener("click", () => {
+      button.disabled = true;
+      status.textContent = "";
+      setTimeout(() => {
+        status.textContent = button.dataset.done!;
+        button.disabled = false;
+      }, 3000);
+    });
+  }
+</script>

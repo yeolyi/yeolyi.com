@@ -1,0 +1,191 @@
+/* yeolyi.com 사이트 묶음의 기본 꼴: 글꼴, 글 폭(measure-col), 본문 크기·행간, 링크·초점·제목. 정본은 design.yeolyi.com.
+   쓰는 쪽 CSS 에서 tailwindcss·@yeolyi/ui/theme.css 다음에 @import 한다. 글꼴 파일은 각 사이트의 /fonts/ 에 둔다(블로그가 preload 하는 주소와 같게). */
+
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MonoplexKR";
+  src: url("/fonts/MonoplexKR-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* Pretendard 를 기본으로 (공식 권장 스택), 로드 전엔 시스템 폰트로 폴백 */
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", sans-serif;
+  --font-mono: "MonoplexKR", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --measure: 45rem;
+}
+
+/* 본문 컬럼 — measure 폭으로 중앙 정렬 + 좌우 여백. 콘텐츠 폭이 정확히
+   min(뷰포트-3rem, measure)가 되도록 패딩은 content-box 바깥에 얹는다. */
+@utility measure-col {
+  box-sizing: content-box;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* 본문 18px(모바일 17px), 행간 1.7. 한국 읽기 사이트 범위(16~18px, 1.6~1.75) 안에서 큰 쪽.
+     고정폭 메타(text-base)는 16px, 모바일 15px. */
+  body {
+    @apply bg-background text-foreground;
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.7;
+    font-family: var(--font-sans);
+  }
+  @media (max-width: 40rem) {
+    body {
+      font-size: 1.0625rem;
+    }
+    :root {
+      --text-base: 0.9375rem;
+    }
+  }
+
+  * {
+    @apply border-border break-keep;
+  }
+
+  /* 굵게는 제목·표 머리·문장 안 강조(strong)에만. 기울임은 쓰지 않는다. */
+  strong {
+    font-weight: 700;
+  }
+  em {
+    font-style: normal;
+  }
+
+  /* 제목: 32·24·19(본문 크기 굵게). 자간만 살짝 좁힌다. */
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    font-size: 2rem;
+    line-height: 1.25;
+  }
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  h3 {
+    font-size: 1.1875rem;
+    line-height: 1.5;
+  }
+
+  /* 선택(드래그): 주황 바탕 + 주황 위 글자색. 코드 색(shiki)도 선택 중엔 이 색으로 덮는다. */
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  /* 링크: 늘 밑줄(색은 글자색), 올리면 반전. */
+  a {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  /* 호버는 반전(잉크 바탕 + 바탕색 글자). 이미 반전된 강조 안의 링크는 다시 뒤집는다. */
+  a:not(:has(img, svg)):hover {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+  .mark a:not(:has(img, svg)):hover {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  /* 다른 사이트로 가는 링크는 끝에 화살표(lucide arrow-up-right). yeolyi.com 과 그 아래 서비스(*.yeolyi.com, 개발 중엔 localhost)는
+     다른 사이트가 아니다. 이미지·아이콘을 감싼 링크와 화면 읽기에서 숨긴 링크(배너)는 뺀다.
+     글자 ↗ 는 Pretendard 에 없어 다른 글꼴로 대신 그려져 높이가 어긋났다. 마스크라 글자색(호버 반전 포함)을 그대로 따른다. */
+  a[href^="http"]:not([href*="//yeolyi.com"], [href*=".yeolyi.com"], [href^="http://localhost"], [aria-hidden="true"]):not(:has(img, svg))::after {
+    content: "";
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-left: 0.15em;
+    vertical-align: -0.05em;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  /* 키보드 초점: 바탕은 그대로, 글자와 밑줄만 주황. */
+  a:focus-visible {
+    outline: none;
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+
+  /* https://dev.to/mmvergara/why-are-buttons-losing-the-pointer-cursor-the-shadcn-and-tailwind-debate-2j93 */
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
+
+  /* 초점 기본값: 주황 고리. 테두리가 있는 컨트롤은 focus-border, 없는 것은 focus-fill 로 덮는다. */
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      /* biome-ignore lint/complexity/noImportantStyles: 움직임 줄이기는 요소마다 건 전환을 모두 이겨야 한다 */
+      transition: none !important;
+      /* biome-ignore lint/complexity/noImportantStyles: 위와 같다 */
+      animation: none !important;
+    }
+  }
+
+  code,
+  code * {
+    font-family: var(--font-mono);
+  }
+
+  /* tailwind preflight가 있더라도 Josh's reset에서 의미있는 것들. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      interpolate-size: allow-keywords;
+    }
+  }
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+}

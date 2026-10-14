@@ -1,0 +1,5 @@
+/* 디자인 시스템(design.yeolyi.com)을 따른다. 시뮬레이터 색은 @yeolyi/logic/theme.css 가 토큰에 맞춘다. */
+@import "tailwindcss";
+@import "@yeolyi/ui/theme.css";
+@import "@yeolyi/site/base.css";
+@import "@yeolyi/logic/theme.css";

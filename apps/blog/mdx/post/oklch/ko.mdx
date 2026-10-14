@@ -1,0 +1,89 @@
+---
+title: "가짜 빨간색"
+date: 2026-02-01
+description: "rgb 보다 다양한 색공간이 있음을 살펴봅시다."
+---
+
+import RgbPicker from "./components/RGBPicker";
+import RGBQuiz from "./components/RGBQuiz";
+import HSLPicker from "./components/HSLPicker";
+import HSLQuiz from "./components/HSLQuiz";
+import OKLCHPicker from "./components/OKLCHPicker";
+
+> 내 언어의 한계는 내 세계의 한계를 의미한다.
+
+#ff0000은 가장 빨간색이 아닙니다.
+
+## rgb
+
+색을 표현할 때 rgb 형식을 자주 사용합니다. 빛의 삼원색을 적당한 비율로 섞어 색을
+표현하는 방식입니다.
+
+<RgbPicker client:idle />
+
+하지만 헥스값만 보고 어떤 색인지 알기는 쉽지 않습니다. 아래 퀴즈를 통해
+테스트해봅시다.
+
+<RGBQuiz client:idle />
+
+## hsl
+
+그래서 rgb를 더 쉽게 표현하기 위해 hsl 형식이 등장했습니다. hsl 형식은 색상,
+채도, 명도로 색을 표현합니다. 사람이 색을 떠올리는 방식과 바로 대응됩니다.
+그래서 한 축만 바꿨을 때 "밝게/어둡게, 진하게/연하게" 같은 의도가 코드에 그대로
+드러납니다.
+
+<HSLPicker client:idle />
+
+아래 퀴즈를 풀어봅시다. 헥스값과 달리 몇 번 연습하면 정답률을 높일 수 있습니다.
+
+<HSLQuiz client:idle />
+
+다만 hsl는 rgb를 기하학적으로만 바꾼 것이기 때문에 사람 눈의 특성을 고려하지
+않았다는 단점이 있습니다. 위 hsl 슬라이더에서 saturation과 lightness를 고정하고
+hue를 조절해봅시다. 같은 밝기값인데 노란색은 밝게, 파란색은 어둡게 보일
+것입니다.
+
+## lch
+
+인간이 색을 인지하는 방식을 반영하여 만들어진 색상 표현 방식입니다. tailwind나
+shadcn/ui 등등 웹개발에서 마주치던 `oklch` 표현이 lch의 개선판입니다.
+
+<OKLCHPicker client:idle />
+
+chroma와 lightness를 고정한 채 hue를 조절하면 일정한 밝기로 보임을 알 수
+있습니다.
+
+## 가짜 빨간색
+
+RGB와 LCH는 표현 방식만 다른뿐 아니라 전제가 되는 색공간의 성격 자체가 다릅니다.
+우리가 CSS에서 사용하는 RGB는 실제로는 sRGB라는 색공간의 표현이고, LCH는
+LAB이라는 색공간을 사람이 다루기 쉽게 표현한 좌표계입니다.
+
+sRGB 색공간은 1990년대 모니터 성능을 기준으로 설계되었기 때문에 색역이 비교적
+좁습니다. 이 안에서 rgb(255,0,0)은 “빨강 채널이 최대”라는 뜻일 뿐, 사람이 인식할
+수 있는 가장 강한 빨강을 의미하지는 않습니다.
+
+<div className="border-border border-y py-[1lh]">
+  <div className="mx-auto flex h-16 max-w-md items-center justify-center bg-[#ff0000] font-mono text-white">
+    #ff0000
+  </div>
+</div>
+
+반면 LAB 색공간은 특정 디스플레이에 묶이지 않은 사람 시각 기준의 참조
+색공간으로, sRGB보다 이론적으로 더 넓은 색 범위를 포함합니다. LCH는 이 LAB
+색공간을 밝기·채도·색상 축으로 표현한 것이기 때문에 sRGB RGB로는 담을 수 없는 더
+강한 빨강 좌표를 가질 수 있고, 이로 인해 RGB의 빨강이 상대적으로 덜 빨갛게
+느껴집니다.
+
+지원하는 환경에서는 아래와 같이 더 강한 빨강을 표현할 수 있습니다.
+
+<div className="border-border border-y py-[1lh]">
+  <div className="mx-auto flex h-16 max-w-md items-center justify-center bg-[oklch(0.649_0.299_29.0)] font-mono text-white">
+    oklch(0.649 0.299 29.0)
+  </div>
+</div>
+
+물론 이 역시 디스플레이 색역의 한계로 인해 사람이 인식할 수 있는 최대 빨강은
+아니지만 sRGB보다 더 넓은 색 영역을 실제로 표현할 수 있다는 점에 의미가
+있습니다.

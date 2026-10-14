@@ -1,0 +1,8 @@
+---
+import Home from "@/components/home/Home.astro";
+import { getVisiblePosts } from "@/lib/content";
+
+const posts = await getVisiblePosts();
+---
+
+<Home posts={posts} />

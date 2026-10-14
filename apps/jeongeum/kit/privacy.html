@@ -1,0 +1,56 @@
+<title>정음 개인정보처리방침</title>
+<style>
+/* 한 단짜리 문서. 법률 문서답게 차분하게, 정음의 빨강은 제목 표식에만 */
+:root {
+  --bg: #fbfaf8; --fg: #22201d; --muted: #6d6760; --line: #e6e1da; --accent: #b8321f;
+  --sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #191817; --fg: #ece8e2; --muted: #a29b92; --line: #34312d; --accent: #e5604a; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #191817; --fg: #ece8e2; --muted: #a29b92; --line: #34312d; --accent: #e5604a; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.75 var(--sans); }
+main { max-width: 640px; margin: 0 auto; padding-inline: 20px; padding-block: 56px 72px; }
+.mark { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--accent); color: #fff; font-weight: 700; font-size: 19px; }
+h1 { font-size: 28px; line-height: 1.3; margin: 16px 0 4px; letter-spacing: -0.02em; text-wrap: balance; }
+.meta { color: var(--muted); font-size: 14px; margin: 0 0 36px; }
+h2 { font-size: 17px; margin: 32px 0 6px; }
+p, li { margin: 0 0 10px; }
+ul { padding-left: 20px; margin: 0 0 10px; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0 32px; }
+.en h2 { font-size: 16px; }
+.en { color: var(--muted); font-size: 15px; }
+</style>
+
+<main>
+  <span class="mark" aria-hidden="true">한</span>
+  <h1>정음 개인정보처리방침</h1>
+  <p class="meta">시행일 2026년 10월 9일 · 크롬 확장 프로그램 「정음 — 외국어를 한글 소리로」</p>
+
+  <h2>수집하는 정보</h2>
+  <p>정음은 어떤 개인정보도 수집하지 않습니다. 방문 기록, 페이지 내용, 입력한 글, 계정 정보, 사용 통계를 모으지 않으며, 분석 도구나 광고도 쓰지 않습니다.</p>
+
+  <h2>페이지 글자를 다루는 방식</h2>
+  <p>외국 글자를 한글 소리로 바꾸려면 보고 있는 페이지의 텍스트를 읽어야 합니다. 이 변환은 모두 사용자의 브라우저 안에서, 확장 프로그램에 함께 들어 있는 사전으로 이루어집니다. 페이지 내용은 저장하지 않으며 외부 서버로 보내지 않습니다. 정음은 네트워크 요청을 하지 않습니다.</p>
+
+  <h2>저장하는 설정</h2>
+  <p>다음 세 가지 설정만 크롬의 저장 공간(chrome.storage.sync)에 저장합니다.</p>
+  <ul>
+    <li>한글 변환을 켰는지 여부</li>
+    <li>숫자도 한글로 읽을지 여부</li>
+    <li>변환을 꺼 둔 사이트 주소 목록</li>
+  </ul>
+  <p>크롬 동기화를 켜 두었다면 이 설정은 사용자의 구글 계정을 통해 다른 기기의 크롬과 동기화됩니다. 정음 개발자는 이 값에 접근할 수 없습니다. 확장 프로그램을 삭제하면 설정도 함께 지워집니다.</p>
+
+  <h2>제3자 제공</h2>
+  <p>수집하는 정보가 없으므로 제3자에게 제공하거나 판매하는 정보도 없습니다.</p>
+
+  <h2>변경과 문의</h2>
+  <p>이 방침이 바뀌면 이 페이지에 새 시행일과 함께 알립니다. 문의는 크롬 웹 스토어의 정음 페이지에 적힌 개발자 연락처로 보내 주세요.</p>
+
+  <hr>
+
+  <section class="en" lang="en">
+    <h2>Privacy Policy (English summary)</h2>
+    <p>Jeongeum does not collect, store, or transmit any personal data. To show foreign text as Korean pronunciation, it reads the text of the page you are viewing and converts it locally in your browser using a dictionary bundled with the extension. Page content never leaves your device, and the extension makes no network requests.</p>
+    <p>The only data saved is three settings in chrome.storage.sync: whether conversion is on, whether numbers are read aloud in Korean, and a list of sites where conversion is turned off. If Chrome Sync is enabled, these settings sync through your Google account; the developer cannot access them. Nothing is shared with or sold to third parties.</p>
+  </section>
+</main>

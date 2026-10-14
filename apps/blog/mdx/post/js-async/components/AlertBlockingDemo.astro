@@ -1,0 +1,21 @@
+---
+import Button from "@yeolyi/ui/Button";
+import Clock from "./Clock.astro";
+---
+
+<div class="flex items-center gap-2">
+  <Button id="alert-btn" className="w-fit" data-alert="카운터가 멈춥니다."
+    >실행</Button
+  >
+  <Clock />
+</div>
+
+<script>
+  const button = document.getElementById("alert-btn") as HTMLButtonElement;
+
+  if (button) {
+    button.addEventListener("click", () => {
+      alert(button.dataset.alert);
+    });
+  }
+</script>

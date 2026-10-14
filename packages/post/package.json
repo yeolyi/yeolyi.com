@@ -1,0 +1,22 @@
+{
+  "name": "@yeolyi/post",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./actions": "./src/actions/index.ts",
+    "./HeartButton": "./src/heart/HeartButton.tsx",
+    "./PostMeta": "./src/PostMeta.tsx",
+    "./mdx": "./src/mdx.ts",
+    "./Img.astro": "./src/Img.astro"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.93.1",
+    "@yeolyi/ui": "workspace:*",
+    "lucide-react": "^0.536.0",
+    "zustand": "^5.0.10"
+  },
+  "peerDependencies": {
+    "astro": "^7.1.0",
+    "react": "catalog:"
+  }
+}
