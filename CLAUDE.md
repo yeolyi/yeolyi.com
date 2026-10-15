@@ -50,6 +50,11 @@ packages/track  @yeolyi/track. 방문 기록 `startTracking(사이트)`. 모든 
   `.prettierrc`·`biome.jsonc` 도 루트에 있다.
 - **간격 단위는 `rlh`**(루트 줄 높이, base.css 가 html 에 본문 줄 높이를 길이로
   둔다). `lh` 는 그 요소 자신의 줄 높이라 작은 글씨에서 어긋나니 쓰지 않는다.
+- **지원 브라우저는 Baseline Widely available**(모든 브라우저에 들어온 지 30개월
+  지난 기능. Vite 의 기본 `build.target` 이라 따로 설정하지 않는다). 문법은
+  esbuild 가 내려 주지만 `toSorted`·`Promise.withResolvers` 같은 API 는 폴리필이
+  없으니 새 API 는 쓰기 전에 Baseline 상태를 본다. tsconfig `lib` 는 ESNext 로
+  둔다.
 - **배포는 Vercel GitHub 연동.** 앱마다 프로젝트 하나(Root Directory =
   `apps/<앱>`), main 에 푸시하면 배포된다. 각 앱 `vercel.json` 의
   `ignoreCommand` 가 그 앱 폴더·`packages/`·잠금 파일이 안 바뀌었으면 빌드를

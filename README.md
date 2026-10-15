@@ -13,6 +13,9 @@
 | `apps/stats`    | [stats.yeolyi.com](https://stats.yeolyi.com)       |
 | `apps/jeongeum` | 크롬 확장                                          |
 
+지원 브라우저는 [Baseline Widely available](https://web.dev/baseline)(Vite 기본
+`build.target`)이다.
+
 ## 인프라
 
 - **Vercel**: 앱마다 프로젝트 하나. main에 푸시하면 바뀐 앱만 배포
