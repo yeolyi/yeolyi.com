@@ -126,7 +126,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "사는 곳",
       question: i === 0 ? "어디에 사나요?" : "배우자는 어디에 사나요?",
-      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다. 확인: 주민등록표 등본(정부24나 카카오톡 지갑의 전자증명서에서 발급).",
+      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다. 확인: 주민등록등본(정부24나 카카오톡 지갑의 전자증명서에서 발급).",
       input: ({ d, set }) => (
         <div className="flex flex-wrap items-center gap-2">
           <Select
@@ -171,7 +171,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "전입일",
       question: `${subject}지금 주소로 언제 전입했나요?`.trim(),
-      hint: "투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다. 확인: 주민등록표 등본의 전입일.",
+      hint: "투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다. 확인: 주민등록등본의 전입일.",
       input: date("movedInAt"),
       check: (s) => dateProblem(p(s).movedInAt),
       answer: (s) => dateText(p(s).movedInAt),
@@ -181,7 +181,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "세대주",
       question: i === 0 ? "세대주인가요?" : "배우자가 세대주인가요?",
-      hint: "주민등록표 등본 맨 위의 사람입니다. 규제지역 1순위는 세대주만 됩니다.",
+      hint: "주민등록등본 맨 위의 사람입니다. 규제지역 1순위는 세대주만 됩니다.",
       input: ({ d, set }) => (
         <RadioGroup
           aria-label="세대주"
