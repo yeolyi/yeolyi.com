@@ -118,7 +118,8 @@ function Month({
     cells.slice(w * 7, w * 7 + 7),
   );
   return (
-    <table className="w-full table-fixed border-collapse">
+    // 넓은 화면에서 칸이 너무 커지지 않게 달 하나는 28rem(칸 64px)까지.
+    <table className="w-full max-w-[28rem] table-fixed border-collapse">
       <caption className="mb-1 text-left font-bold">
         {y}년 {m}월
       </caption>
@@ -139,7 +140,12 @@ function Month({
         {weeks.map((week, wi) => (
           <tr key={wi}>
             {week.map((d, di) => {
-              if (d === null) return <td key={di} className="h-12" />;
+              if (d === null)
+                return (
+                  <td key={di} className="p-[1px]">
+                    <div className="aspect-square min-h-12" />
+                  </td>
+                );
               const date = ymd(y, m, d);
               const on = events.filter(
                 (e) => e.start <= date && date <= (e.end ?? e.start),
@@ -150,10 +156,11 @@ function Month({
               );
               const past = today !== undefined && date < today;
               return (
-                <td key={di} className="h-12 p-[1px] align-top">
+                <td key={di} className="p-[1px] align-top">
                   <div
                     className={clsx(
-                      "h-full px-1 text-sm leading-tight",
+                      // 칸은 폭만큼 높게(정사각형). 좁아도 글자 두 줄은 들어가게 최소 높이를 둔다.
+                      "aspect-square min-h-12 px-1 text-sm leading-tight",
                       on.length > 0 && "bg-muted",
                       date === today &&
                         "outline-foreground outline-2 -outline-offset-2",

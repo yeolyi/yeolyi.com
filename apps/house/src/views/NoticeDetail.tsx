@@ -9,12 +9,14 @@ import {
 import { isMainRound } from "@shared/site.ts";
 import type { Notice, Settings, Unit } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
+import { Details, Summary } from "@yeolyi/ui/Details";
 import Tabs from "@yeolyi/ui/Tabs";
 import { clsx } from "clsx";
 import { ArrowLeft } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
-import { Facts } from "../components/Facts.tsx";
+import { facts } from "../components/Facts.tsx";
 import { IncomeBar } from "../components/IncomeBar.tsx";
+import { KakaoMap } from "../components/KakaoMap.tsx";
 import { MapLinks } from "../components/MapLinks.tsx";
 import { Mark } from "../components/Mark.tsx";
 import { Schedule } from "../components/Schedule.tsx";
@@ -78,6 +80,7 @@ export function NoticeDetail({
         <MapLinks n={n} />
       ),
     ],
+    ["종류", facts(n).join(" · ")],
     ["사업주체", n.builder],
     ["세대", n.totalUnits ? `${n.totalUnits.toLocaleString()}세대` : undefined],
     // 주택형 표가 분양가를 주택형별로 보여 주면 여기선 뺀다.
@@ -95,12 +98,9 @@ export function NoticeDetail({
     <article>
       {back}
       <h1 className="mt-[1rlh]">{n.name}</h1>
-      <div className="mt-[0.25rlh]">
-        <Facts n={n} />
-      </div>
-      {/* 공고문이 그 공고의 규칙 원본이라 제목 바로 아래에 둔다. */}
+      {/* 공고문이 그 공고의 규칙 원본이라 제목 바로 아래에 둔다(지역·성격은 목록 한 줄과 공고 정보 탭에). */}
       {n.url && (
-        <p className="mt-[0.5rlh]">
+        <p className="mt-[0.25rlh]">
           <a href={n.url} target="_blank" rel="noreferrer">
             청약홈에서 공고문 보기
           </a>
@@ -135,6 +135,7 @@ export function NoticeDetail({
                   </tbody>
                 </table>
 
+                {n.address && <KakaoMap address={n.address} />}
                 {n.units && n.units.length > 0 && (
                   <div className="mt-[1rlh]">
                     <Units n={n} />
@@ -173,9 +174,12 @@ export function NoticeDetail({
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-[1rlh]">
-                      <People n={n} v={v} s={s} today={today} />
-                    </div>
+                    {/* 가구 조건(권역·자산)에서 걸렸으면 사람별 표는 보이지 않는다. */}
+                    {v.pass && (
+                      <div className="mt-[1rlh]">
+                        <People n={n} v={v} s={s} today={today} />
+                      </div>
+                    )}
                     <p className="text-muted-foreground mt-[1rlh] text-base">
                       개인화에 넣은 답으로 계산한 참고용입니다. 자격은
                       공고문으로 확인하세요.
@@ -275,7 +279,8 @@ function Units({ n }: { n: Notice }) {
   );
 }
 
-/** 사람별 사다리. 특공은 가구에서 한 명만 넣으니 추천된 사람에게만 펼친다. */
+/** 사람별 사다리. 위에 공급 종류 × 사람의 한 단어 결론 표, 아래 공급 종류마다 접힌 근거.
+ *  특공은 가구에서 한 명만 넣으니 추천된 사람 칸만 채운다. 무순위·임의공급은 사람마다 다를 게 없어 한 번만. */
 function People({
   n,
   v,
@@ -288,67 +293,142 @@ function People({
   today: string;
 }) {
   const w = who(n, v, s, today);
-  const applicant = w.people.find((f) => f.special)?.person.name;
-  // 무순위·임의공급은 통장·순위를 안 봐서 사람마다 다를 게 없다. 한 번만 보인다.
-  if (!isMainRound(n)) {
-    const filled = w.people.find((f) => personFilled(f.person));
-    if (!filled)
-      return (
-        <p className="text-muted-foreground">
-          정보가 없습니다. <a href="/settings">개인화</a>에서
-          생년월일·주소·통장을 넣으면 계산합니다.
-        </p>
-      );
+  const filled = w.people.filter((f) => personFilled(f.person));
+  if (!filled.length)
+    return (
+      <p className="text-muted-foreground">
+        정보가 없습니다. <a href="/settings">개인화</a>에서 생년월일·주소·통장을
+        넣으면 계산합니다.
+      </p>
+    );
+  if (!isMainRound(n))
     return (
       <div className="space-y-[1rlh]">
         {w.blocked && <p className="font-bold">{w.blocked}</p>}
-        {ladders(filled.person, n, v, s, today).map((l) => (
+        {ladders(filled[0]!.person, n, v, s, today).map((l) => (
           <LadderView key={l.title} l={l} />
         ))}
       </div>
     );
+
+  // 공급 종류(사다리 제목)마다 사람별 사다리를 모은다.
+  const rows = new Map<
+    string,
+    { person: string; l: Ladder | null; note?: string }[]
+  >();
+  for (const f of w.people) {
+    const ls = personFilled(f.person) ? ladders(f.person, n, v, s, today) : [];
+    for (const l of ls) {
+      const special = l.title.startsWith("예비신혼");
+      const list = rows.get(l.title) ?? [];
+      list.push(
+        special && !f.special
+          ? { person: f.person.name, l: null, note: "가구에서 한 명만" }
+          : { person: f.person.name, l },
+      );
+      rows.set(l.title, list);
+    }
   }
+  const people = w.people.map((f) => f.person.name);
   return (
-    <div className="space-y-[1rlh]">
+    <div>
       {w.blocked && <p className="font-bold">{w.blocked}</p>}
-      {w.people.map((f) => (
-        <div key={f.person.name}>
-          <h3>{f.person.name}</h3>
-          {!personFilled(f.person) ? (
-            <p className="text-muted-foreground">
-              정보가 없습니다. <a href="/settings">개인화</a>에서
-              생년월일·주소·통장을 넣으면 계산합니다.
-            </p>
-          ) : v.assetBlocked ? (
-            <p className="text-muted-foreground">
-              자산 기준에 걸려 이 공고엔 넣을 수 없습니다.
-            </p>
-          ) : (
-            ladders(f.person, n, v, s, today).map((l) => {
-              const isSpecial = l.title.startsWith("예비신혼");
-              if (isSpecial && !f.special)
+      <table className="table">
+        <thead>
+          <tr>
+            <th />
+            {people.map((name) => (
+              <th key={name}>{name}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {[...rows].map(([title, cells]) => (
+            <tr key={title}>
+              <th scope="row" className="whitespace-normal">
+                {title}
+              </th>
+              {people.map((name) => {
+                const c = cells.find((x) => x.person === name);
+                const r = c?.l ? cellOf(c.l) : undefined;
                 return (
-                  <p
-                    key={l.title}
-                    className="text-muted-foreground mt-[0.5rlh]"
-                  >
-                    {l.title}: 가구에서 한 명만 넣습니다.{" "}
-                    {applicant
-                      ? `추천은 ${applicant}.`
-                      : "통장 조건이 되는 사람이 없습니다."}
-                  </p>
+                  <td key={name} className="whitespace-normal">
+                    {r ? (
+                      <span className="inline-flex items-baseline gap-1.5">
+                        <Mark ok={r.ok} />
+                        <span className={clsx(r.ok === false && "font-bold")}>
+                          {r.text}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        {c?.note ??
+                          (personFilled(
+                            w.people.find((f) => f.person.name === name)!
+                              .person,
+                          )
+                            ? "–"
+                            : "정보 없음")}
+                      </span>
+                    )}
+                  </td>
                 );
-              return <LadderView key={l.title} l={l} recommended={isSpecial} />;
-            })
-          )}
-        </div>
-      ))}
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-[1rlh] space-y-[0.5rlh]">
+        {[...rows].map(([title, cells]) => (
+          <Details key={title}>
+            <Summary>{title} 근거</Summary>
+            {cells
+              .filter((c) => c.l)
+              .map((c) => (
+                <div key={c.person}>
+                  {people.length > 1 && <p className="font-bold">{c.person}</p>}
+                  <LadderView l={c.l!} hideTitle />
+                </div>
+              ))}
+          </Details>
+        ))}
+      </div>
     </div>
   );
 }
 
+/** 표 한 칸의 결론. 전제를 못 넘으면 걸린 조건, 넘으면 들어가는 줄 이름. */
+function cellOf(l: Ladder): { ok: boolean | null; text: string } {
+  const failed = l.prerequisites.find((p) => p.ok === false);
+  // 짧은 이유(통장 미달·세대주가 아님)가 있으면 그것, 아니면 걸린 조건 이름.
+  if (failed)
+    return {
+      ok: false,
+      text:
+        failed.detail && failed.detail.length <= 12
+          ? failed.detail
+          : `${failed.label.split(":")[0]} 안 됨`,
+    };
+  const on = l.tiers.find((t) => t.on);
+  if (!on)
+    return {
+      ok: null,
+      text: l.tierNote ? l.tierNote.split(",")[0]! : "줄 모름",
+    };
+  return { ok: true, text: on.label };
+}
+
 /** 사다리 하나: 제목·물량, 전제, 줄(또는 소득 막대), 줄 안의 순서. */
-function LadderView({ l, recommended }: { l: Ladder; recommended?: boolean }) {
+function LadderView({
+  l,
+  recommended,
+  hideTitle,
+}: {
+  l: Ladder;
+  recommended?: boolean;
+  /** 접기 제목이 이미 공급 종류를 말할 때. */
+  hideTitle?: boolean;
+}) {
   return (
     <div className="mt-[0.5rlh]">
       <p>

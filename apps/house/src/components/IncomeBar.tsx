@@ -78,10 +78,9 @@ export function IncomeBar({ scale }: { scale: IncomeScale }) {
         </div>
       </div>
       <p className="text-muted-foreground text-sm">
-        {scale.pct}% = 가구 세전 월소득 {scale.incomeMan.toLocaleString()}만 ÷
-        도시근로자 가구당 월평균소득(3인 이하 칸){" "}
-        {scale.baseMan.toLocaleString()}만. 가구원 보수월액 합산. 개인화에서
-        바꿉니다.
+        {scale.pct}% = 가구 월소득 {scale.incomeMan.toLocaleString()}만 ÷ 2026년
+        도시근로자 가구당 월평균소득{" "}
+        {Math.round(scale.baseMan).toLocaleString()}만(가구원 수 기준).
       </p>
     </div>
   );
