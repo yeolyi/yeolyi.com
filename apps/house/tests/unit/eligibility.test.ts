@@ -3,10 +3,10 @@ import { test } from "node:test";
 import {
   account,
   incomeTiers,
-  ladders,
   residency,
   who,
 } from "../../supabase/functions/_shared/eligibility.ts";
+import { depositNeeded } from "../../supabase/functions/_shared/requirements.ts";
 import { judge } from "../../supabase/functions/_shared/verdict.ts";
 import { notice, settings, TODAY, unit } from "./helpers.ts";
 
@@ -26,22 +26,23 @@ test("거주: 시도는 맞지만 성남 2년이 안 돼 해당지역은 아직"
   ); // 비규제는 기간 요건 없음
 });
 
-test("통장: 특공 6개월·6회(민영은 예치금까지), 1순위는 2년 + 공공 24회 / 민영 예치금 500만 + 규제지역 세대주", () => {
+test("통장: 특공 6개월(국민 6회 / 민영 예치금), 1순위는 지역 등급별 기간 + 국민 횟수 / 민영 예치금(별표 2) + 규제지역 세대주", () => {
+  // 성남(투기과열) 45㎡ 민영, 경기 거주 갑: 2년 · 예치금 200만(그 밖의 지역 85㎡ 이하) · 세대주
   const a = account(갑, 성남민영, TODAY);
   assert.equal(a.special, true);
   assert.equal(a.rank1, true);
   const 공공 = notice({ publicHousing: true });
-  assert.equal(account({ ...갑, accountCount: 20 }, 공공, TODAY).rank1, false);
+  assert.equal(account({ ...갑, accountCount: 20 }, 공공, TODAY).rank1, false); // 규제지역 국민 24회
   assert.equal(
-    account({ ...갑, accountPaidMan: 300 }, 성남민영, TODAY).rank1,
+    account({ ...갑, accountPaidMan: 150 }, 성남민영, TODAY).rank1,
     false,
   );
   assert.equal(
-    account({ ...갑, accountPaidMan: 300 }, 성남민영, TODAY).special,
+    account({ ...갑, accountPaidMan: 150 }, 성남민영, TODAY).special,
     false,
-  ); // 민영 특공은 예치금도 봄
+  ); // 민영 특공도 예치금
   assert.equal(
-    account({ ...갑, accountPaidMan: 300 }, 공공, TODAY).special,
+    account({ ...갑, accountPaidMan: 150 }, 공공, TODAY).special,
     true,
   );
   assert.equal(
@@ -50,12 +51,43 @@ test("통장: 특공 6개월·6회(민영은 예치금까지), 1순위는 2년 +
   );
   const notHead = account({ ...갑, householder: false }, 성남민영, TODAY);
   assert.equal(notHead.rank1, false);
-  assert.equal(notHead.rank1Why, "세대주가 아님");
+  assert.equal(notHead.rank1Why, "세대주 미충족");
   assert.equal(
     account({ ...갑, householder: false }, notice({ regulated: false }), TODAY)
       .rank1,
     true,
   ); // 비규제는 세대주 무관
+});
+
+test("1순위 기간은 지역 등급별: 수도권 비규제 1년·12회, 수도권 밖 6개월·6회, 규제지역 2년·24회 (제27조 ①)", () => {
+  const 가입8개월 = { ...갑, accountOpenedAt: "2026-02-01", accountCount: 8 };
+  const 국민 = (sido: string, regulated = false) =>
+    notice({ publicHousing: true, sido, regulated, address: `${sido} 어딘가` });
+  assert.equal(account(가입8개월, 국민("부산"), TODAY).rank1, true);
+  assert.equal(account(가입8개월, 국민("경기"), TODAY).rank1, false);
+  assert.equal(
+    account(
+      { ...갑, accountOpenedAt: "2025-06-01", accountCount: 15 },
+      국민("경기"),
+      TODAY,
+    ).rank1,
+    true,
+  );
+  assert.equal(
+    account(
+      { ...갑, accountOpenedAt: "2025-06-01", accountCount: 15 },
+      국민("경기", true),
+      TODAY,
+    ).rank1,
+    false,
+  );
+});
+
+test("민영 예치금은 사는 곳 × 전용면적(별표 2)", () => {
+  assert.equal(depositNeeded("서울", 84), 300);
+  assert.equal(depositNeeded("인천", 100), 400);
+  assert.equal(depositNeeded("경기", 130), 400);
+  assert.equal(depositNeeded("부산", 150), 1500);
 });
 
 test("누가: 민영 신혼 특공은 혼인신고 전엔 막힘(일반만). 신고 후엔 지역 점수 높은 한 명. 정보 없는 사람은 둘 다 아님", () => {
@@ -149,133 +181,6 @@ test("소득 줄: 분모는 3인 이하 칸(2026-08 공고 753.4만) → 126%. �
   );
 });
 
-test("사다리(민영, 갑, 혼인신고 후): 자격에 예치금, 물량은 일반 칸(126%), 순서는 자녀 1/2순위·해당지역. 일반공급은 세대주 포함 1순위, 가점 ✗ 추첨 ✓", () => {
-  const married = settings({ marriedAt: "2026-10-01" });
-  const v = judge(성남민영, married);
-  const [special, general] = ladders(갑, 성남민영, v, married, TODAY);
-  assert.equal(special!.title, "예비신혼 특공 (민영)");
-  assert.equal(special!.supply, "신혼 21세대");
-  assert.equal(special!.income?.pct, 126);
-  assert.deepEqual(
-    special!.prerequisites.map((st) => [st.label, st.ok]),
-    [
-      ["통장 6개월·예치금 500만", true],
-      ["혼인 7년 이내", true],
-    ],
-  );
-  assert.deepEqual(
-    special!.tiers.map((t) => [t.label, t.on]),
-    [
-      ["우선 50%", false],
-      ["일반 20%", true],
-      ["추첨 30%", false],
-    ],
-  );
-  assert.deepEqual(
-    special!.within.map((st) => [st.label, st.ok]),
-    [
-      ["1순위: 혼인 중 자녀(임신 포함)", false],
-      ["해당지역 거주자 우선", false],
-      ["자녀 수 → 추첨", null],
-    ],
-  );
-  assert.equal(general!.title, "일반공급 (민영)");
-  assert.equal(general!.supply, "일반 5세대");
-  assert.match(general!.prerequisites[0]!.label, /세대주/);
-  assert.deepEqual(
-    general!.tiers.map((t) => [t.label, t.on]),
-    [
-      ["가점제", false],
-      ["추첨제", true],
-    ],
-  );
-  assert.match(general!.tierNote, /가점 27점/); // 무주택 0 + 부양가족 10(배우자) + 통장 17
-  // 신고 전엔 특공 사다리가 아예 없다
-  assert.deepEqual(
-    ladders(갑, 성남민영, judge(성남민영, s), s, TODAY).map((l) => l.title),
-    ["일반공급 (민영)"],
-  );
-});
-
-test("사다리: 소득 100% 이하면 우선 칸에 서고 순서에 자녀 1순위·해당지역이 붙는다", () => {
-  const low = settings({
-    marriedAt: "2026-10-01",
-    incomeMan: 600,
-    children: 0,
-  });
-  const [special] = ladders(갑, 성남민영, judge(성남민영, low), low, TODAY);
-  assert.deepEqual(
-    special!.tiers.map((t) => t.on),
-    [true, false, false],
-  );
-  assert.deepEqual(
-    special!.within.map((st) => [st.label, st.ok]),
-    [
-      ["1순위: 혼인 중 자녀(임신 포함)", false],
-      ["해당지역 거주자 우선", false],
-      ["자녀 수 → 추첨", null],
-    ],
-  );
-  assert.equal(
-    ladders(
-      갑,
-      성남민영,
-      judge(성남민영, { ...low, children: 1 }),
-      { ...low, children: 1 },
-      TODAY,
-    )[0]!.within[0]!.ok,
-    true,
-  );
-});
-
-test("사다리: 공공 신혼은 20% 칸(126% ≤ 140, 예비신혼도). 공공 일반은 자녀 없고 무주택 0년이라 추첨 20%가 실제 표. 임의공급은 공고문이 정함", () => {
-  const 공공 = notice({
-    publicHousing: true,
-    publicType: "일반형",
-    units: [unit(79000, { newlywed: 10, area: 75 })],
-  });
-  const [sp, gen] = ladders(갑, 공공, judge(공공, s), s, TODAY);
-  assert.deepEqual(
-    sp!.tiers.map((t) => t.on),
-    [false, true, false],
-  );
-  assert.equal(sp!.prerequisites[1]!.label, "예비신혼부부 (공공만)");
-  assert.deepEqual(
-    gen!.tiers.map((t) => [t.label, t.on]),
-    [
-      ["자녀 우선 50%", false],
-      ["순차 30%", false],
-      ["추첨 20%", true],
-    ],
-  ); // 만 26세 → 무주택 0년 → 2순차
-  assert.match(gen!.prerequisites[2]!.label, /60㎡ 이하/); // 공급면적 75 ≈ 전용 58
-  assert.deepEqual(
-    ladders(
-      { ...갑, birth: "1990-01-01" },
-      공공,
-      judge(공공, s),
-      s,
-      TODAY,
-    )[1]!.tiers.map((t) => t.on),
-    [false, true, false],
-  );
-  const l = ladders(
-    갑,
-    notice({ kind: "임의공급", units: [unit(90000)] }),
-    judge(notice({ kind: "임의공급" }), s),
-    s,
-    TODAY,
-  );
-  assert.deepEqual(
-    l.map((x) => x.title),
-    ["임의공급"],
-  );
-  assert.equal(
-    l[0]!.tiers.every((t) => !t.on),
-    true,
-  );
-});
-
 test("소득 구간 외벌이: 민영 100/140, 공공 100/130. 공공 외벌이는 130%를 넘으면 추첨도 못 들어감", () => {
   const single = settings({ dualIncome: false }); // 126%
   assert.deepEqual(
@@ -312,19 +217,4 @@ test("월소득을 안 넣으면 소득 구간을 정하지 않고, 총자산을
     units: [unit(79000, { special: 145 })],
   });
   assert.equal(judge(sh, blank).assetBlocked, undefined);
-});
-
-test("공공 일반공급: 소득 상한(순차 칸)은 60㎡ 이하에만. 60㎡ 초과만 있으면 소득이 높아도 순차 칸을 막지 않는다", () => {
-  const rich = settings({ incomeMan: 1200 }); // 159%, 맞벌이 140% 넘음
-  const general = (type: string) => {
-    const n = notice({ publicHousing: true, units: [unit(50000, { type })] });
-    return ladders(갑, n, judge(n, rich), rich, TODAY).find(
-      (l) => l.title === "일반공급 (공공)",
-    )!;
-  };
-  assert.match(general("059.9000A").tierNote, /못 들어감/);
-  assert.doesNotMatch(general("084.9800A").tierNote, /못 들어감/);
-  assert.ok(
-    !general("084.9800A").prerequisites.some((p) => p.label.startsWith("소득")),
-  );
 });

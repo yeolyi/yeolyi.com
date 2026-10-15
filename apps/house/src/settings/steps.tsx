@@ -355,6 +355,48 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     hint: "신혼부부 특별공급은 자녀가 있으면 1순위입니다. 없으면 0.",
     unit: "명",
   }),
+  {
+    id: "ownshome",
+    group: "가구",
+    label: "집 소유",
+    question: "신청하는 사람과 같은 세대 누구라도 집이 있나요?",
+    hint: "분양권·입주권도 집으로 칩니다. 국민주택·특별공급·규제지역 1순위는 무주택 가구만 됩니다. 확인: 본인이 알거나 등기부.",
+    input: ({ d, set }) => (
+      <RadioGroup
+        aria-label="집 소유"
+        orientation="vertical"
+        value={d.ownsHome === null ? "" : d.ownsHome ? "y" : "n"}
+        onValueChange={(v) => set({ ...d, ownsHome: v === "y" })}
+        options={[
+          { value: "y", label: "예" },
+          { value: "n", label: "아니요" },
+        ]}
+      />
+    ),
+    answer: (s) =>
+      s.ownsHome === null ? NOT_YET : s.ownsHome ? "예" : "아니요",
+  },
+  {
+    id: "wonrecently",
+    group: "가구",
+    label: "최근 당첨",
+    question: "최근 5년 안에 세대원 누구라도 청약에 당첨된 적이 있나요?",
+    hint: "계약하지 않았어도 당첨이면 셉니다. 규제지역 1순위와 재공급은 이것으로 막힙니다. 확인: 청약홈 '청약 제한 사항 확인'.",
+    input: ({ d, set }) => (
+      <RadioGroup
+        aria-label="최근 당첨"
+        orientation="vertical"
+        value={d.wonRecently === null ? "" : d.wonRecently ? "y" : "n"}
+        onValueChange={(v) => set({ ...d, wonRecently: v === "y" })}
+        options={[
+          { value: "y", label: "예" },
+          { value: "n", label: "아니요" },
+        ]}
+      />
+    ),
+    answer: (s) =>
+      s.wonRecently === null ? NOT_YET : s.wonRecently ? "예" : "아니요",
+  },
 ];
 
 const STEPS_AFTER_PEOPLE: Step[] = [
@@ -364,6 +406,14 @@ const STEPS_AFTER_PEOPLE: Step[] = [
     label: "총자산",
     question: "가구의 총자산은 얼마인가요?",
     hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다. 모르면 비워 두세요. 확인: 부동산은 공시가격, 자동차는 보험개발원 차량기준가액.",
+    unit: "억",
+  }),
+  numberStep("realEstateEok", {
+    id: "realestate",
+    group: "소득과 자산",
+    label: "부동산",
+    question: "가구가 가진 부동산(땅·건물) 가액은 얼마인가요?",
+    hint: "민영 신혼부부 특별공급은 소득이 기준을 넘어도 부동산이 3.31억 이하면 추첨 구간에 넣을 수 있습니다. 없으면 0, 모르면 비워 두세요. 확인: 공시가격.",
     unit: "억",
   }),
   numberStep("incomeMan", {

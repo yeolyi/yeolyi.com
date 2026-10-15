@@ -29,6 +29,12 @@ const DATE_FIELDS = [
   "contractStart",
   "contractEnd",
   "url",
+  // 분류 칸도 원본이 바뀌면 따라간다(규제지역 지정·해제, 공급 구분).
+  "regulated",
+  "adjusted",
+  "priceCap",
+  "houseSecd",
+  "rental",
 ] as const;
 
 /** known 은 저장된 공고(id → 공고). 바뀐 것만 돌려준다 — 저장은 호출자 몫. */
@@ -45,14 +51,14 @@ export async function collect(
   const changed = new Map<string, Notice>();
   let added = 0;
 
-  // 이미 있는 건 일정이 바뀌었을 수 있어 날짜 칸만 덮어쓴다.
+  // 이미 있는 건 일정·분류가 바뀌었을 수 있어 그 칸만 덮어쓴다.
   for (const n of [...ah, ...mh]) {
     const cur = known.get(n.id);
     if (cur) {
       let dirty = false;
       for (const k of DATE_FIELDS) {
         if (n[k] !== undefined && cur[k] !== n[k]) {
-          cur[k] = n[k];
+          (cur as Record<string, unknown>)[k] = n[k];
           dirty = true;
         }
       }

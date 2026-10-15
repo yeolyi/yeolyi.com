@@ -1,3 +1,4 @@
+import { classify } from "@shared/classify.ts";
 import { addYears, fmtYears, yearsBetween } from "@shared/dates.ts";
 import {
   account,
@@ -10,6 +11,13 @@ import {
   who,
 } from "@shared/eligibility.ts";
 import {
+  type Check,
+  homelessCheck,
+  noRankChecks,
+  rank1Checks,
+  specialAccountChecks,
+} from "@shared/requirements.ts";
+import {
   bonusPoints,
   homelessStart,
   incomeBaseMan,
@@ -20,9 +28,7 @@ import {
   PUBLIC_GENERAL,
   PUBLIC_RANK1_HOMELESS_YEARS,
   privatePointShare,
-  RANK1_ACCOUNT,
   regionsOf,
-  SPECIAL_ACCOUNT,
 } from "@shared/rules.ts";
 import { isMainRound } from "@shared/site.ts";
 import type { Notice, Person, Settings } from "@shared/types.ts";
@@ -97,22 +103,33 @@ const CheckTable = ({ children }: { children: ReactNode }) => (
     <tbody>{children}</tbody>
   </table>
 );
-function Check({
-  ok,
-  label,
-  children,
+type Req = Check;
+/** 표 한 줄: 요구 조건 | 우리 상태(비었으면 넣으러 가는 링크) | 결과. 결과는 아이콘 + 글자(색 없이도 읽히게). */
+function CheckRow({
+  c,
+  Fill,
+  linkEvenIfKnown,
 }: {
-  ok: Ok;
-  label: ReactNode;
-  children?: ReactNode;
+  c: Req;
+  Fill: (p: { step: string; children: ReactNode }) => ReactNode;
+  linkEvenIfKnown?: boolean;
 }) {
+  const ok = c.ok;
   const Icon = ok === null ? CircleHelp : ok ? Check2 : X;
   return (
     <tr>
       <td className={clsx("whitespace-normal", ok === false && "font-bold")}>
-        {label}
+        {c.label}
       </td>
-      <td className="text-muted-foreground whitespace-normal">{children}</td>
+      <td className="text-muted-foreground whitespace-normal">
+        {c.mine}
+        {c.need && (ok === null || linkEvenIfKnown) && (
+          <>
+            {c.mine ? " · " : ""}
+            <Fill step={c.need}>{c.mine ? "고치기" : "넣기"}</Fill>
+          </>
+        )}
+      </td>
       <td>
         <span
           className={clsx(
@@ -205,7 +222,7 @@ export function MyEligibility({
   const bandLabel = (b: number) =>
     b === 60 ? "60㎡ 이하" : b === 85 ? "60~85㎡" : "85㎡ 초과";
   const shareOf = (b: number) =>
-    privatePointShare(b === 60 ? 59 : b === 85 ? 84 : 100, !!n.regulated);
+    privatePointShare(b === 60 ? 59 : b === 85 ? 84 : 100, classify(n).zone);
   const shareRows = bands.flatMap((b) => {
     const sh = shareOf(b);
     return sh === "공고"
@@ -275,7 +292,7 @@ export function MyEligibility({
             <>
               <P>
                 1순위 안에서 가점제로 먼저 뽑고, 떨어지면 추첨제로 넘어갑니다.
-                {lotteryHomelessFirst(n.sido, !!n.regulated) &&
+                {lotteryHomelessFirst(n.sido, classify(n).zone) &&
                   ` 추첨 물량의 ${LOTTERY_HOMELESS_PCT}%는 무주택자 먼저.`}
               </P>
               {shareRows.length > 0 && (
@@ -300,151 +317,234 @@ export function MyEligibility({
   );
 
   // ───────── 내 자격 ─────────
+  // 요건은 requirements.ts 의 표에서 나온다(공고 분류 × 사람 답). 여기서는 섹션으로 묶어 그리기만 한다.
   const sidos = people.map((p) => p.sido).filter(Boolean);
   const regions = regionsOf(sidos);
-  const accountLabel = n.publicHousing
-    ? `특공 통장 6개월·${SPECIAL_ACCOUNT.count}회`
-    : `특공 통장 6개월·예치금 ${RANK1_ACCOUNT.privateDepositMan}만 원`;
-  const rank1Label = n.publicHousing
-    ? `1순위 통장 ${RANK1_ACCOUNT.years}년·${RANK1_ACCOUNT.publicCount}회${n.regulated ? "·세대주" : ""}`
-    : `1순위 통장 ${RANK1_ACCOUNT.years}년·예치금 ${RANK1_ACCOUNT.privateDepositMan}만 원${n.regulated ? "·세대주" : ""}`;
-  const blocked = v.region === "out" || !!v.assetBlocked;
+  const cls = classify(n);
+  const blocked = v.region === "out" || !!v.assetBlocked || !!v.notSubscription;
   const cap = tiers.at(-1)?.capPct;
+  const local = sidos.length
+    ? people.some((p) => personFilled(p) && residency(p, n, today).inCity)
+    : null;
+  const regionRow: Req = {
+    id: "region",
+    label:
+      cls.supply === "본청약" || cls.supply === "공공임대"
+        ? `지역: 사는 곳의 권역 안(${n.sido} 공고)`
+        : cls.supply === "재공급"
+          ? `지역: ${n.sido} 해당 시·군 거주`
+          : "지역",
+    law: cls.supply === "재공급" ? "규칙 제47조의3 ②" : "규칙 제4조 ③",
+    ok:
+      cls.supply === "본청약" ||
+      cls.supply === "공공임대" ||
+      cls.supply === "재공급"
+        ? sidos.length
+          ? v.region === "in"
+          : null
+        : true,
+    mine: sidos.length
+      ? cls.supply === "본청약" || cls.supply === "공공임대"
+        ? `${regions.map((r) => r.label).join("·")} 거주 가구${v.region === "in" ? "" : " · 혁신도시 등 예외는 공고문 확인"}`
+        : cls.supply === "재공급"
+          ? local
+            ? "해당 시·군 거주"
+            : "해당 시·군 거주 안 함"
+          : "전국(거주 요건은 아래)"
+      : "",
+    need: "p0-home",
+  };
+  const assetRow: Req | undefined = assetGated(n)
+    ? {
+        id: "asset",
+        label: `총자산 ${PUBLIC_ASSET_CAP_EOK}억 이하`,
+        law: "공공주택 특별법 시행규칙 별표 6의6",
+        ok: s.totalAssetsEok === null ? null : !v.assetBlocked,
+        mine:
+          s.totalAssetsEok === null ? "" : `우리 가구 ${s.totalAssetsEok}억`,
+        need: "assets",
+      }
+    : undefined;
+  // 사람별 요건에서 가구 단위(무주택·5년 내 당첨)는 따로 한 번만 보인다.
+  const HOUSEHOLD_IDS = ["homeless", "nowin"];
+  const personRows = (cs: Req[]) =>
+    cs.filter((c) => !HOUSEHOLD_IDS.includes(c.id));
+  const householdRows = (cs: Req[]) => {
+    const seen = new Set<string>();
+    return cs.filter(
+      (c) => HOUSEHOLD_IDS.includes(c.id) && !seen.has(c.id) && seen.add(c.id),
+    );
+  };
+  const filledPeople = people.filter(personFilled);
+  const generalAll = filledPeople.flatMap((p) =>
+    rank1Checks(p, people.indexOf(p), n, s, today),
+  );
+  const _specialAll = filledPeople.flatMap((p) =>
+    specialAccountChecks(p, people.indexOf(p), n, today),
+  );
+  const overIncome = pct !== undefined && cap !== undefined && pct > cap;
+  const privateLotteryOnly =
+    !n.publicHousing &&
+    pct !== undefined &&
+    landing >= 0 &&
+    tiers[landing]?.capPct === undefined;
+
+  const missingPeopleRows = people
+    .filter((p) => !personFilled(p))
+    .map((p) => (
+      <CheckRow
+        key={`${p.name}-missing`}
+        c={{
+          id: "person",
+          label: `${p.name}: 통장·주소`,
+          law: "",
+          ok: null,
+          mine: "",
+          need: personStep(p),
+        }}
+        Fill={Fill}
+      />
+    ));
 
   const eligibility = (
     <>
-      <CheckTable>
-        <Check
-          ok={sidos.length ? v.region === "in" : null}
-          label={`지역: ${n.sido} 공고`}
-        >
-          {sidos.length ? (
-            `${regions.map((r) => r.label).join("·")} 거주 가구${v.region === "in" ? "" : ", 권역 밖(혁신도시 등 예외는 공고문 확인)"}`
-          ) : (
-            <Fill step="p0-home">사는 곳 넣기</Fill>
-          )}
-        </Check>
-        {assetGated(n) && (
-          <Check
-            ok={s.totalAssetsEok === null ? null : !v.assetBlocked}
-            label={`총자산 ${PUBLIC_ASSET_CAP_EOK}억 이하`}
-          >
-            {s.totalAssetsEok === null ? (
-              <Fill step="assets">총자산 넣기</Fill>
-            ) : (
-              `우리 가구 ${s.totalAssetsEok}억`
+      {v.notSubscription ? (
+        <CheckTable>
+          <CheckRow
+            c={{
+              id: "sale",
+              label: "청약 공고인가",
+              law: "",
+              ok: false,
+              mine: "선착순 매각 공고(청약이 아님). 조건은 공고문",
+            }}
+            Fill={Fill}
+          />
+        </CheckTable>
+      ) : (
+        <CheckTable>
+          <CheckRow c={regionRow} Fill={Fill} />
+          {assetRow && <CheckRow c={assetRow} Fill={Fill} />}
+          {main &&
+            cls.housing === "국민" &&
+            !generalAll.some((c) => c.id === "homeless") && (
+              <CheckRow c={homelessCheck(s, "규칙 제4조 ①")} Fill={Fill} />
             )}
-          </Check>
-        )}
-      </CheckTable>
+          {!main &&
+            noRankChecks(n, s, local).map((c) => (
+              <CheckRow key={c.id} c={c} Fill={Fill} />
+            ))}
+          {cls.supply === "공공임대" && (
+            <CheckRow
+              c={{
+                id: "rental",
+                label: "공공임대 입주 자격",
+                law: "공공주택 특별법 시행규칙",
+                ok: null,
+                mine: "이 서비스는 판정하지 않음 · 공고문 확인",
+              }}
+              Fill={Fill}
+            />
+          )}
+        </CheckTable>
+      )}
       {!blocked && hasNewlywed && (
         <>
           <H3>신혼부부 특별공급</H3>
           <CheckTable>
             {!n.publicHousing && (
               // 혼인신고일이 비었으면 "아직 안 함"이라고 답한 것으로 본다.
-              <Check ok={!!s.marriedAt} label="혼인신고(민영은 필수)">
-                {s.marriedAt ? (
-                  s.marriedAt
-                ) : (
-                  <>
-                    아직 안 함 · 했다면{" "}
-                    <Fill step="married">혼인신고일 넣기</Fill>
-                  </>
-                )}
-              </Check>
+              <CheckRow
+                c={{
+                  id: "married",
+                  label: "혼인신고(민영은 필수)",
+                  law: "규칙 제41조",
+                  ok: !!s.marriedAt,
+                  mine: s.marriedAt || "아직 안 함",
+                  need: s.marriedAt ? undefined : "married",
+                }}
+                Fill={Fill}
+                linkEvenIfKnown
+              />
             )}
-            {people.map((p) => {
-              if (!personFilled(p))
-                return (
-                  <Check
-                    key={p.name}
-                    ok={null}
-                    label={`${p.name}: ${accountLabel}`}
-                  >
-                    <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
-                  </Check>
-                );
-              const a = account(p, n, today);
-              return (
-                <Check
-                  key={p.name}
-                  ok={a.special}
-                  label={`${p.name}: ${accountLabel}`}
-                >
-                  {`${fmtYears(a.years)} · ${p.accountCount}회 · ${p.accountPaidMan.toLocaleString()}만 원`}
-                </Check>
-              );
-            })}
-            <Check
-              ok={pct === undefined ? null : landing !== -1}
-              label={
-                cap
+            <CheckRow c={homelessCheck(s, "규칙 제41조 ①")} Fill={Fill} />
+            {filledPeople.flatMap((p) =>
+              personRows(
+                specialAccountChecks(p, people.indexOf(p), n, today),
+              ).map((c) => (
+                <CheckRow
+                  key={`${p.name}-${c.id}`}
+                  c={{ ...c, label: `${p.name}: 특공 ${c.label}` }}
+                  Fill={Fill}
+                />
+              )),
+            )}
+            {missingPeopleRows}
+            <CheckRow
+              c={{
+                id: "income",
+                label: cap
                   ? `가구 소득 ${cap}% 이하(${e})`
-                  : "가구 소득(추첨 구간은 상한 없음)"
-              }
-            >
-              {pct === undefined ? (
-                <Fill step="income">월소득 넣기</Fill>
-              ) : (
-                `우리 가구 ${pct}%`
-              )}
-              {people.length > 1 && s.dualIncome === null && (
-                <>
-                  {" · "}
-                  <Fill step="dualincome">맞벌이 여부 넣기</Fill>
-                </>
-              )}
-            </Check>
+                  : "가구 소득(추첨 구간은 상한 없음)",
+                law: n.publicHousing
+                  ? "공공주택 특별법 시행규칙 별표 6"
+                  : "규칙 제41조 ②",
+                ok: pct === undefined ? null : !overIncome,
+                mine: pct === undefined ? "" : `우리 가구 ${pct}%`,
+                need: "income",
+              }}
+              Fill={Fill}
+            />
+            {privateLotteryOnly && (
+              <CheckRow
+                c={{
+                  id: "realestate",
+                  label: "추첨 구간: 가구 부동산 3.31억 이하",
+                  law: "규칙 제41조 ②",
+                  ok: s.realEstateEok === null ? null : s.realEstateEok <= 3.31,
+                  mine: s.realEstateEok === null ? "" : `${s.realEstateEok}억`,
+                  need: "realestate",
+                }}
+                Fill={Fill}
+              />
+            )}
           </CheckTable>
         </>
       )}
-      {!blocked && main && (
+      {!blocked && main && cls.supply !== "공공임대" && (
         <>
-          <H3>일반공급</H3>
+          <H3>일반공급 1순위</H3>
           <CheckTable>
-            {people.map((p) => {
-              if (!personFilled(p))
-                return (
-                  <Check
-                    key={p.name}
-                    ok={null}
-                    label={`${p.name}: ${rank1Label}`}
-                  >
-                    <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
-                  </Check>
-                );
-              const a = account(p, n, today);
-              const until =
-                a.years < RANK1_ACCOUNT.years
-                  ? ` · ${addYears(p.accountOpenedAt, RANK1_ACCOUNT.years)}에 2년`
-                  : "";
-              return (
-                <Check
-                  key={p.name}
-                  ok={a.rank1}
-                  label={`${p.name}: ${rank1Label}`}
-                >
-                  {`${fmtYears(a.years)} · ${n.publicHousing ? `${p.accountCount}회` : `${p.accountPaidMan.toLocaleString()}만 원`}${p.householder ? " · 세대주" : ""}${until}`}
-                </Check>
-              );
-            })}
+            {householdRows(generalAll).map((c) => (
+              <CheckRow key={c.id} c={c} Fill={Fill} />
+            ))}
+            {filledPeople.flatMap((p) =>
+              personRows(rank1Checks(p, people.indexOf(p), n, s, today)).map(
+                (c) => (
+                  <CheckRow
+                    key={`${p.name}-${c.id}`}
+                    c={{ ...c, label: `${p.name}: ${c.label}` }}
+                    Fill={Fill}
+                  />
+                ),
+              ),
+            )}
+            {missingPeopleRows}
           </CheckTable>
+          <p className="text-muted-foreground mt-[0.5rlh] text-base">
+            {cls.zone === "투기과열" || cls.zone === "청약과열"
+              ? `${cls.zone === "투기과열" ? "투기과열지구" : "청약과열지역"}라 1순위가 엄격합니다(2년·세대주·5년 내 당첨 없음).`
+              : `${cls.zone === "수도권" ? "수도권" : "수도권 밖"} 비규제 지역 기준입니다. 시·도가 기간을 늘렸으면 공고문의 기간이 기준입니다.`}{" "}
+            1순위가 아니면 2순위로 넣을 수 있습니다.
+          </p>
         </>
-      )}
-      {!blocked && !main && (
-        <CheckTable>
-          <Check ok={null} label="무주택">
-            통장·순위는 보지 않습니다. 지역 조건은 공고문으로
-          </Check>
-        </CheckTable>
       )}
     </>
   );
 
   // ───────── 내 순위 ─────────
   const generalRank = (p: Person): ReactNode => {
-    const a = account(p, n, today);
+    const a = account(p, n, today, s);
     if (!a.rank1)
       return (
         <Item key={p.name} ok={false} label={`${p.name}: 1순위 아님`}>
@@ -476,7 +576,9 @@ export function MyEligibility({
       </Item>
     );
   };
-  const local = applicant ? residency(applicant, n, today).localOk : false;
+  const applicantLocal = applicant
+    ? residency(applicant, n, today).localOk
+    : false;
   const rank = !blocked && main && (
     <>
       {hasNewlywed && newlywedAllowed(n, s) && (
@@ -539,8 +641,8 @@ export function MyEligibility({
                 : "자녀 없음, 그 다음 순서"}
             </Item>
             {!n.publicHousing && applicant && (
-              <Item ok={local} label="해당지역 거주자 먼저">
-                {local
+              <Item ok={applicantLocal} label="해당지역 거주자 먼저">
+                {applicantLocal
                   ? `${applicant.sigungu} 거주`
                   : `${n.address?.split(" ").slice(0, 2).join(" ") ?? n.sido} 거주자 다음`}
               </Item>

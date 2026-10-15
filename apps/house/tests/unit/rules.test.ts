@@ -35,11 +35,15 @@ test("가점 무주택기간: 미혼이면 만 30세부터, 그 전이면 0", ()
 
 test("민영 가점 비율(제28조): 투기과열 40/70/80, 그 밖은 85㎡ 이하 공고·초과 추첨", () => {
   assert.deepEqual(
-    [59, 84, 101].map((a) => privatePointShare(a, true)),
+    [59, 84, 101].map((a) => privatePointShare(a, "투기과열")),
     [40, 70, 80],
   );
   assert.deepEqual(
-    [59, 84, 101].map((a) => privatePointShare(a, false)),
+    [59, 84, 101].map((a) => privatePointShare(a, "수도권")),
     ["공고", "공고", 0],
   );
+});
+
+test("민영 가점 비율(제28조): 청약과열지역은 85㎡ 초과 50%", () => {
+  assert.equal(privatePointShare(101, "청약과열"), 50);
 });

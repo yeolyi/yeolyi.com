@@ -45,6 +45,9 @@ export type Notice = {
   publicType?: PublicType;
   priceCap?: boolean; // 분양가상한제
   regulated?: boolean; // 투기과열지구
+  adjusted?: boolean; // 조정대상지역(청약과열지역). 청약홈 MDAT_TRGET_AREA_SECD
+  houseSecd?: string; // 청약홈 공급 구분(HOUSE_SECD): 01 APT · 09 신혼희망타운 · 04 무순위 · 06 불법행위 재공급 · 11 임의공급
+  rental?: boolean; // 분양전환 가능 임대(공공임대). 청약홈 RENT_SECD_NM
   units?: Unit[];
   enrichError?: string;
   firstSeenAt: string;
@@ -70,7 +73,10 @@ export type Settings = {
   children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
   totalAssetsEok: number | null; // 안 넣었으면 null(자산으로 거르지 않음). 공공주택 총자산(전세보증금 포함, 부채 차감)
   incomeMan: number | null; // 안 넣었으면 null(소득 구간을 모름). 가구 세전 월소득 합산
-  dualIncome: boolean | null; // 안 넣었으면 null. 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
+  dualIncome: boolean | null;
+  ownsHome: boolean | null; // 세대원 누구라도 집이 있나. null 은 안 넣음
+  wonRecently: boolean | null; // 최근 5년 안에 세대원이 청약에 당첨된 적 있나(규제지역 1순위·재당첨 제한)
+  realEstateEok: number | null; // 가구 부동산 가액(억). 민영 신혼 특공 추첨 구간은 3.31억 이하 // 안 넣었으면 null. 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
 };
 
 export const emptyPerson = (name: string): Person => ({
@@ -92,6 +98,9 @@ export const DEFAULT_SETTINGS: Settings = {
   totalAssetsEok: null,
   incomeMan: null,
   dualIncome: null,
+  ownsHome: null,
+  wonRecently: null,
+  realEstateEok: null,
 };
 
 /** 저장된 값을 기본값 위에 얹는다. 항목이 늘어도 예전 값이 그대로 뜨고, 없어진 항목은 따라 사라진다. */
@@ -109,6 +118,7 @@ export function withDefaults(
 export const SETTINGS_LIMITS = {
   totalAssetsEok: [0, 100],
   incomeMan: [0, 10000],
+  realEstateEok: [0, 100],
   children: [0, 10],
 } as const;
 export type NumericSetting = keyof typeof SETTINGS_LIMITS;

@@ -1,3 +1,4 @@
+import { supplyOf } from "./classify.ts";
 import { PUBLIC_ASSET_CAP_EOK, regionsOf } from "./rules.ts";
 import type { Notice, Settings } from "./types.ts";
 
@@ -16,6 +17,8 @@ export type Tickets = {
 };
 export type Verdict = {
   region: Region;
+  /** 청약이 아닌 판매(오피스텔·매입임대 일반매각 등)라 판정하지 않음 */
+  notSubscription?: boolean;
   assetBlocked?: string;
   pass: boolean;
   status: Status;
@@ -26,11 +29,30 @@ export type Verdict = {
 
 export const manToEok = (man: number) => Math.round(man / 1000) / 10;
 
-/** 두 사람이 사는 시도의 권역(규칙 제4조 ③) 안이면 넣을 수 있다. 사는 곳을 아직 안 넣었으면 거르지 않는다. */
+/** 지역 판정. 공급 방식마다 법이 다르다.
+ *  · 본청약·공공임대: 두 사람이 사는 시도의 권역(규칙 제4조 ③) 안이어야 한다.
+ *  · 재공급(계약취소주택): 해당 주택건설지역(시·군) 거주자만(제47조의3 ②).
+ *  · 무순위: 기본은 전국(제26조 ⑤). 시·군·구가 붙인 거주 요건은 공고문에만 있어 거르지 않는다.
+ *  · 임의공급·LH잔여: 사업주체가 정하니 거르지 않는다.
+ *  사는 곳을 아직 안 넣었으면 거르지 않는다. */
 export const regionOf = (n: Notice, s: Settings): Region => {
-  const regions = regionsOf(s.people.map((p) => p.sido).filter(Boolean));
-  if (!regions.length) return "in";
-  return regions.some((r) => r.sidos.includes(n.sido)) ? "in" : "out";
+  const sidos = s.people.map((p) => p.sido).filter(Boolean);
+  if (!sidos.length) return "in";
+  const supply = supplyOf(n);
+  if (
+    supply === "무순위" ||
+    supply === "임의공급" ||
+    supply === "LH잔여" ||
+    supply === "매각"
+  )
+    return "in";
+  if (supply === "재공급")
+    return s.people.some(
+      (p) => p.sido === n.sido && p.sigungu && n.address?.includes(p.sigungu),
+    )
+      ? "in"
+      : "out";
+  return regionsOf(sidos).some((r) => r.sidos.includes(n.sido)) ? "in" : "out";
 };
 
 export function ticketsOf(n: Notice): Tickets {
@@ -68,9 +90,11 @@ export function judge(n: Notice, s: Settings): Verdict {
       ? `총자산 ${s.totalAssetsEok}억 > ${PUBLIC_ASSET_CAP_EOK}억`
       : undefined;
 
-  const pass = region === "in" && !assetBlocked;
+  const notSubscription = supplyOf(n) === "매각";
+  const pass = region === "in" && !assetBlocked && !notSubscription;
   return {
     region,
+    notSubscription,
     assetBlocked,
     pass,
     status: pass ? "candidate" : "rejected",

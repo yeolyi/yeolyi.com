@@ -86,6 +86,9 @@ export function toNotice(r: Row, kind: Kind, now: string): Notice {
     publicType: pub && kind !== "신혼희망타운" ? publicTypeOf(name) : undefined,
     priceCap: str(r, "PARCPRC_ULS_AT") === "Y",
     regulated: str(r, "SPECLT_RDN_EARTH_AT") === "Y",
+    adjusted: str(r, "MDAT_TRGET_AREA_SECD") === "Y",
+    houseSecd: str(r, "HOUSE_SECD"),
+    rental: /임대/.test(str(r, "RENT_SECD_NM") ?? ""),
     firstSeenAt: now,
   };
 }

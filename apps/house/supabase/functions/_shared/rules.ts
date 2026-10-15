@@ -1,3 +1,4 @@
+import type { Zone } from "./classify.ts";
 import { addYears, yearsBetween } from "./dates.ts";
 
 // 청약 규칙의 숫자. 근거는 각 줄의 조문(주택공급규칙·공공주택특별법 시행규칙)이다.
@@ -7,14 +8,6 @@ import { addYears, yearsBetween } from "./dates.ts";
 export const PUBLIC_ASSET_CAP_EOK = 3.62;
 /** 투기과열지구에서 "해당지역 거주자"로 우선공급을 받으려면 살아야 하는 햇수. */
 export const LOCAL_YEARS_REGULATED = 2;
-/** 특공 통장(규칙 제48조 원문): 공공은 가입 6개월·6회, 민영은 가입 6개월 + 거주지 예치금(회차 요건 없음). */
-export const SPECIAL_ACCOUNT = { years: 0.5, count: 6 };
-/** 규제지역 1순위(규칙 제27·28조 원문): 통장 2년 + (공공 24회 / 민영 별표2 예치금 — 성남 거주자 모든 면적 500만) + 세대주 + 세대 5년 내 무당첨. */
-export const RANK1_ACCOUNT = {
-  years: 2,
-  publicCount: 24,
-  privateDepositMan: 500,
-};
 
 /** 맞벌이: 신청자와 배우자 모두 근로·사업소득이 있는 가구. 외벌이는 한 명만(혼자 사는 사람 포함). 소득 경계가 다르다. */
 export type Earners = "맞벌이" | "외벌이";
@@ -134,21 +127,36 @@ export function bonusPoints(input: {
 }
 
 /** 민영 일반공급 1순위의 가점제 비율(규칙 제28조 ②·④). 투기과열지구: 60㎡ 이하 40%, 85㎡ 이하 70%, 85㎡ 초과 80%.
- *  그 밖의 지역: 85㎡ 이하는 시장·군수·구청장이 40% 이하에서 공고, 85㎡ 초과는 모두 추첨. 나머지는 추첨제.
- *  청약과열지역·공공주택지구는 따로 정하지만 공고 데이터로 가를 수 없어 공고문을 보라고 한다. */
+ *  청약과열지역: 60㎡ 이하 40%, 85㎡ 이하 70%, 85㎡ 초과 50%. 그 밖: 85㎡ 이하는 시장·군수·구청장이 40% 이하에서 공고, 85㎡ 초과는 모두 추첨.
+ *  나머지는 추첨제. 수도권 공공주택지구(그린벨트 해제 50% 이상)도 따로 정하지만 공고 데이터로 가를 수 없다. */
 export function privatePointShare(
   exclusiveArea: number,
-  regulated: boolean,
+  zone: Zone,
 ): number | "공고" {
-  if (regulated)
-    return exclusiveArea <= 60 ? 40 : exclusiveArea <= 85 ? 70 : 80;
+  if (zone === "투기과열" || zone === "청약과열")
+    return exclusiveArea <= 60
+      ? 40
+      : exclusiveArea <= 85
+        ? 70
+        : zone === "투기과열"
+          ? 80
+          : 50;
   return exclusiveArea <= 85 ? "공고" : 0;
 }
 /** 추첨 물량의 75% 를 무주택자에게 먼저(규칙 제28조 ⑧): 투기과열지구·청약과열지역·수도권·광역시. */
 export const LOTTERY_HOMELESS_PCT = 75;
-const METRO = ["서울", "경기", "인천", "부산", "대구", "광주", "대전", "울산"];
-export const lotteryHomelessFirst = (sido: string, regulated: boolean) =>
-  regulated || METRO.includes(sido);
+const METRO_AND_CITIES = [
+  "서울",
+  "경기",
+  "인천",
+  "부산",
+  "대구",
+  "광주",
+  "대전",
+  "울산",
+];
+export const lotteryHomelessFirst = (sido: string, zone: Zone) =>
+  zone === "투기과열" || zone === "청약과열" || METRO_AND_CITIES.includes(sido);
 
 /** 도시근로자 가구당 월평균소득(전년도) 100% 금액(원), 2026년 적용. LH 공공분양 안내(2026-09)·공고문 표 그대로.
  *  3인 이하는 한 칸(가구원 수로 나누지 않은 가구당 평균), 4인부터 가구원 수별(규칙 제41조·제43조, 별표 6). 해마다 바꾼다. */
