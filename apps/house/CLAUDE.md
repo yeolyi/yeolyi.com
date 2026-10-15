@@ -42,6 +42,13 @@ tests/unit/                node --test. 원천은 가짜를 주입하고, fixtur
 - 규칙 숫자(`_shared/rules.ts`)는 한 가구(경기 성남, 예비신혼)를 기준으로 원문과
   대조한 것이다. 민영 1순위 예치금(지역·면적별), 다자녀·노부모 특공 등은 아직
   일반화하지 않았다.
+- **규칙 숫자는 법령 원문으로 확인한다.** 청약홈 안내 표는 줄여 쓴 데가
+  있다(공공 추첨이 "부부 모두 소득이 있는 경우"로만 적혀 있지만, 별표 6은 앞
+  구간에서 떨어진 외벌이도 넣는다). 국가법령정보센터 본문은
+  `https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=<번호>` 를 curl 로
+  받고(주택공급에 관한 규칙 286965, 공공주택 특별법 시행규칙 289013. 개정되면
+  번호가 바뀌니 `lsScListR.do` 검색으로 찾는다), 별표는 그 페이지의
+  `flDownload.do?flSeq=` PDF 를 pdftotext 로 읽는다.
 - 화면은 디자인 시스템(`@yeolyi/ui`·`@yeolyi/site`, 정본 design.yeolyi.com)을
   따른다. 맨 위는 ServiceHeader. 초록·빨강이 없어 판정 ✓/✗ 는 기호와 굵기로
   가른다.
