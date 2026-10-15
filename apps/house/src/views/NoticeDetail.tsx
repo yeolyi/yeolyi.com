@@ -210,7 +210,9 @@ export const unitLabel = (type: string) => {
   const [, num = "", rest = ""] = m;
   const area = Number.parseFloat(num);
   const suffix = rest.trim();
-  return `${Number.isInteger(area) ? area : area.toFixed(2).replace(/0$/, "")}㎡${suffix ? ` ${suffix}` : ""}`;
+  // 반올림하면 59.9968 이 "60.0" 이 되어 60㎡ 초과처럼 보인다. 둘째 자리에서 버린다.
+  const shown = (Math.floor(area * 100) / 100).toString();
+  return `${shown}㎡${suffix ? ` ${suffix}` : ""}`;
 };
 
 type Col = { head: string; cell: (u: Unit) => string };

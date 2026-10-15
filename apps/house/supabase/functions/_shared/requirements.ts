@@ -225,8 +225,11 @@ export function noRankChecks(n: Notice, s: Settings): Check[] {
       homelessCheck(s, "규칙 제47조의3 ②"),
       {
         id: "householder",
-        label: "세대주",
-        law: "규칙 제47조의3 ②",
+        // 특별공급으로 나왔던 집을 다시 파는 물량은 그 특공 요건으로 뽑아 세대주를 따지지 않는다(제47조의3 ③)
+        label: (n.units ?? []).some((u) => u.special > 0)
+          ? "세대주(특별공급 물량은 그 특공 요건으로 뽑아 세대주를 따지지 않음)"
+          : "세대주",
+        law: "규칙 제47조의3 ②·③",
         ok: head ? true : null,
         mine: head ? `${head.name}: 세대주` : "세대주인 사람이 없음",
         need: "p0-householder",

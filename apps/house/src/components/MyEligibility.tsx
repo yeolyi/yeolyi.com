@@ -130,8 +130,12 @@ function CheckRow({
   const Icon = ok === null ? CircleHelp : ok ? Check2 : X;
   return (
     <tr>
-      <td className={clsx("whitespace-normal", ok === false && "font-bold")}>
-        {c.label}
+      <td className="whitespace-normal">
+        <span className={clsx(ok === false && "font-bold")}>{c.label}</span>
+        {/* 근거 조문. 판정이 어디서 왔는지 바로 확인할 수 있게 */}
+        {c.law && (
+          <span className="text-muted-foreground block text-sm">{c.law}</span>
+        )}
       </td>
       <td className="text-muted-foreground whitespace-normal">
         {c.mine}
@@ -235,16 +239,28 @@ export function MyEligibility({
   const stage = newlywedStage(n, s);
   // 신혼 말고 다른 특공(신생아·생애최초·다자녀·노부모·청년). 요건은 specials.ts
   const specials = main ? specialsOf(n, s, today) : [];
-  /** "우선 100% 이하 70% → 일반 140% 이하 20% → 추첨 10%" */
-  const tierText = (sp: SpecialPlan) =>
-    sp.rule && sp.rule.tiers.length > 1
-      ? sp.rule.tiers
-          .map(
-            (x) =>
-              `${x.label}${x.capPct && x.label !== "추첨" ? ` ${x.capPct}% 이하` : ""} 약 ${seats(sp.units, x.sharePct)}세대`,
-          )
-          .join(" → ")
-      : "";
+  /** 다른 특공의 소득 구간 막대(신혼과 같은 차트). 구간이 하나뿐이거나 소득을 안 보는 공급은 그리지 않는다. */
+  const specialChart = (sp: SpecialPlan) => {
+    const all = sp.rule?.tiers ?? [];
+    if (all.length < 2 || !all.some((x) => x.capPct !== undefined)) return null;
+    // 앞 구간과 상한이 같은 칸(공공 외벌이 추첨 등)은 막대에서 합친다
+    const shown = all.filter(
+      (x, i) =>
+        i === 0 || x.capPct === undefined || x.capPct !== all[i - 1]?.capPct,
+    );
+    return (
+      <TierChart
+        rows={[
+          {
+            label: `${n.publicHousing ? "공공" : "민영"}${n.publicHousing ? ` ${e}` : ""}`,
+            맞벌이: shown,
+            외벌이: shown,
+          },
+        ]}
+        caption={`${all.map((x) => `${x.label} 약 ${seats(sp.units, x.sharePct)}세대`).join(" · ")}. 막대 아래 숫자는 도시근로자 월평균소득 대비 % 경계.`}
+      />
+    );
+  };
 
   // 일반공급 면적대
   const bands = uniq(
@@ -323,10 +339,8 @@ export function MyEligibility({
               <H3>
                 {sp.title} · {sp.units}세대
               </H3>
-              <P>
-                {sp.how}
-                {tierText(sp) && ` ${tierText(sp)}.`}
-              </P>
+              <P>{sp.how}</P>
+              {specialChart(sp)}
             </Fragment>
           ))}
           {!hasGeneral ? null : n.publicHousing ? (
