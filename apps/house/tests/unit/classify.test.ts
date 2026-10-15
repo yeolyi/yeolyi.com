@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classify } from "../../supabase/functions/_shared/classify.ts";
+import { sidoOf } from "../../supabase/functions/_lib/myhome.ts";
+import {
+  classify,
+  normalizeSido,
+} from "../../supabase/functions/_shared/classify.ts";
 import { judge } from "../../supabase/functions/_shared/verdict.ts";
 import { notice, settings } from "./helpers.ts";
 
@@ -97,4 +101,35 @@ test("지역 판정은 공급마다: 본청약은 권역, 무순위는 전국, �
   );
   assert.equal(sale.notSubscription, true);
   assert.equal(sale.status, "rejected");
+});
+
+test("전남광주통합특별시: 시도 칸이 한 이름으로 와도 주소의 자치구로 광주·전남을 가른다", () => {
+  assert.equal(
+    normalizeSido("광주", "전남광주통합특별시 북구 임동 100-1"),
+    "광주",
+  );
+  assert.equal(
+    normalizeSido("전남광주통합특별시", "전남광주통합특별시 북구 임동 100-1"),
+    "광주",
+  );
+  assert.equal(
+    normalizeSido(
+      "전남광주통합특별시",
+      "광주연구개발특구 첨단3지구 A8블록(전남광주통합특별시 장성군 진원면)",
+    ),
+    "전남",
+  );
+  assert.equal(
+    normalizeSido("전남광주통합특별시", "광주선운2 A1블록 잔여세대"),
+    "광주",
+  );
+  assert.equal(
+    normalizeSido("전남광주통합특별시", "순천 신대 A5 잔여세대"),
+    "전남",
+  );
+  assert.equal(
+    sidoOf("전남광주통합특별시", "광주선운2 A1블록 잔여세대"),
+    "광주",
+  );
+  assert.equal(sidoOf("전라남도"), "전남");
 });

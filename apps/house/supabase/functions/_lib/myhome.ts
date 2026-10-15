@@ -1,3 +1,4 @@
+import { normalizeSido } from "../_shared/classify.ts";
 import { normalizeYmd } from "../_shared/dates.ts";
 import type { Notice } from "../_shared/types.ts";
 import { publicTypeOf } from "./applyhome.ts";
@@ -35,8 +36,11 @@ const SIDO: Record<string, string> = {
   경상남: "경남",
   경남: "경남",
 };
-export const sidoOf = (brtc: string) =>
-  Object.entries(SIDO).find(([k]) => brtc.startsWith(k))?.[1];
+/** 전남광주통합특별시는 "전남"으로 시작해 아래 표로는 전부 전남이 되므로 공고명으로 먼저 가른다. */
+export const sidoOf = (brtc: string, name = "") =>
+  /전남광주|광주전남/.test(brtc)
+    ? normalizeSido(brtc, name)
+    : Object.entries(SIDO).find(([k]) => brtc.startsWith(k))?.[1];
 // 본청약은 청약홈이 더 완전하니 여기선 청약홈에 없는 종류만 남긴다.
 // 무순위·추가모집: 공공 사업주체는 비규제지역 무순위를 청약홈 밖에서 받을 수 있다(주택공급규칙 제19조 ⑥ 괄호).
 // 2025-09~2026-09 에 이 둘로 새로 걸린 3건(GH 고덕 무순위 5차, LH 양주옥정 추가모집, 서귀포 무순위 선착순)은 모두 청약홈에 없던 차수다.
@@ -119,7 +123,7 @@ export class Myhome {
       this.requestCount++;
       const { rows, total } = await this.page(fromYm, toYm, p);
       for (const row of rows) {
-        const sido = sidoOf(row.brtcCodeNm);
+        const sido = sidoOf(row.brtcCodeNm, row.pblancNm);
         if (!sido || !LEFTOVER.test(row.pblancNm) || seen.has(row.pblancId))
           continue;
         seen.set(row.pblancId, toNotice(row, sido, now));

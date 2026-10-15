@@ -1,3 +1,4 @@
+import { normalizeSido } from "../_shared/classify.ts";
 import { normalizeYmd } from "../_shared/dates.ts";
 import type { Kind, Notice, PublicType, Unit } from "../_shared/types.ts";
 
@@ -65,7 +66,10 @@ export function toNotice(r: Row, kind: Kind, now: string): Notice {
     kind,
     name,
     address: str(r, "HSSPLY_ADRES"),
-    sido: str(r, "SUBSCRPT_AREA_CODE_NM") ?? "",
+    sido: normalizeSido(
+      str(r, "SUBSCRPT_AREA_CODE_NM") ?? "",
+      str(r, "HSSPLY_ADRES"),
+    ),
     builder: str(r, "BSNS_MBY_NM"),
     url: str(r, "PBLANC_URL"),
     announcedAt: ymd(r, "RCRIT_PBLANC_DE") ?? now,

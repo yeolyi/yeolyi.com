@@ -646,6 +646,16 @@ export function MyEligibility({
   );
 
   // ───────── 내 순위 ─────────
+  // 같은 순차 안의 순서(제27조 ②): 40㎡ 초과는 저축총액, 40㎡ 이하는 납입 횟수가 많은 순
+  const areas = units.map(exclusiveArea).filter((x) => x > 0);
+  const orderBy = (p: Person) => {
+    const paid = `저축총액 ${p.accountPaidMan.toLocaleString()}만 원 순`;
+    const count = `납입 ${p.accountCount}회 순`;
+    if (areas.length && areas.every((x) => x <= 40)) return count;
+    if (areas.some((x) => x <= 40))
+      return `40㎡ 초과는 ${paid}, 40㎡ 이하는 ${count}`;
+    return paid;
+  };
   const generalRank = (p: Person): ReactNode => {
     const a = account(p, n, today, s);
     if (!a.rank1)
@@ -701,7 +711,7 @@ export function MyEligibility({
       );
     return yrs >= PUBLIC_RANK1_HOMELESS_YEARS ? (
       <Item key={p.name} ok={true} label={`${p.name}: 순서 몫 1순차`}>
-        {`무주택 ${fmtYears(yrs)} · 저축총액 ${p.accountPaidMan.toLocaleString()}만 원 순`}
+        {`무주택 ${fmtYears(yrs)} · ${orderBy(p)}`}
       </Item>
     ) : (
       <Item key={p.name} ok={false} label={`${p.name}: 순서 몫 2순차`}>

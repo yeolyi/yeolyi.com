@@ -22,6 +22,19 @@ export type Zone = "투기과열" | "청약과열" | "수도권" | "수도권외
 export type NoticeClass = { housing: Housing; supply: Supply; zone: Zone };
 
 export const METRO = ["서울", "인천", "경기"];
+
+const GWANGJU_GU = ["동구", "서구", "남구", "북구", "광산구"];
+/** 2026-07 출범한 전남광주통합특별시. 청약홈 시도 칸은 아직 광주·전남으로 나눠 오지만(주소만 새 이름),
+ *  시도 칸까지 한 이름으로 오면 권역·해당지역 판정이 깨지므로 주소(없으면 공고명)의 자치구로 광주·전남을 가른다.
+ *  광주 자치구 이름(동구·서구 등)은 다른 시도에도 있어 통합특별시 뒤에 바로 올 때만 본다. */
+export function normalizeSido(raw: string, where = ""): string {
+  if (!/전남광주|광주전남/.test(raw)) return raw;
+  const after = /(?:전남광주통합특별시|광주광역시)\s*(\S+)/.exec(where)?.[1];
+  if (after) return GWANGJU_GU.includes(after) ? "광주" : "전남";
+  return /광주/.test(where.replace(/전남광주통합특별시/g, ""))
+    ? "광주"
+    : "전남";
+}
 const SALE = /오피스텔|매입임대|다세대|미분양매입|일반매각|도시형생활주택|상가/;
 
 export function supplyOf(n: Notice): Supply {
