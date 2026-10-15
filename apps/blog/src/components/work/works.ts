@@ -28,8 +28,7 @@ export const WORKS: Work[] = [
     site: "house",
     banner: "house",
     name: "청약 알리미",
-    summary: "청약 공고를 내 상황에 맞춰 걸러 보는 알리미",
-    hidden: true,
+    summary: "청약 공고를 우리 가구 조건으로 걸러 보는 알리미(베타)",
   },
   {
     slug: "carousel",

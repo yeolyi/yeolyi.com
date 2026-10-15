@@ -14,12 +14,13 @@ const { posts } = Astro.props;
 
 const external = { target: "_blank", rel: "noopener noreferrer" };
 // 순서는 임팩트(실제로 쓰는 사람·바깥 반응) 순. 새 작업을 넣으면 ORDER 에 자리를 정한다.
+// 청약 알리미는 막 연(베타) 작업이라 맨 위에 둔다.
 const ORDER = [
+  "house",
   "cse",
   "cs",
   "chadcn-ui",
   "jeongeum",
-  "house",
   "logic-gate-simulator",
   "carousel",
   "design",
