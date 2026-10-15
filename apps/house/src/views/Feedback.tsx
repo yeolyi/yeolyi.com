@@ -11,7 +11,7 @@ const MAX = 2000;
 export function Feedback({ from }: { from: string }) {
   const bodyId = useId();
   const [body, setBody] = useState("");
-  const [withPage, setWithPage] = useState(true);
+  const [withPage, setWithPage] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
   );
@@ -63,7 +63,7 @@ export function Feedback({ from }: { from: string }) {
             className="mt-1"
           />
         </div>
-        {/* 보던 화면 주소는 보낼지 고를 수 있다(기본은 보냄). */}
+        {/* 보던 화면 주소는 보낼지 고를 수 있다(기본은 안 보냄). */}
         {from && (
           <div className="mt-[0.5rlh]">
             <Checkbox checked={withPage} onCheckedChange={setWithPage}>
