@@ -1,6 +1,12 @@
 import { checks } from "@shared/checks.ts";
 import { todayYmd } from "@shared/dates.ts";
-import { ladders, personFilled, who } from "@shared/eligibility.ts";
+import {
+  type Ladder,
+  ladders,
+  personFilled,
+  who,
+} from "@shared/eligibility.ts";
+import { isMainRound } from "@shared/site.ts";
 import type { Notice, Settings, Unit } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
 import { clsx } from "clsx";
@@ -241,6 +247,25 @@ function People({
 }) {
   const w = who(n, v, s, today);
   const applicant = w.people.find((f) => f.special)?.person.name;
+  // 무순위·임의공급은 통장·순위를 안 봐서 사람마다 다를 게 없다. 한 번만 보인다.
+  if (!isMainRound(n)) {
+    const filled = w.people.find((f) => personFilled(f.person));
+    if (!filled)
+      return (
+        <p className="text-muted-foreground">
+          정보가 없습니다. <a href="/settings">개인화</a>에서
+          생년월일·주소·통장을 넣으면 계산합니다.
+        </p>
+      );
+    return (
+      <div className="space-y-[1rlh]">
+        {w.blocked && <p className="font-bold">{w.blocked}</p>}
+        {ladders(filled.person, n, v, s, today).map((l) => (
+          <LadderView key={l.title} l={l} />
+        ))}
+      </div>
+    );
+  }
   return (
     <div className="space-y-[1rlh]">
       {w.blocked && <p className="font-bold">{w.blocked}</p>}
@@ -271,59 +296,55 @@ function People({
                       : "통장 조건이 되는 사람이 없습니다."}
                   </p>
                 );
-              return (
-                <div key={l.title} className="mt-[0.5rlh]">
-                  <p>
-                    <strong>{l.title}</strong>
-                    {isSpecial && " (추천)"}
-                    {l.supply && <span className="meta"> {l.supply}</span>}
-                  </p>
-                  <ul>
-                    {l.prerequisites.map((st) => (
-                      <StepLine key={st.label} st={st} />
-                    ))}
-                  </ul>
-                  <div className="mt-[0.25rlh]">
-                    {l.income ? (
-                      <IncomeBar scale={l.income} />
-                    ) : (
-                      <p>
-                        {l.tiers.map((t, i) => (
-                          <Fragment key={t.label}>
-                            {i > 0 && (
-                              <span className="text-muted-foreground"> · </span>
-                            )}
-                            <span
-                              className={
-                                t.on ? "font-bold" : "text-muted-foreground"
-                              }
-                            >
-                              {t.label}
-                            </span>
-                          </Fragment>
-                        ))}
-                        {l.tierNote && (
-                          <span className="text-muted-foreground">
-                            {" "}
-                            {l.tierNote}
-                          </span>
-                        )}
-                      </p>
-                    )}
-                  </div>
-                  {l.within.length > 0 && (
-                    <ul className="mt-[0.25rlh]">
-                      {l.within.map((st) => (
-                        <StepLine key={st.label} st={st} />
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
+              return <LadderView key={l.title} l={l} recommended={isSpecial} />;
             })
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+/** 사다리 하나: 제목·물량, 전제, 줄(또는 소득 막대), 줄 안의 순서. */
+function LadderView({ l, recommended }: { l: Ladder; recommended?: boolean }) {
+  return (
+    <div className="mt-[0.5rlh]">
+      <p>
+        <strong>{l.title}</strong>
+        {recommended && " (추천)"}
+        {l.supply && <span className="meta"> {l.supply}</span>}
+      </p>
+      <ul>
+        {l.prerequisites.map((st) => (
+          <StepLine key={st.label} st={st} />
+        ))}
+      </ul>
+      <div className="mt-[0.25rlh]">
+        {l.income ? (
+          <IncomeBar scale={l.income} />
+        ) : (
+          <p>
+            {l.tiers.map((t, i) => (
+              <Fragment key={t.label}>
+                {i > 0 && <span className="text-muted-foreground"> · </span>}
+                <span className={t.on ? "font-bold" : "text-muted-foreground"}>
+                  {t.label}
+                </span>
+              </Fragment>
+            ))}
+            {l.tierNote && (
+              <span className="text-muted-foreground"> {l.tierNote}</span>
+            )}
+          </p>
+        )}
+      </div>
+      {l.within.length > 0 && (
+        <ul className="mt-[0.25rlh]">
+          {l.within.map((st) => (
+            <StepLine key={st.label} st={st} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
