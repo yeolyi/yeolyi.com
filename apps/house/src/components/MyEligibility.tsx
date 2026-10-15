@@ -11,6 +11,7 @@ import {
   who,
 } from "@shared/eligibility.ts";
 import {
+  allOk,
   type Check,
   homelessCheck,
   noRankChecks,
@@ -32,12 +33,13 @@ import {
   regionsOf,
 } from "@shared/rules.ts";
 import { isMainRound } from "@shared/site.ts";
+import { landingOf, type SpecialPlan, specialsOf } from "@shared/specials.ts";
 import type { Notice, Person, Settings } from "@shared/types.ts";
 import { assetGated, type Verdict } from "@shared/verdict.ts";
 import { clsx } from "clsx";
 import { sumBy, uniq } from "es-toolkit";
 import { Check as Check2, CircleHelp, X } from "lucide-react";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { ic } from "../util.ts";
 import { StackBars } from "./GuideCharts.tsx";
 import { TierChart } from "./GuideWidgets.tsx";
@@ -211,6 +213,18 @@ export function MyEligibility({
   const w = who(n, v, s, today);
   const applicant = w.people.find((f) => f.special)?.person;
   const hasNewlywed = main && t.newlywed > 0;
+  // 신혼 말고 다른 특공(신생아·생애최초·다자녀·노부모·청년). 요건은 specials.ts
+  const specials = main ? specialsOf(n, s, today) : [];
+  /** "우선 100% 이하 70% → 일반 140% 이하 20% → 추첨 10%" */
+  const tierText = (sp: SpecialPlan) =>
+    sp.rule && sp.rule.tiers.length > 1
+      ? sp.rule.tiers
+          .map(
+            (x) =>
+              `${x.label}${x.capPct && x.label !== "추첨" ? ` ${x.capPct}% 이하` : ""} 약 ${seats(sp.units, x.sharePct)}세대`,
+          )
+          .join(" → ")
+      : "";
 
   // 일반공급 면적대
   const bands = uniq(
@@ -262,6 +276,17 @@ export function MyEligibility({
               />
             </>
           )}
+          {specials.map((sp) => (
+            <Fragment key={sp.key}>
+              <H3>
+                {sp.title} · {sp.units}세대
+              </H3>
+              <P>
+                {sp.how}
+                {tierText(sp) && ` ${tierText(sp)}.`}
+              </P>
+            </Fragment>
+          ))}
           <H3>일반공급{general > 0 ? ` · ${general}세대` : ""}</H3>
           {n.publicHousing ? (
             <>
@@ -530,6 +555,17 @@ export function MyEligibility({
           </CheckTable>
         </>
       )}
+      {!blocked &&
+        specials.map((sp) => (
+          <Fragment key={sp.key}>
+            <H3>{sp.title}</H3>
+            <CheckTable>
+              {sp.checks.map((c) => (
+                <CheckRow key={c.id} c={c} Fill={Fill} />
+              ))}
+            </CheckTable>
+          </Fragment>
+        ))}
       {!blocked && main && cls.supply !== "공공임대" && (
         <>
           <H3>일반공급 1순위</H3>
@@ -669,6 +705,38 @@ export function MyEligibility({
           </List>
         </>
       )}
+      {specials.map((sp) => {
+        const rule = sp.rule;
+        if (!rule?.tiers.some((x) => x.capPct !== undefined)) return null;
+        const at = landingOf(rule, pct);
+        const tier = rule.tiers[at];
+        return (
+          <Fragment key={sp.key}>
+            <H3>{sp.title}</H3>
+            <List>
+              <Item
+                ok={at < 0 ? null : !!tier}
+                label={tier ? `${tier.label} 구간에서 시작` : "시작 구간"}
+              >
+                {at < 0 ? (
+                  <Fill step="income">월소득 넣기</Fill>
+                ) : tier ? (
+                  `약 ${seats(sp.units, tier.sharePct)}세대${
+                    at < rule.tiers.length - 1
+                      ? `, 떨어지면 ${rule.tiers
+                          .slice(at + 1)
+                          .map((x) => x.label)
+                          .join(" → ")}`
+                      : ""
+                  }`
+                ) : (
+                  "소득 상한을 넘음"
+                )}
+              </Item>
+            </List>
+          </Fragment>
+        );
+      })}
       <H3>일반공급</H3>
       <List>
         {people.map((p) =>
@@ -684,29 +752,7 @@ export function MyEligibility({
     </>
   );
 
-  const others = [
-    t.firstHome > 0 && ["생애최초", t.firstHome, "first-home"],
-    t.newborn > 0 && ["신생아", t.newborn, "newborn"],
-    t.young > 0 && ["청년", t.young, "other-special"],
-  ].filter(Boolean) as [string, number, string][];
-
-  if (part === "explain")
-    return (
-      <div>
-        {explain}
-        {main && others.length > 0 && (
-          <P>
-            {others.map(([label, k, slug], i) => (
-              <span key={label}>
-                {i > 0 && ", "}
-                <a href={`/guide/${slug}`}>{label}</a> {k}세대
-              </span>
-            ))}
-            도 있지만 아직 계산하지 않습니다. 공고문으로 확인하세요.
-          </P>
-        )}
-      </div>
-    );
+  if (part === "explain") return <div>{explain}</div>;
   if (part === "eligibility") return <div>{eligibility}</div>;
   return (
     <div>

@@ -45,6 +45,149 @@ export const NEWLYWED_TIERS: Record<
     ],
   },
 };
+/** 신혼 말고 다른 특공의 소득 구간. 한 줄이 한 몫이고, 앞 몫에서 떨어지면 다음 몫으로 내려간다.
+ *  cap 은 자격 상한(이걸 넘으면 못 넣음). 민영 신생아·생애최초는 cap 을 넘어도 부동산이 29등급 평균(3.31억) 이하면 마지막 몫에 넣는다.
+ *  민영: 규칙 제35조의3 ③④(신생아)·제43조 ③④(생애최초). 다자녀(제40조)·노부모(제46조)는 소득을 보지 않는다.
+ *  공공: 공공주택 특별법 시행규칙 별표 6 2.가(다자녀)·다(생애최초)·라(노부모)·마(신생아), 2026-06-22. 맞벌이면 칸마다 상한이 높다.
+ *  청년(별표 6의6, 나눔형·토지임대부)은 이 서비스가 아직 읽지 않아 공고문 확인으로 둔다. */
+export type SpecialKey =
+  | "newborn"
+  | "firstHome"
+  | "multiChild"
+  | "elderly"
+  | "young";
+export type SpecialRule = {
+  tiers: readonly Tier[];
+  capPct?: number;
+  realEstateAlt?: boolean;
+};
+const lot = (share: number, cap?: number): Tier => ({
+  label: "추첨",
+  capPct: cap,
+  sharePct: share,
+});
+export const SPECIAL_TIERS: Record<
+  "newborn" | "firstHome" | "multiChild" | "elderly",
+  Record<"private" | "public", Record<Earners, SpecialRule>>
+> = {
+  newborn: {
+    private: {
+      맞벌이: {
+        tiers: [
+          { label: "우선", capPct: 130, sharePct: 50 },
+          { label: "일반", capPct: 160, sharePct: 20 },
+          lot(30),
+        ],
+        capPct: 160,
+        realEstateAlt: true,
+      },
+      외벌이: {
+        tiers: [
+          { label: "우선", capPct: 130, sharePct: 50 },
+          { label: "일반", capPct: 160, sharePct: 20 },
+          lot(30),
+        ],
+        capPct: 160,
+        realEstateAlt: true,
+      },
+    },
+    public: {
+      맞벌이: {
+        tiers: [
+          { label: "우선", capPct: 120, sharePct: 70 },
+          { label: "일반", capPct: 150, sharePct: 20 },
+          lot(10, 200),
+        ],
+        capPct: 200,
+      },
+      외벌이: {
+        tiers: [
+          { label: "우선", capPct: 100, sharePct: 70 },
+          { label: "일반", capPct: 140, sharePct: 20 },
+          lot(10, 140),
+        ],
+        capPct: 140,
+      },
+    },
+  },
+  firstHome: {
+    private: {
+      맞벌이: {
+        tiers: [
+          { label: "우선", capPct: 130, sharePct: 50 },
+          { label: "일반", capPct: 160, sharePct: 20 },
+          lot(30),
+        ],
+        capPct: 160,
+        realEstateAlt: true,
+      },
+      외벌이: {
+        tiers: [
+          { label: "우선", capPct: 130, sharePct: 50 },
+          { label: "일반", capPct: 160, sharePct: 20 },
+          lot(30),
+        ],
+        capPct: 160,
+        realEstateAlt: true,
+      },
+    },
+    public: {
+      맞벌이: {
+        tiers: [
+          { label: "우선", capPct: 120, sharePct: 70 },
+          { label: "일반", capPct: 140, sharePct: 20 },
+          lot(10, 200),
+        ],
+        capPct: 200,
+      },
+      외벌이: {
+        tiers: [
+          { label: "우선", capPct: 100, sharePct: 70 },
+          { label: "일반", capPct: 130, sharePct: 20 },
+          lot(10, 130),
+        ],
+        capPct: 130,
+      },
+    },
+  },
+  multiChild: {
+    private: {
+      맞벌이: { tiers: [{ label: "배점 순", sharePct: 100 }] },
+      외벌이: { tiers: [{ label: "배점 순", sharePct: 100 }] },
+    },
+    public: {
+      맞벌이: {
+        tiers: [{ label: "우선", capPct: 130, sharePct: 90 }, lot(10, 200)],
+        capPct: 200,
+      },
+      외벌이: {
+        tiers: [{ label: "우선", capPct: 120, sharePct: 90 }, lot(10, 120)],
+        capPct: 120,
+      },
+    },
+  },
+  elderly: {
+    private: {
+      맞벌이: { tiers: [{ label: "가점 순", sharePct: 100 }] },
+      외벌이: { tiers: [{ label: "가점 순", sharePct: 100 }] },
+    },
+    public: {
+      맞벌이: {
+        tiers: [{ label: "우선", capPct: 130, sharePct: 90 }, lot(10, 200)],
+        capPct: 200,
+      },
+      외벌이: {
+        tiers: [{ label: "우선", capPct: 120, sharePct: 90 }, lot(10, 120)],
+        capPct: 120,
+      },
+    },
+  },
+};
+/** 민영 신생아·생애최초·신혼 추첨 구간의 부동산 상한(억). 건강보험 재산등급 29등급 하한·상한 평균. */
+export const REAL_ESTATE_CAP_EOK = 3.31;
+/** 공공 생애최초 저축액(별표 6 2.다 1)가)): 선납금 포함 600만 원 이상. */
+export const PUBLIC_FIRST_HOME_SAVINGS_MAN = 600;
+
 /** 공공 일반형 일반공급(별표 6 1.): 50% 2세 미만 자녀 가구 → 30% 소득 칸 안에서 제27조 순차 → 20% 추첨.
  *  소득 상한은 외벌이 100%, 맞벌이 140%(자녀 우선·순차 칸) / 200%(60㎡ 이하의 자격 요건). */
 export const PUBLIC_GENERAL = {
@@ -195,3 +338,24 @@ export const REGIONS: { label: string; sidos: readonly string[] }[] = [
 /** 사는 시도들이 속한 권역. */
 export const regionsOf = (sidos: string[]) =>
   REGIONS.filter((r) => sidos.some((s) => r.sidos.includes(s)));
+
+/** 공고 상세 주택형 표의 "필요한 돈" 어림. 판정에는 쓰지 않는다(대출 규제는 자주 바뀐다).
+ *  계약금은 공고문마다 달라 흔한 범위(10~20%)로, 대출은 LTV 70%(2025.6.27 생애최초)와
+ *  수도권·규제지역 금액 상한(2025.10.15: 집값 15억 이하 6억, 25억 이하 4억, 그 위 2억) 중 작은 쪽. 가이드 계산기와 같은 기준. */
+export const MONEY_EXAMPLE = {
+  depositPct: [10, 20] as const,
+  ltvPct: 70,
+  capsMan: [
+    [150000, 60000],
+    [250000, 40000],
+    [Number.POSITIVE_INFINITY, 20000],
+  ] as const,
+};
+/** 대출 어림(만 원). capped 가 거짓이면(수도권 밖 비규제) 금액 상한 없이 LTV 만. */
+export function loanExampleMan(priceMan: number, capped: boolean) {
+  const byLtv = (priceMan * MONEY_EXAMPLE.ltvPct) / 100;
+  if (!capped) return byLtv;
+  const cap =
+    MONEY_EXAMPLE.capsMan.find(([upTo]) => priceMan <= upTo)?.[1] ?? 0;
+  return Math.min(byLtv, cap);
+}

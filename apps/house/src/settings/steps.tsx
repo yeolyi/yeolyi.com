@@ -93,6 +93,36 @@ function numberStep(
   };
 }
 
+type YesNoKey =
+  | "ownsHome"
+  | "wonRecently"
+  | "newbornChild"
+  | "everOwned"
+  | "taxFiveYears"
+  | "elderParent";
+/** 예/아니요 질문. 안 넣었으면 null 이고 요약에 "비어 있음". */
+function yesNoStep(
+  key: YesNoKey,
+  o: Omit<Step, "input" | "answer" | "check">,
+): Step {
+  return {
+    ...o,
+    input: ({ d, set }) => (
+      <RadioGroup
+        aria-label={o.label}
+        orientation="vertical"
+        value={d[key] === null ? "" : d[key] ? "y" : "n"}
+        onValueChange={(v) => set({ ...d, [key]: v === "y" })}
+        options={[
+          { value: "y", label: "예" },
+          { value: "n", label: "아니요" },
+        ]}
+      />
+    ),
+    answer: (s) => (s[key] === null ? NOT_YET : s[key] ? "예" : "아니요"),
+  };
+}
+
 function personSteps(i: 0 | 1): Step[] {
   const who = PERSON_LABEL[i];
   const group = i === 0 ? "나" : "배우자";
@@ -271,6 +301,11 @@ function personSteps(i: 0 | 1): Step[] {
           만 원
         </span>
       ),
+      // 원 단위로 넣는 실수가 흔하다(635만 원 → 6350000). 10억을 넘으면 단위를 다시 묻는다.
+      check: (s) =>
+        p(s).accountPaidMan > 100000
+          ? `만 원 단위로 넣어 주세요. 지금 값은 ${won(p(s).accountPaidMan)} 원입니다. 원 단위로 넣었다면 끝의 0 네 개를 빼 주세요.`
+          : undefined,
       answer: (s) => won(p(s).accountPaidMan),
     },
   ];
@@ -351,52 +386,47 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     id: "children",
     group: "가구",
     label: "자녀",
-    question: "혼인 중에 낳거나 임신·입양한 자녀가 몇 명인가요?",
-    hint: "신혼부부 특별공급은 자녀가 있으면 1순위입니다. 없으면 0.",
+    question: "미성년 자녀가 몇 명인가요?",
+    hint: "임신 중인 아이와 입양한 자녀도 셉니다. 신혼부부 특별공급은 자녀가 있으면 1순위이고, 다자녀 특별공급은 2명 이상입니다. 없으면 0. 확인: 주민등록등본.",
     unit: "명",
   }),
-  {
+  yesNoStep("ownsHome", {
     id: "ownshome",
     group: "가구",
     label: "집 소유",
     question: "신청하는 사람과 같은 세대 누구라도 집이 있나요?",
     hint: "분양권·입주권도 집으로 칩니다. 국민주택·특별공급·규제지역 1순위는 무주택 가구만 됩니다. 확인: 본인이 알거나 등기부.",
-    input: ({ d, set }) => (
-      <RadioGroup
-        aria-label="집 소유"
-        orientation="vertical"
-        value={d.ownsHome === null ? "" : d.ownsHome ? "y" : "n"}
-        onValueChange={(v) => set({ ...d, ownsHome: v === "y" })}
-        options={[
-          { value: "y", label: "예" },
-          { value: "n", label: "아니요" },
-        ]}
-      />
-    ),
-    answer: (s) =>
-      s.ownsHome === null ? NOT_YET : s.ownsHome ? "예" : "아니요",
-  },
-  {
+  }),
+  yesNoStep("everOwned", {
+    id: "everowned",
+    group: "가구",
+    label: "집을 가진 적",
+    question:
+      "신청하는 사람과 같은 세대 누구라도 집을 가진 적이 있나요(지금 포함)?",
+    hint: "생애최초 특별공급은 세대원 모두 집을 가진 적이 없어야 합니다. 배우자가 혼인 전에 가졌다가 판 집은 빼고 셉니다. 청년 특별공급은 본인만 봅니다. 확인: 본인이 알거나 등기부.",
+  }),
+  yesNoStep("wonRecently", {
     id: "wonrecently",
     group: "가구",
     label: "최근 당첨",
     question: "최근 5년 안에 세대원 누구라도 청약에 당첨된 적이 있나요?",
     hint: "계약하지 않았어도 당첨이면 셉니다. 규제지역 1순위와 재공급은 이것으로 막힙니다. 확인: 청약홈 '청약 제한 사항 확인'.",
-    input: ({ d, set }) => (
-      <RadioGroup
-        aria-label="최근 당첨"
-        orientation="vertical"
-        value={d.wonRecently === null ? "" : d.wonRecently ? "y" : "n"}
-        onValueChange={(v) => set({ ...d, wonRecently: v === "y" })}
-        options={[
-          { value: "y", label: "예" },
-          { value: "n", label: "아니요" },
-        ]}
-      />
-    ),
-    answer: (s) =>
-      s.wonRecently === null ? NOT_YET : s.wonRecently ? "예" : "아니요",
-  },
+  }),
+  yesNoStep("taxFiveYears", {
+    id: "tax",
+    group: "가구",
+    label: "소득세 5년",
+    question: "특별공급에 넣을 사람이 근로·사업소득세를 5년 이상 냈나요?",
+    hint: "생애최초 특별공급 조건입니다. 연속이 아니어도 되고, 공제로 낼 세금이 0원이었던 해도 셉니다. 확인: 홈택스의 지급명세서(근로소득 원천징수영수증) 조회.",
+  }),
+  yesNoStep("elderParent", {
+    id: "elder",
+    group: "가구",
+    label: "노부모 부양",
+    question:
+      "만 65세 이상 부모(배우자의 부모 포함)를 3년 이상 같은 주민등록등본에 올려 모시고 있나요?",
+    hint: "노부모 부양 특별공급 조건입니다. 민영은 신청자가 세대주여야 합니다. 확인: 주민등록등본(정부24나 카카오톡 지갑의 전자증명서).",
+  }),
 ];
 
 const STEPS_AFTER_PEOPLE: Step[] = [
@@ -449,9 +479,20 @@ const DUAL_INCOME_STEP: Step = {
     s.dualIncome === null ? NOT_YET : s.dualIncome ? "맞벌이" : "외벌이",
 };
 
+/** 자녀가 있을 때만 묻는다. */
+const NEWBORN_STEP = yesNoStep("newbornChild", {
+  id: "newborn",
+  group: "가구",
+  label: "2세 미만 자녀",
+  question: "2세 미만 자녀가 있나요(임신 중 포함)?",
+  hint: "공고일에 2세가 되는 날까지 셉니다. 신생아 특별공급과 공공분양 일반공급의 자녀 우선 몫이 이것을 봅니다. 확인: 주민등록등본, 임신 중이면 임신진단서.",
+});
+
 /** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문과 맞벌이 질문이 빠진다. */
 export const stepsFor = (s: Settings): [Step, ...Step[]] => [
-  ...STEPS_BEFORE_PEOPLE,
+  ...(STEPS_BEFORE_PEOPLE.flatMap((st) =>
+    st.id === "children" && s.children > 0 ? [st, NEWBORN_STEP] : [st],
+  ) as [Step, ...Step[]]),
   ...personSteps(0),
   ...(s.people.length > 1 ? personSteps(1) : []),
   ...STEPS_AFTER_PEOPLE.flatMap((st) =>

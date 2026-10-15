@@ -105,6 +105,8 @@ export function toUnit(r: Row): Unit {
     newlywed: num(r, "NWWDS_HSHLDCO"),
     firstHome: num(r, "LFE_FRST_HSHLDCO"),
     newborn: num(r, "NWBB_HSHLDCO"),
+    multiChild: num(r, "MNYCH_HSHLDCO"),
+    elderly: num(r, "OLD_PARNTS_SUPORT_HSHLDCO"),
   };
 }
 

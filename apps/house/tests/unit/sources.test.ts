@@ -101,6 +101,8 @@ test("주택형 행 → Unit", () => {
     NWWDS_HSHLDCO: 8,
     LFE_FRST_HSHLDCO: 4,
     NWBB_HSHLDCO: 5,
+    MNYCH_HSHLDCO: 3,
+    OLD_PARNTS_SUPORT_HSHLDCO: 1,
   });
   // SUPLY_HSHLDCO 는 일반공급만이라 전체는 일반 28 + 특공 24.
   assert.deepEqual(u, {
@@ -113,6 +115,8 @@ test("주택형 행 → Unit", () => {
     newlywed: 8,
     firstHome: 4,
     newborn: 5,
+    multiChild: 3,
+    elderly: 1,
   });
   assert.equal(toUnit({ LTTOT_TOP_AMOUNT: null }).topPriceMan, undefined);
 });

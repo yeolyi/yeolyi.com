@@ -18,6 +18,8 @@ export type Unit = {
   newlywed: number;
   firstHome: number;
   newborn: number;
+  multiChild?: number; // 다자녀. 2026-10 에 받기 시작해 그 전 공고는 enrich 로 채운다
+  elderly?: number; // 노부모 부양
 };
 
 export type Notice = {
@@ -70,7 +72,11 @@ export type Person = {
 export type Settings = {
   people: Person[]; // 한두 명. 특공은 그중 한 명만 넣는다
   marriedAt: string; // 혼인신고일. 비면 미혼. 민영 신혼 특공은 신고 필수, 공공은 예비신혼도 됨. 무주택기간·가점 부양가족도 여기서
-  children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
+  children: number; // 미성년 자녀(태아·입양 포함). 신혼 특공 1순위(혼인 전 자녀도 혼인하면 혼인 중 자녀로 본다, 민법 제855조 ②)·다자녀(2명 이상)
+  newbornChild: boolean | null; // 2세 미만 자녀(태아·입양 포함)가 있나. 신생아 특공·공공 일반공급 자녀 우선 몫. 자녀가 0명이면 묻지 않는다
+  everOwned: boolean | null; // 세대원 누구라도 집을 가진 적이 있나(지금 포함). 생애최초·청년 특공
+  taxFiveYears: boolean | null; // 넣을 사람이 근로·사업소득세를 5년 이상 냈나. 생애최초 특공
+  elderParent: boolean | null; // 만 65세 이상 부모(배우자 부모 포함)를 3년 이상 같은 등본에서 모셨나. 노부모 부양 특공
   totalAssetsEok: number | null; // 안 넣었으면 null(자산으로 거르지 않음). 공공주택 총자산(전세보증금 포함, 부채 차감)
   incomeMan: number | null; // 안 넣었으면 null(소득 구간을 모름). 가구 세전 월소득 합산
   dualIncome: boolean | null;
@@ -95,6 +101,10 @@ export const DEFAULT_SETTINGS: Settings = {
   people: [emptyPerson("나")],
   marriedAt: "",
   children: 0,
+  newbornChild: null,
+  everOwned: null,
+  taxFiveYears: null,
+  elderParent: null,
   totalAssetsEok: null,
   incomeMan: null,
   dualIncome: null,

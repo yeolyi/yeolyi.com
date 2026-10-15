@@ -11,7 +11,7 @@ src/                       화면(Vite + React). 판정은 브라우저에서 �
   settings/steps.tsx       개인화 질문 목록(한 페이지에 질문 하나). 요약 페이지와 질문 페이지가 이것 하나를 본다
   views/Guide.tsx          가이드(처음 보는 사람용 안내, 한 페이지에 개념 하나)
 supabase/functions/_shared/ 도메인. 화면(@shared 별칭)과 Edge Function 이 같은 파일을 쓴다. CLI 가 functions 밖 파일을 함수에 싣지 않아 여기 둔다
-  classify(공고 분류: 국민·민영 × 공급 구분 × 지역 등급) · requirements(조문 단위 요건 → 충족/미충족/모름) · rules(규칙의 숫자)
+  classify(공고 분류: 국민·민영 × 공급 구분 × 지역 등급) · requirements(조문 단위 요건 → 충족/미충족/모름) · specials(신혼 말고 다른 특공의 요건) · rules(규칙의 숫자)
   verdict(목록의 후보·제외) · eligibility(사람·통장·소득 구간) · site(단지 키·살아있음) · types · dates · links(지도 링크)
 supabase/sql/              house 스키마. 적용은 carousel 과 같이 `supabase db query --linked -f`(db push 금지)
 supabase/functions/
@@ -27,7 +27,9 @@ scripts/                   backfill(지난 공고 넣기) · enrich(지난 공�
   화면(브라우저)이 `_shared/verdict.ts` 로 계산한다.
 - **돈으로 거르지 않는다.** 법이 정한 자격(소득·자산 상한)만 판정하고, 감당할 수
   있는지(자기자본·대출·계약금)는 보지 않는다. 돈은 그때 가서 마련하는 경우가
-  많고, 대출 규제는 자주 바뀐다. 대출 계산은 가이드의 계산기에만 있다.
+  많고, 대출 규제는 자주 바뀐다. 공고 정보 탭의 주택형 표에는 최고 분양가로
+  어림한 계약금(10~20%)과 대출 뒤 내 돈(rules.ts 의 MONEY_EXAMPLE)을 참고로 보여
+  주고, 직접 바꿔 보는 계산기는 가이드에 있다.
 - **지도는 카카오 지도 하나, 길찾기는 링크.** 공고 상세의 공고 정보 탭에 카카오
   지도(JavaScript SDK, 주소 → 좌표는 SDK 의 Geocoder 가 브라우저에서)로 핀
   하나를 찍는다. 키는 공개용 `PUBLIC_KAKAO_MAP_KEY`(yeolyebon.com 과 같은 카카오
@@ -51,14 +53,21 @@ scripts/                   backfill(지난 공고 넣기) · enrich(지난 공�
   정한다. 화면 문구는 요건의 이름에서 나온다. 원본에 없는 조건(시·도가 늘린
   1순위 기간, 무순위 거주 요건 등)은 추측하지 않고 "모름"으로 둔다. 알고리즘
   전체는 가이드 부록(/guide/algorithm)에 있고, 요건을 바꾸면 부록도 같이 고친다.
-  다자녀·노부모·생애최초·신생아·청년 특공과 공공임대는 아직 판정하지 않는다.
+  신혼 말고 다른 특공(신생아·생애최초·다자녀·노부모·청년)은 `specials.ts`.
+  공공분양은 공공주택 특별법 시행규칙 별표 6, 민영은 규칙 각 조문을 따른다.
+  공공임대, 청년 특공의 소득·자산(별표 6의6), 다자녀 배점(고시)은 판정하지
+  않는다.
 - **규칙 숫자는 법령 원문으로 확인한다.** 청약홈 안내 표는 줄여 쓴 데가
   있다(공공 추첨이 "부부 모두 소득이 있는 경우"로만 적혀 있지만, 별표 6은 앞
   구간에서 떨어진 외벌이도 넣는다). 국가법령정보센터 본문은
   `https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=<번호>` 를 curl 로
   받고(주택공급에 관한 규칙 286965, 공공주택 특별법 시행규칙 289013. 개정되면
   번호가 바뀌니 `lsScListR.do` 검색으로 찾는다), 별표는 그 페이지의
-  `flDownload.do?flSeq=` PDF 를 pdftotext 로 읽는다.
+  `flDownload.do?flSeq=` PDF 를 pdftotext 로 읽는다. 공공주택 특별법 시행규칙
+  별표처럼 그림으로만 있는 건
+  `lsBylInfoPLinkR.do?lsNm=<법령명>&bylNo=0006&bylBrNo=00&bylCls=BE` 에서 bylSeq
+  를 얻고, `lsBylContentsInfoR.do` 에 POST(bylSeq·lsiSeq)하면 쪽마다 GIF 의
+  flSeq 가 나온다.
 - 화면은 디자인 시스템(`@yeolyi/ui`·`@yeolyi/site`, 정본 design.yeolyi.com)을
   따른다. 맨 위는 ServiceHeader. 초록·빨강이 없어 판정 ✓/✗ 는 기호와 굵기로
   가른다.

@@ -1,7 +1,8 @@
 // 이미 쌓인 청약홈 공고를 한 번 보강한다. 수집기는 접수 중인 공고만 주택형을 채우고, 분류 칸(공급 구분·조정대상지역·임대)은
 // 새로 받은 공고부터 붙어서, 1년치를 한꺼번에 넣은(backfill) 지난 공고에는 둘 다 비어 있다.
 //  · 분류 칸: 청약홈 목록을 다시 받아 같은 id 에 houseSecd·adjusted·rental 을 채운다
-//  · 주택형: units 가 없는 공고마다 주택형 조회를 부른다(공고당 한 번)
+//  · 주택형: units 가 없거나 다자녀·노부모 칸(2026-10 추가)이 없는 공고마다 주택형 조회를 부른다(공고당 한 번).
+//    다시 받을 때 무순위·임의공급이 본청약에서 빌려 온 분양가는 그대로 둔다
 // 여러 번 돌려도 된다(이미 채운 칸은 그대로). 새 공고는 수집기가 하므로 정기적으로 돌릴 필요는 없다.
 //   node scripts/enrich.ts [일수=365]      레포 루트 .env 의 APPLYHOME_KEY·PUBLIC_SUPABASE_URL·SUPABASE_SERVICE_ROLE_KEY
 import path from "node:path";
@@ -66,9 +67,14 @@ for (const n of stored) {
     classified++;
     dirty = true;
   }
-  if (!n.units) {
+  if (!n.units || n.units.some((u) => u.multiChild === undefined)) {
     try {
-      n.units = await ah.units(n);
+      const old = n.units;
+      n.units = (await ah.units(n)).map((u) => ({
+        ...u,
+        topPriceMan:
+          u.topPriceMan ?? old?.find((o) => o.type === u.type)?.topPriceMan,
+      }));
       enriched++;
       dirty = true;
     } catch (e) {

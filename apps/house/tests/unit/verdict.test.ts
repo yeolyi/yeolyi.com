@@ -22,6 +22,8 @@ test("고른 시도 안이면 후보. 분양가는 판정하지 않고 범위만
     newlywed: 8,
     firstHome: 0,
     newborn: 0,
+    multiChild: 0,
+    elderly: 0,
   });
   assert.equal(v.minPriceEok, 10);
   assert.equal(v.maxPriceEok, 24.6);

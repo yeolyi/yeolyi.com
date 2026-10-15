@@ -14,6 +14,8 @@ export type Tickets = {
   newlywed: number;
   firstHome: number;
   newborn: number;
+  multiChild: number;
+  elderly: number;
 };
 export type Verdict = {
   region: Region;
@@ -56,13 +58,22 @@ export const regionOf = (n: Notice, s: Settings): Region => {
 };
 
 export function ticketsOf(n: Notice): Tickets {
-  const t: Tickets = { young: 0, newlywed: 0, firstHome: 0, newborn: 0 };
+  const t: Tickets = {
+    young: 0,
+    newlywed: 0,
+    firstHome: 0,
+    newborn: 0,
+    multiChild: 0,
+    elderly: 0,
+  };
   for (const u of n.units ?? []) {
     t.young += u.young;
     // 신혼희망타운은 전 세대가 신혼(예비신혼·한부모) 몫이라 특공 칸이 비어 온다. 특별공급 세대수가 곧 신혼 물량.
     t.newlywed += n.kind === "신혼희망타운" ? u.special : u.newlywed;
     t.firstHome += u.firstHome;
     t.newborn += u.newborn;
+    t.multiChild += u.multiChild ?? 0;
+    t.elderly += u.elderly ?? 0;
   }
   return t;
 }
