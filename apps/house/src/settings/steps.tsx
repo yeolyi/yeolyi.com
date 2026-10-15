@@ -134,10 +134,12 @@ function personSteps(i: 0 | 1): Step[] {
             aria-label="시도"
             value={p(d).sido || undefined}
             placeholder="시도"
-            // 시도를 바꾸면 그 안에 없는 시군구는 지운다.
+            // 시도를 바꾸면 그 안에 없는 시군구는 지운다. 사는 시도는 볼 지역에도 더한다
+            // (배우자만 그 지역에서 유리할 수 있어, 두 사람이 사는 시도의 공고는 늘 후보에 들게).
             onValueChange={(v) =>
               set({
                 ...d,
+                areas: d.areas.includes(v) ? d.areas : [...d.areas, v],
                 people: setP(d, {
                   sido: v,
                   sigungu: SIGUNGU[v]?.includes(p(d).sigungu)
@@ -279,7 +281,7 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     group: "공고",
     label: "지역",
     question: "어느 지역 공고를 볼까요?",
-    hint: "고른 시도의 공고만 후보로 봅니다. 여러 곳을 골라도 됩니다.",
+    hint: "고른 시도의 공고만 후보로 봅니다. 여러 곳을 골라도 됩니다. 나와 배우자가 사는 시도는 뒤에서 사는 곳을 넣을 때 저절로 더해집니다.",
     input: ({ d, set }) => (
       <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-y-2">
         {AREA_NAMES.map((a) => (
