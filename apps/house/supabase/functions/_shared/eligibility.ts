@@ -2,7 +2,6 @@ import { addYears, fmtYears, yearsBetween } from "./dates.ts";
 import {
   bonusPoints,
   LOCAL_YEARS_REGULATED,
-  LOTTERY_HOMELESS_SHARE_PCT,
   NEWLYWED_TIERS,
   PRIVATE_NEWLYWED_REQUIRES_MARRIAGE,
   PUBLIC_GENERAL,
@@ -141,7 +140,7 @@ export function incomeTiers(
 
 // ---- 사다리. 트랙마다 세 부분 — 전제(못 넘으면 못 넣음) · 줄(배타, 하나만 켜짐) · 줄 안의 순서.
 export type Step = { ok: boolean | null; label: string; detail?: string };
-export type TierOption = { label: string; tip: string; on: boolean };
+export type TierOption = { label: string; on: boolean };
 export type IncomeScale = {
   pct: number;
   incomeMan: number;
@@ -220,11 +219,6 @@ export function ladders(
       ],
       tiers: tiers.map((t) => ({
         label: `${t.label} ${t.sharePct}%`,
-        tip: t.capPct
-          ? `소득 ${t.capPct}% 이하. 물량 ${t.sharePct}%. 위 구간에서 떨어진 사람도 내려온다.`
-          : n.publicHousing
-            ? `소득 무관. 물량 ${t.sharePct}%.`
-            : `소득 무관, 부동산 3.3억 이하. 물량 ${t.sharePct}%.`,
         on: t === landing,
       })),
       tierNote: landing
@@ -267,14 +261,10 @@ export function ladders(
       ],
       tiers: optional
         ? [
-            { label: "추첨", tip: "공고문이 추첨으로 정한 경우", on: false },
-            {
-              label: "선착순",
-              tip: "접수 순 동호지정. 공고문이 정함",
-              on: false,
-            },
+            { label: "추첨", on: false },
+            { label: "선착순", on: false },
           ]
-        : [{ label: "추첨", tip: "무순위는 전부 추첨", on: true }],
+        : [{ label: "추첨", on: true }],
       tierNote: optional ? "공고문이 정함" : "",
       within: [],
     });
@@ -321,17 +311,14 @@ export function ladders(
       tiers: [
         {
           label: `자녀 우선 ${PUBLIC_GENERAL.childFirstSharePct}%`,
-          tip: `2세 미만 자녀(태아 포함) 가구, 소득 맞벌이 ${PUBLIC_GENERAL.childFirstCapPct}% 이하.`,
           on: false,
         },
         {
           label: `순차 ${PUBLIC_GENERAL.orderedSharePct}%`,
-          tip: `소득 맞벌이 ${PUBLIC_GENERAL.orderedCapPct}% 이하인 1순위를 제27조 순차(무주택 3년 → 저축총액)로.`,
           on: inOrdered && firstTier,
         },
         {
           label: `추첨 ${PUBLIC_GENERAL.lotterySharePct}%`,
-          tip: "요건만 갖추면 누구나. 위 칸에서 떨어진 사람도 포함.",
           on: incomeOk && !(inOrdered && firstTier),
         },
       ],
@@ -346,7 +333,6 @@ export function ladders(
       accountYears: a.years,
       married: !!s.marriedAt,
     });
-    const small = (n.units ?? []).some((u) => u.area > 0 && u.area <= 60 * 1.3); // 공급면적으로 전용 60㎡ 근사
     out.push({
       title: "일반공급 (민영)",
       supply: generalSupply(n),
@@ -362,12 +348,10 @@ export function ladders(
       tiers: [
         {
           label: "가점제",
-          tip: `무주택기간(만 30세부터, 32) · 부양가족(35) · 통장 기간(17) 합산 84점 만점.`,
           on: false,
         },
         {
           label: "추첨제",
-          tip: `가점 낮은 1순위는 여기. 물량 ${small ? "60㎡ 이하 60% · 60~85㎡ 30%" : "60~85㎡ 30% · 85㎡ 초과 20%"}. 그중 ${LOTTERY_HOMELESS_SHARE_PCT}%는 무주택자 먼저.`,
           on: true,
         },
       ],

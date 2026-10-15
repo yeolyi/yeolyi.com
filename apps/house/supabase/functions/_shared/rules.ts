@@ -1,3 +1,5 @@
+import { addYears } from "./dates.ts";
+
 // 청약 규칙의 숫자. 근거는 각 줄의 조문(주택공급규칙·공공주택특별법 시행규칙)이다.
 // "대략치"라고 적은 것은 감을 잡기 위한 값이고, 심사 기준이 아니다.
 
@@ -39,14 +41,30 @@ export const PUBLIC_GENERAL = {
 };
 /** 민영 신혼 특공은 혼인신고가 필수. 예비신혼부부는 공공주택(공공주택특별법 시행규칙)에서만 인정. */
 export const PRIVATE_NEWLYWED_REQUIRES_MARRIAGE = true;
-/** 추첨제 물량의 75%는 무주택세대에 먼저 배정한다. */
-export const LOTTERY_HOMELESS_SHARE_PCT = 75;
 export type Tier =
   | (typeof NEWLYWED_TIERS.private)[number]
   | (typeof NEWLYWED_TIERS.public)[number];
 
 /** 공공 일반공급(40㎡ 초과) 1순차 요건: 무주택 3년 이상. 무주택기간은 만 30세(또는 혼인신고일)부터 센다. */
 export const PUBLIC_RANK1_HOMELESS_YEARS = 3;
+
+/** 가점 무주택기간을 세기 시작하는 날(별표 1 1.가 3)). 만 30세가 되는 날, 그 전에 혼인했으면 혼인신고일.
+ *  신청자나 배우자가 집을 가진 적이 있으면 마지막으로 무주택자가 된 날이 그보다 늦을 때 그날부터. */
+export function homelessStart(input: {
+  birth: string;
+  marriedAt?: string;
+  homelessSince?: string;
+}) {
+  const at30 = addYears(input.birth, 30);
+  const married = !!input.marriedAt && input.marriedAt < at30;
+  const base = married && input.marriedAt ? input.marriedAt : at30;
+  if (input.homelessSince && input.homelessSince > base)
+    return { date: input.homelessSince, from: "무주택자가 된 날" } as const;
+  return {
+    date: base,
+    from: married ? "혼인신고일" : "만 30세가 되는 날",
+  } as const;
+}
 
 /** 민영 가점 표. 무주택기간(센 해가 없으면 0, 1년 미만 2, 해마다 2씩 최대 32) · 부양가족(0명 5, 한 명마다 5씩 최대 35) ·
  *  통장 기간(6개월 미만 1, 1년 미만 2, 해마다 1씩 최대 17). 가이드의 계산기도 이걸 쓴다. */

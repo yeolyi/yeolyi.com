@@ -1,5 +1,4 @@
 import { NEWLYWED_TIERS } from "@shared/rules.ts";
-import Checkbox from "@yeolyi/ui/Checkbox";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Slider from "@yeolyi/ui/Slider";
 import { clsx } from "clsx";
@@ -11,139 +10,6 @@ import { Box, Row } from "./GuideCalcs.tsx";
 
 const man = (v: number) =>
   v >= 10000 ? `${v / 10000}억` : `${v.toLocaleString()}만`;
-const Mark = ({ ok }: { ok: boolean }) => (
-  <span
-    className={clsx(
-      "inline-block w-[2ch]",
-      ok ? "font-bold" : "text-muted-foreground",
-    )}
-  >
-    {ok ? "✓" : "✗"}
-  </span>
-);
-
-/** 규칙 제27조(공공)·제28조(민영) 제1항의 1순위 요건. 위축지역과 시·도지사의 기간 연장은 빼고 기본값만 본다. */
-type Area = "capital" | "regulated" | "other";
-const AREA_LABEL: Record<Area, string> = {
-  capital: "수도권",
-  regulated: "규제지역",
-  other: "수도권 밖",
-};
-const RANK1: Record<
-  Area,
-  { months: number; count: number; householder: boolean }
-> = {
-  capital: { months: 12, count: 12, householder: false },
-  regulated: { months: 24, count: 24, householder: true },
-  other: { months: 6, count: 6, householder: false },
-};
-export function Rank1Check() {
-  const [area, setArea] = useState<Area>("capital");
-  const [sector, setSector] = useState("민영");
-  const [months, setMonths] = useState(18);
-  const [count, setCount] = useState(18);
-  const [deposit, setDeposit] = useState(true);
-  const [householder, setHouseholder] = useState(false);
-  const [noWin, setNoWin] = useState(true);
-  const r = RANK1[area];
-  const pub = sector === "공공";
-  const checks = [
-    { label: `통장 가입 ${r.months}개월 이상`, ok: months >= r.months },
-    pub
-      ? { label: `납입 ${r.count}회 이상`, ok: count >= r.count }
-      : { label: "예치금 채움", ok: deposit },
-    ...(r.householder
-      ? [
-          { label: "세대주", ok: householder },
-          { label: "가구가 5년 안에 당첨된 적 없음", ok: noWin },
-        ]
-      : []),
-  ];
-  const rank1 = checks.every((c) => c.ok);
-  return (
-    <Box>
-      <p>단지가 있는 곳</p>
-      <div className="mt-1">
-        <RadioGroup
-          aria-label="단지가 있는 곳"
-          options={(Object.keys(AREA_LABEL) as Area[]).map((a) => ({
-            value: a,
-            label: AREA_LABEL[a],
-          }))}
-          value={area}
-          onValueChange={(v) => setArea(v as Area)}
-        />
-      </div>
-      <p className="mt-[0.5rlh]">분양</p>
-      <div className="mt-1">
-        <RadioGroup
-          aria-label="분양"
-          options={["민영", "공공"]}
-          value={sector}
-          onValueChange={setSector}
-        />
-      </div>
-      <div className="mt-[0.5rlh]">
-        <Row label="통장 가입 기간" value={`${months}개월`}>
-          {(id) => (
-            <Slider
-              value={months}
-              onValueChange={setMonths}
-              min={0}
-              max={36}
-              aria-labelledby={id}
-            />
-          )}
-        </Row>
-        {pub && (
-          <Row label="납입 횟수" value={`${count}회`}>
-            {(id) => (
-              <Slider
-                value={count}
-                onValueChange={setCount}
-                min={0}
-                max={36}
-                aria-labelledby={id}
-              />
-            )}
-          </Row>
-        )}
-      </div>
-      <div className="mt-[0.5rlh] flex flex-col items-start">
-        {!pub && (
-          <Checkbox checked={deposit} onCheckedChange={setDeposit}>
-            예치금을 채웠다
-          </Checkbox>
-        )}
-        {r.householder && (
-          <>
-            <Checkbox checked={householder} onCheckedChange={setHouseholder}>
-              세대주다
-            </Checkbox>
-            <Checkbox checked={noWin} onCheckedChange={setNoWin}>
-              가구가 5년 안에 당첨된 적이 없다
-            </Checkbox>
-          </>
-        )}
-      </div>
-      <div className="mt-[1rlh] border-t pt-[0.5rlh]" aria-live="polite">
-        <p className="font-bold">{rank1 ? "1순위입니다" : "2순위입니다"}</p>
-        <ul className="mt-1">
-          {checks.map((c) => (
-            <li
-              key={c.label}
-              className={clsx(!c.ok && "text-muted-foreground")}
-            >
-              <Mark ok={c.ok} />
-              {c.label}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </Box>
-  );
-}
-
 /** 규칙 제10조 ②(선납은 24회분까지)·③(연체하면 회차별 납입인정일 = 약정납입일 + (연체총일수 − 선납총일수) ÷ 납입횟수).
  *  공고일 없이 "미리 내면 / 밀린 걸 내면"만 본다. 밀린 것은 가입 직후부터 연달아 밀렸고 오늘 한꺼번에 낸다고 가정한다(선납 없음). */
 const DAYS_PER_MONTH = 365.25 / 12;
@@ -299,7 +165,8 @@ export function IncomeTable() {
   );
 }
 
-/** 신혼부부 특공의 소득 구간을 소득 축 위에 그린다. 가로축은 도시근로자 월평균소득 대비 %(맞벌이 기준), 칸 안 숫자는 그 구간의 물량.
+/** 특공의 소득 구간을 소득 축 위에 그린다. 가로축은 도시근로자 월평균소득 대비 %, 칸 안 숫자는 그 구간의 물량.
+ *  공공은 맞벌이와 외벌이의 경계가 달라 막대 하나에 둘을 담을 수 없으니 줄을 나눈다.
  *  민영 추첨 구간은 소득 상한이 없어 축 끝까지 칠하고 끝을 흐린다. 색은 줄 순서(우선 → 일반 → 추첨)를 잉크 → 보조 → 연한 회색으로, 범례를 함께 둔다.
  *  화면 읽기 프로그램에는 같은 내용을 표로 준다. */
 const AXIS_MAX = 220;
@@ -308,64 +175,82 @@ const TIER_FILL = [
   "bg-muted-foreground text-background",
   "bg-muted text-foreground",
 ];
-type TierRow = {
-  label: string;
-  tiers: readonly { label: string; capPct?: number; sharePct: number }[];
-};
+type Tier = { label: string; capPct?: number; sharePct: number };
+type Earners = "맞벌이" | "외벌이";
+type TierRow = { label: string } & Record<Earners, readonly Tier[]>;
+// 숫자는 규칙 제35조의3·제41조·제43조(2026-06-15)와 별표 6(2026-06-22) 원문과 대조했다. 외벌이는 부부 중 한 명만 소득이 있는 가구(공공은 미혼 포함).
+// 공공 외벌이는 자격 상한이 일반 구간 상한과 같아 추첨 칸이 없다. 추첨 몫엔 앞 구간에서 떨어진 사람으로 들어간다(별표 6 2.나 2)다)).
+// 마지막 줄 물량은 100에서 앞 줄을 뺀 값.
 const NEWLYWED_ROWS: TierRow[] = [
-  { label: "민영", tiers: NEWLYWED_TIERS.private },
-  { label: "공공", tiers: NEWLYWED_TIERS.public },
-];
-/** 생애최초(규칙 제43조 ③, 별표 6 2.다)·신생아(규칙 제35조의3 ③, 별표 6 2.마)의 줄. 맞벌이 기준 상한, 민영은 맞벌이 구분이 없다.
- *  마지막 줄은 "나머지"라 물량은 100에서 앞 줄을 뺀 값. 공공 마지막 줄 상한은 그 특공의 자격 상한(맞벌이 200%). */
-export const FIRST_HOME_ROWS: TierRow[] = [
   {
     label: "민영",
-    tiers: [
-      { label: "우선", capPct: 130, sharePct: 50 },
-      { label: "일반", capPct: 160, sharePct: 20 },
+    맞벌이: NEWLYWED_TIERS.private,
+    외벌이: [
+      { label: "우선", capPct: 100, sharePct: 50 },
+      { label: "일반", capPct: 140, sharePct: 20 },
       { label: "추첨", sharePct: 30 },
     ],
   },
   {
     label: "공공",
-    tiers: [
+    맞벌이: NEWLYWED_TIERS.public,
+    외벌이: [
+      { label: "우선", capPct: 100, sharePct: 70 },
+      { label: "일반", capPct: 130, sharePct: 20 },
+    ],
+  },
+];
+/** 생애최초(규칙 제43조 ③, 별표 6 2.다)·신생아(규칙 제35조의3 ③, 별표 6 2.마). 민영은 맞벌이 구분이 없다. */
+const PRIVATE_130_160: readonly Tier[] = [
+  { label: "우선", capPct: 130, sharePct: 50 },
+  { label: "일반", capPct: 160, sharePct: 20 },
+  { label: "추첨", sharePct: 30 },
+];
+export const FIRST_HOME_ROWS: TierRow[] = [
+  { label: "민영", 맞벌이: PRIVATE_130_160, 외벌이: PRIVATE_130_160 },
+  {
+    label: "공공",
+    맞벌이: [
       { label: "우선", capPct: 120, sharePct: 70 },
       { label: "일반", capPct: 140, sharePct: 20 },
       { label: "추첨", capPct: 200, sharePct: 10 },
     ],
+    외벌이: [
+      { label: "우선", capPct: 100, sharePct: 70 },
+      { label: "일반", capPct: 130, sharePct: 20 },
+    ],
   },
 ];
 export const NEWBORN_ROWS: TierRow[] = [
-  {
-    label: "민영",
-    tiers: [
-      { label: "우선", capPct: 130, sharePct: 50 },
-      { label: "일반", capPct: 160, sharePct: 20 },
-      { label: "추첨", sharePct: 30 },
-    ],
-  },
+  { label: "민영", 맞벌이: PRIVATE_130_160, 외벌이: PRIVATE_130_160 },
   {
     label: "공공",
-    tiers: [
+    맞벌이: [
       { label: "우선", capPct: 120, sharePct: 70 },
       { label: "일반", capPct: 150, sharePct: 20 },
       { label: "추첨", capPct: 200, sharePct: 10 },
     ],
+    외벌이: [
+      { label: "우선", capPct: 100, sharePct: 70 },
+      { label: "일반", capPct: 140, sharePct: 20 },
+    ],
   },
 ];
-export function TierChart({
-  rows = NEWLYWED_ROWS,
-  note,
-}: {
-  rows?: TierRow[];
-  note?: string;
-}) {
+export function TierChart({ rows = NEWLYWED_ROWS }: { rows?: TierRow[] }) {
   const pct = (v: number) => `${(v / AXIS_MAX) * 100}%`;
+  // 외벌이·맞벌이 경계가 같은 분양(민영 생애최초·신생아)은 한 줄로 둔다.
+  const lines = rows.flatMap((r) =>
+    r.외벌이 === r.맞벌이
+      ? [{ label: r.label, tiers: r.맞벌이 }]
+      : (["외벌이", "맞벌이"] as const).map((e) => ({
+          label: `${r.label} ${e}`,
+          tiers: r[e],
+        })),
+  );
   return (
     <figure className="mt-[0.5rlh]">
       <ul className="text-muted-foreground flex gap-4 text-base" aria-hidden>
-        {rows[0]?.tiers.map((t, i) => (
+        {rows[0]?.맞벌이.map((t, i) => (
           <li key={t.label} className="flex items-center gap-1.5">
             <span
               className={clsx(
@@ -379,10 +264,10 @@ export function TierChart({
       </ul>
       {/* 눈금은 줄마다 그 구간의 경계에만(두 구간 경계를 한 축에 모으면 120·130·140 처럼 겹친다). */}
       <div
-        className="mt-[0.5rlh] grid grid-cols-[3ch_1fr] gap-x-3 gap-y-1"
+        className="mt-[0.5rlh] grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1"
         aria-hidden
       >
-        {rows.map((r) => {
+        {lines.map((r) => {
           let low = 0;
           return (
             <div key={r.label} className="contents">
@@ -433,9 +318,10 @@ export function TierChart({
         })}
       </div>
       <figcaption className="text-muted-foreground mt-[0.5rlh] text-base">
-        막대 아래 숫자는 도시근로자 월평균소득 대비 %(맞벌이 기준)의 구간 경계,
-        칸 안 숫자는 그 구간의 물량입니다. 민영 추첨 구간은 소득 상한이
-        없습니다.{note && ` ${note}`}
+        막대 아래 숫자는 도시근로자 월평균소득 대비 %의 구간 경계, 칸 안 숫자는
+        그 구간의 물량입니다. 같은 분양의 외벌이·맞벌이 두 줄은 물량을 함께
+        쓰고, 구간에 들어가는 소득만 다릅니다. 민영 추첨 구간은 소득 상한이
+        없고, 공공 외벌이는 일반 구간 상한이 자격 상한이라 추첨 칸이 없습니다.
       </figcaption>
       <div className="sr-only">
         <table>
@@ -449,7 +335,7 @@ export function TierChart({
             </tr>
           </thead>
           <tbody>
-            {rows.flatMap((r) =>
+            {lines.flatMap((r) =>
               r.tiers.map((t) => (
                 <tr key={r.label + t.label}>
                   <td>{r.label}</td>
@@ -543,32 +429,32 @@ export function TierCascade() {
 const SCORE_ITEMS = [
   {
     label: "소득(맞벌이면 100% 이하)",
-    options: ["80% 이하", "그 위"],
-    points: [1, 0],
+    options: ["그 위", "80% 이하"],
+    points: [0, 1],
   },
   {
     label: "자녀",
-    options: ["3명+", "2명", "1명", "없음"],
-    points: [3, 2, 1, 0],
+    options: ["없음", "1명", "2명", "3명+"],
+    points: [0, 1, 2, 3],
   },
   {
     label: "그 지역에 산 기간",
-    options: ["3년+", "1~3년", "1년 미만"],
-    points: [3, 2, 1],
+    options: ["1년 미만", "1~3년", "3년+"],
+    points: [1, 2, 3],
   },
   {
     label: "납입 횟수",
-    options: ["24회+", "12~23회", "6~11회"],
-    points: [3, 2, 1],
+    options: ["6~11회", "12~23회", "24회+"],
+    points: [1, 2, 3],
   },
   {
     label: "혼인 기간",
-    options: ["3년 이하", "3~5년", "5~7년"],
-    points: [3, 2, 1],
+    options: ["5~7년", "3~5년", "3년 이하"],
+    points: [1, 2, 3],
   },
 ] as const;
 const SCORE_MAX = SCORE_ITEMS.reduce((a, it) => a + Math.max(...it.points), 0);
-// 고른 보기(인덱스)의 점수. 아직 안 골랐으면 첫 보기.
+// 보기는 점수가 낮은 것부터라 오른쪽으로 갈수록 높다. 처음엔 첫 보기(최저점).
 const pointOf = (it: (typeof SCORE_ITEMS)[number], pick: number | undefined) =>
   it.points[pick ?? 0] ?? 0;
 const SCORE_ROW =

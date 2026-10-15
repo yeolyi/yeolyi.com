@@ -9,8 +9,9 @@ import { Fragment, type ReactNode } from "react";
 import { Facts } from "../components/Facts.tsx";
 import { IncomeBar } from "../components/IncomeBar.tsx";
 import { MapLinks } from "../components/MapLinks.tsx";
+import { Mark } from "../components/Mark.tsx";
+import { NoticeGuides } from "../components/NoticeGuides.tsx";
 import { Schedule } from "../components/Schedule.tsx";
-import { Mark, Term } from "../components/Term.tsx";
 import { useNotice } from "../data.ts";
 import { ic } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
@@ -97,21 +98,19 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
           <>
             <p className="font-bold">{verdictLine(v)}</p>
             <ul className="mt-[0.5rlh]">
-              {checks(n, v, s)
-                .filter((c) => c.key !== "price")
-                .map((c) => (
-                  <li
-                    key={c.key}
-                    className="flex flex-wrap items-baseline gap-x-2"
-                  >
-                    <Mark ok={c.ok} />
-                    <Term tip={c.tip}>{c.label}</Term>
-                    <span className={clsx(c.ok === false && "font-bold")}>
-                      {c.value}
-                    </span>
-                    <span className="text-muted-foreground">{c.detail}</span>
-                  </li>
-                ))}
+              {checks(n, v, s).map((c) => (
+                <li
+                  key={c.key}
+                  className="flex flex-wrap items-baseline gap-x-2"
+                >
+                  <Mark ok={c.ok} />
+                  <span>{c.label}</span>
+                  <span className={clsx(c.ok === false && "font-bold")}>
+                    {c.value}
+                  </span>
+                  <span className="text-muted-foreground">{c.detail}</span>
+                </li>
+              ))}
             </ul>
             <p className="text-muted-foreground mt-[0.5rlh] text-base">
               개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
@@ -133,23 +132,22 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
 
       {n.units && n.units.length > 0 && (
         <Section title="주택형">
-          <Units n={n} refType={v.refType} />
+          <Units n={n} />
         </Section>
       )}
+
+      <Section title="관련 가이드">
+        <NoticeGuides n={n} v={v} />
+      </Section>
     </article>
   );
 }
 
-/** 판정 한 줄. 후보면 기준 주택형, 제외면 걸린 이유. */
+/** 판정 한 줄. 제외면 걸린 이유. */
 function verdictLine(v: Verdict): string {
-  if (v.status === "candidate")
-    return v.refType
-      ? `후보입니다. 기준 주택형 ${unitLabel(v.refType)}(${v.refPriceEok}억)으로 보면 필요 자기자본은 ${v.neededEquityEok}억입니다.`
-      : "후보입니다. 분양가가 아직 없어 가격은 따지지 않았습니다.";
+  if (v.status === "candidate") return "후보입니다.";
   if (v.region === "out") return "제외: 개인화에서 고른 시도 밖의 공고입니다.";
-  if (v.assetBlocked)
-    return `제외: 총자산이 기준(${v.assetBlocked})을 넘습니다.`;
-  return `제외: 살 수 있는 주택형이 없습니다. 가장 싼 것도 필요 자기자본이 ${v.neededEquityEok}억입니다.`;
+  return `제외: 총자산이 기준(${v.assetBlocked})을 넘습니다.`;
 }
 
 /** 청약홈 주택형 "084.9100A" → "84.91㎡ A". 전용면적과 타입 글자. */
@@ -163,7 +161,7 @@ export const unitLabel = (type: string) => {
 };
 
 /** 주택형 표. 값이 하나도 없는 칸(공급면적, 특공 종류, 분양가)은 그리지 않는다. */
-function Units({ n, refType }: { n: Notice; refType?: string }) {
+function Units({ n }: { n: Notice }) {
   const units = n.units ?? [];
   const all: { head: string; cell: (u: Unit) => string }[] = [
     { head: "공급면적", cell: (u) => (u.area ? `${u.area.toFixed(1)}㎡` : "") },
@@ -185,43 +183,32 @@ function Units({ n, refType }: { n: Notice; refType?: string }) {
   ];
   const cols = all.filter((c) => units.some((u) => c.cell(u)));
   return (
-    <>
-      <div className="overflow-x-auto">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>주택형(전용)</th>
+    <div className="overflow-x-auto">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>주택형(전용)</th>
+            {cols.map((c) => (
+              <th key={c.head} className="text-right">
+                {c.head}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {units.map((u) => (
+            <tr key={u.type}>
+              <td>{unitLabel(u.type)}</td>
               {cols.map((c) => (
-                <th key={c.head} className="text-right">
-                  {c.head}
-                </th>
+                <td key={c.head} className="text-right">
+                  {c.cell(u)}
+                </td>
               ))}
             </tr>
-          </thead>
-          <tbody>
-            {units.map((u) => (
-              <tr
-                key={u.type}
-                className={clsx(u.type === refType && "font-bold")}
-              >
-                <td>{unitLabel(u.type)}</td>
-                {cols.map((c) => (
-                  <td key={c.head} className="text-right">
-                    {c.cell(u)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {refType && (
-        <p className="text-muted-foreground mt-[0.5rlh] text-base">
-          굵은 줄이 판정 기준 주택형입니다. 내 돈으로 살 수 있는 것 중 가장 비싼
-          것입니다.
-        </p>
-      )}
-    </>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -300,14 +287,13 @@ function People({
                             {i > 0 && (
                               <span className="text-muted-foreground"> · </span>
                             )}
-                            <Term
-                              tip={t.tip}
+                            <span
                               className={
                                 t.on ? "font-bold" : "text-muted-foreground"
                               }
                             >
                               {t.label}
-                            </Term>
+                            </span>
                           </Fragment>
                         ))}
                         {l.tierNote && (

@@ -163,7 +163,7 @@ function Summary({ settings }: { settings: Settings }) {
       ) : (
         <>
           <p className="mt-[0.5rlh]">
-            <a href={`/settings/${steps[0].id}`}>처음부터 차례로 다시 답하기</a>
+            <a href={`/settings/${steps[0].id}`}>처음부터 다시 답하기</a>
           </p>
           {groups.map((g) => (
             <section key={g} className="mt-[2rlh]">

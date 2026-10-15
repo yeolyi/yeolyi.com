@@ -3,27 +3,12 @@ import { isMainRound } from "@shared/site.ts";
 import type { Notice } from "@shared/types.ts";
 import { clsx } from "clsx";
 import MonthCalendar from "./MonthCalendar";
-import { Term } from "./Term.tsx";
 
 export type Milestone = {
   label: string;
   date: string;
   end?: string;
   month?: boolean;
-};
-
-const TIP: Record<string, string> = {
-  공고: "입주자모집공고. 단지 정보·분양가·특공 물량·자격이 전부 담긴 문서.",
-  "특공 접수": "특별공급 접수일. 일반공급보다 먼저 받는다.",
-  "1순위 접수": "일반공급 1순위 접수일. 규제지역은 통장 2년·세대주 조건.",
-  "2순위 접수": "1순위에서 미달일 때만 의미가 있다.",
-  접수: "무순위·임의공급 접수일. 순위 없이 추첨 또는 선착순.",
-  "접수(첫날 특공)":
-    "LH 공공 본청약. 청약홈엔 기간 하나로만 오지만 첫날이 특공, 그다음부터 1순위. 정확한 날은 공고문.",
-  "당첨 발표":
-    "이 날 청약홈에서 확인. 당첨되면 서류 심사(소득·자산·무주택) 뒤 계약.",
-  계약: "계약금(분양가의 20% 안)을 낸다. 계약을 포기해도 당첨 이력은 남아 재당첨 제한이 걸린다.",
-  입주: "입주 예정 월. 잔금을 여기서 낸다.",
 };
 
 export function milestones(n: Notice): Milestone[] {
@@ -70,7 +55,7 @@ export const fmtWhen = (m: Milestone) =>
       ? `${fmtDate(m.date)}~${fmtDate(m.end)}`
       : fmtDate(m.date);
 
-// 달력 칸에 들어갈 짧은 이름. 풀이는 아래 목록의 Term 에 있다.
+// 달력 칸에 들어갈 짧은 이름. 온전한 이름은 아래 목록에 있다.
 const SHORT: Record<string, string> = {
   "특공 접수": "특공",
   "1순위 접수": "1순위",
@@ -102,27 +87,35 @@ export function Schedule({ n, today }: { n: Notice; today: string }) {
 /** 날짜 + 일. 지난 것은 보조 색, 오늘 걸린 것은 굵게. */
 function ScheduleList({ ms, today }: { ms: Milestone[]; today: string }) {
   return (
-    <ul className="mt-[1rlh] grid grid-cols-[max-content_1fr] gap-x-4">
-      {ms.map((m) => {
-        const past = (m.end ?? m.date) < today;
-        const now = m.date <= today && today <= (m.end ?? m.date);
-        return (
-          <li
-            key={m.label}
-            className={clsx(
-              "contents",
-              past && "text-muted-foreground",
-              now && "font-bold",
-            )}
-          >
-            <span className="font-mono">{fmtWhen(m)}</span>
-            <span>
-              <Term tip={TIP[m.label] ?? m.label}>{m.label}</Term>
-              {now && " (오늘)"}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
+    <>
+      <ul className="mt-[1rlh] grid grid-cols-[max-content_1fr] gap-x-4">
+        {ms.map((m) => {
+          const past = (m.end ?? m.date) < today;
+          const now = m.date <= today && today <= (m.end ?? m.date);
+          return (
+            <li
+              key={m.label}
+              className={clsx(
+                "contents",
+                past && "text-muted-foreground",
+                now && "font-bold",
+              )}
+            >
+              <span className="font-mono">{fmtWhen(m)}</span>
+              <span>
+                {m.label}
+                {now && " (오늘)"}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      {ms.some((m) => m.label === "접수(첫날 특공)") && (
+        <p className="text-muted-foreground mt-[0.5rlh] text-base">
+          LH 공공 본청약은 청약홈에 접수 기간이 하나로만 와서, 그 첫날이
+          특별공급이고 다음 날부터 1순위입니다. 정확한 날은 공고문에 있습니다.
+        </p>
+      )}
+    </>
   );
 }

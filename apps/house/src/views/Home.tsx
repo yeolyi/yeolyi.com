@@ -8,7 +8,7 @@ import { isFresh } from "./Settings.tsx";
 const PLACES = [
   { href: "/notices", label: "공고", what: "매시간 모은 전국 청약 공고" },
   { href: "/guide", label: "가이드", what: "청약을 처음 본다면" },
-  { href: "/settings", label: "개인화", what: "지역, 가구, 통장, 돈" },
+  { href: "/settings", label: "개인화", what: "지역, 가구, 통장, 소득" },
 ];
 
 export function Home({ settings }: { settings?: Settings }) {

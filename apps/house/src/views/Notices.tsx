@@ -147,9 +147,8 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   );
 }
 
-/** 한 줄 요약. 제외는 걸린 이유를 먼저. 판정하지 않는 묶음(진행 중·마감)은 필요 자기자본을 적지 않는다. */
+/** 한 줄 요약. 제외는 걸린 이유를 먼저. */
 function summary(n: Notice, v: Verdict, scope: Scope): string {
-  const judging = scope === "candidate" || scope === "rejected";
   const why =
     scope !== "rejected"
       ? ""
@@ -157,17 +156,13 @@ function summary(n: Notice, v: Verdict, scope: Scope): string {
         ? "고른 시도 밖"
         : v.assetBlocked
           ? `자산 기준 초과(${v.assetBlocked})`
-          : v.price === "over"
-            ? `필요 자기자본 ${v.neededEquityEok}억이 넘음`
-            : "";
+          : "";
   const price =
     v.maxPriceEok === undefined
       ? "분양가 미상"
-      : judging && v.refPriceEok !== undefined
-        ? `${v.refPriceEok}억, 필요 자기자본 ${v.neededEquityEok}억`
-        : v.minPriceEok === v.maxPriceEok
-          ? `${v.maxPriceEok}억`
-          : `${v.minPriceEok}~${v.maxPriceEok}억`;
+      : v.minPriceEok === v.maxPriceEok
+        ? `${v.maxPriceEok}억`
+        : `${v.minPriceEok}~${v.maxPriceEok}억`;
   return [why, n.sido, ...facts(n).slice(0, 2), price]
     .filter(Boolean)
     .join(" · ");

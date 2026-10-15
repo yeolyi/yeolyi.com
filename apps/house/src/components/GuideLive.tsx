@@ -145,7 +145,7 @@ export function ScheduleExample() {
   );
 }
 
-/** 청약이 뭔가요: 가장 최근에 나온 수도권 본청약 3개. */
+/** 청약이란: 가장 최근에 나온 수도권 본청약 3개. */
 export function LatestNotices() {
   const { list, status, busy } = useCapitalMain();
   return (

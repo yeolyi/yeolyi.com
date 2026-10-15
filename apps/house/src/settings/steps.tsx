@@ -353,26 +353,9 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
 ];
 
 const STEPS_AFTER_PEOPLE: Step[] = [
-  numberStep("equityEok", {
-    id: "equity",
-    group: "돈",
-    label: "자기자본",
-    question: "집값에 보탤 수 있는 내 돈은 얼마인가요?",
-    hint: "예금·주식 같은 금융자산(연금 제외)에 전세보증금을 더하고 전세대출을 뺀 것. 분양가에서 대출을 뺀 만큼이 이 안이어야 후보입니다.",
-    unit: "억",
-    fmt: (v) => `${v}억`,
-  }),
-  numberStep("liquidEok", {
-    id: "liquid",
-    group: "돈",
-    label: "당장 쓸 수 있는 현금",
-    question: "당장 꺼내 쓸 수 있는 현금은 얼마인가요?",
-    hint: "계약할 때 계약금(분양가의 20% 안)을 냅니다. 전세보증금은 그때 못 빼니 넣지 마세요.",
-    unit: "억",
-  }),
   numberStep("totalAssetsEok", {
     id: "assets",
-    group: "돈",
+    group: "소득과 자산",
     label: "총자산",
     question: "가구의 총자산은 얼마인가요?",
     hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다.",
@@ -380,39 +363,12 @@ const STEPS_AFTER_PEOPLE: Step[] = [
   }),
   numberStep("incomeMan", {
     id: "income",
-    group: "돈",
+    group: "소득과 자산",
     label: "월소득",
     question: "가구의 한 달 소득은 세전으로 얼마인가요?",
     hint: "함께 신청하는 사람 모두의 건강보험 보수월액을 더한 것. 특별공급은 이 소득으로 구간을 나눕니다.",
     unit: "만 원",
     fmt: (v) => won(v),
-  }),
-  numberStep("ltvPct", {
-    id: "ltv",
-    group: "계산 가정",
-    label: "LTV",
-    question: "집값의 몇 %까지 대출받는다고 볼까요?",
-    hint: "생애 처음 집을 사면 70%, 아니면 규제지역 40%.",
-    unit: "%",
-    assumption: true,
-  }),
-  numberStep("loanCapEok", {
-    id: "loancap",
-    group: "계산 가정",
-    label: "대출 상한",
-    question: "대출은 최대 얼마까지로 볼까요?",
-    hint: "규제지역 15억 이하 주택은 6억.",
-    unit: "억",
-    assumption: true,
-  }),
-  numberStep("depositPct", {
-    id: "deposit",
-    group: "계산 가정",
-    label: "계약금 비율",
-    question: "계약금은 분양가의 몇 %로 볼까요?",
-    hint: "법은 분양가의 20% 안에서 정하게 하고, 실제 비율은 공고문에 있습니다. 당장 쓸 수 있는 현금과 비교해 경고만 합니다.",
-    unit: "%",
-    assumption: true,
   }),
   numberStep("incomeBaseMan", {
     id: "incomebase",

@@ -42,13 +42,4 @@
       color: var(--color-muted-foreground);
     }
   }
-  /* 용어 풀이 팝업: 1px 가는 선 상자, 모서리·그림자 없음. */
-  .tip {
-    max-width: min(20rem, calc(100vw - 32px));
-    padding: 8px 12px;
-    border: 1px solid var(--color-foreground);
-    background: var(--color-background);
-    font-size: var(--text-base);
-    line-height: 1.6;
-  }
 }

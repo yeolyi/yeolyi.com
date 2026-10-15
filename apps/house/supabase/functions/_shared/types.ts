@@ -69,11 +69,6 @@ export type Settings = {
   people: Person[]; // 한두 명. 특공은 그중 한 명만 넣는다
   marriedAt: string; // 혼인신고일. 비면 미혼. 민영 신혼 특공은 신고 필수, 공공은 예비신혼도 됨. 무주택기간·가점 부양가족도 여기서
   children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
-  equityEok: number; // 자기자본 = 금융자산(연금 제외) + 전세보증금 − 전세대출
-  liquidEok: number; // 계약금으로 당장 쓸 수 있는 현금
-  ltvPct: number; // 생애최초 70, 일반 40
-  loanCapEok: number; // 규제지역 15억 이하 대출 상한
-  depositPct: number; // 계약금 비율 가정
   totalAssetsEok: number; // 공공주택 총자산(전세보증금 포함, 부채 차감)
   incomeMan: number; // 가구 세전 월소득 합산
   incomeBaseMan: number; // 도시근로자 가구당 월평균소득 100%. 3인 이하 가구는 '3인 이하' 칸(가구당 평균), 4인 이상만 가구원수별 — 별표6·규칙41조
@@ -96,11 +91,6 @@ export const DEFAULT_SETTINGS: Settings = {
   people: [emptyPerson("나")],
   marriedAt: "",
   children: 0,
-  equityEok: 3,
-  liquidEok: 1,
-  ltvPct: 70,
-  loanCapEok: 6,
-  depositPct: 10,
   totalAssetsEok: 3,
   incomeMan: 600,
   incomeBaseMan: 753.4, // 2026-08 LH 공고문(성남복정2)의 '3인 이하 100%' 7,533,763 (가구당 평균). 가구원수별 표의 '3인'(8,168,429)과 다른 칸이다
@@ -119,11 +109,6 @@ export function withDefaults(
 }
 
 export const SETTINGS_LIMITS = {
-  equityEok: [0, 50],
-  liquidEok: [0, 50],
-  ltvPct: [0, 100],
-  loanCapEok: [0, 50],
-  depositPct: [0, 50],
   totalAssetsEok: [0, 100],
   incomeMan: [0, 10000],
   incomeBaseMan: [1, 10000],

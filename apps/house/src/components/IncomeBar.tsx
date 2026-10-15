@@ -1,6 +1,5 @@
 import type { IncomeScale } from "@shared/eligibility.ts";
 import { clsx as cn } from "clsx";
-import { Term } from "./Term.tsx";
 
 // 칸 너비는 물량 비율(우선 50 · 일반 20 · 추첨 30)이다 — 소득이 어디 떨어지느냐보다 그 칸이 얼마나 큰지가 당첨엔 중요하다.
 // 내 소득은 해당 칸 안에서 경계 사이를 비례로 찍는다. 경계 눈금(130·170)은 칸 사이에.
@@ -50,12 +49,7 @@ export function IncomeBar({ scale }: { scale: IncomeScale }) {
                 )}
                 style={{ width: `${sg.width * 100}%` }}
               >
-                <Term
-                  tip={`${sg.label}공급: 물량 ${sg.sharePct}%, ${sg.highCap ? `소득 ${sg.highCap}% 이하` : "소득 무관"}`}
-                  plain
-                >
-                  {sg.label} {sg.sharePct}%
-                </Term>
+                {sg.label} {sg.sharePct}%
               </span>
             ))}
           </div>

@@ -32,8 +32,6 @@ const HOUSEHOLD: Partial<Settings> = {
       accountPaidMan: 0,
     },
   ],
-  equityEok: 5.5,
-  liquidEok: 2.2,
   totalAssetsEok: 5.8,
   incomeMan: 950,
 };

@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { isValidElement, type ReactNode } from "react";
 import { MoneyCalc, PointsCalc } from "../components/GuideCalcs.tsx";
-import { SpecialShareChart, StackBars } from "../components/GuideCharts.tsx";
+import { StackBars } from "../components/GuideCharts.tsx";
 import {
   LatestNotices,
   PublicTypesNow,
@@ -13,7 +13,6 @@ import {
   IncomeTable,
   NEWBORN_ROWS,
   PrepayCalc,
-  Rank1Check,
   SameLineOrder,
   TierCascade,
   TierChart,
@@ -40,6 +39,7 @@ const RULE_TITLES = {
   제10조: "월납입금을 선납 또는 연체한 경우 등의 처리",
   제19조: "입주자모집 방법",
   제21조: "입주자모집 공고",
+  제25조: "주택의 공급방법",
   제26조: "일반공급 예비입주자의 선정",
   제27조: "국민주택의 일반공급",
   제28조: "민영주택의 일반공급",
@@ -156,10 +156,9 @@ function collectSources(node: ReactNode, out: Source[] = []): Source[] {
       s?: Source;
       children?: ReactNode;
       items?: ReactNode[];
-      rows?: { cite?: Source[] }[];
     }>(node)
   ) {
-    const { s, children, items, rows } = node.props;
+    const { s, children, items } = node.props;
     if (
       node.type === C &&
       s &&
@@ -168,11 +167,6 @@ function collectSources(node: ReactNode, out: Source[] = []): Source[] {
       out.push(s);
     collectSources(children, out);
     collectSources(items, out);
-    // DiffTable 처럼 줄마다 출처(cite)를 props 로 받는 부품.
-    for (const r of rows ?? [])
-      for (const c of r.cite ?? [])
-        if (!out.some((x) => x.href === c.href && x.label === c.label))
-          out.push(c);
   }
   return out;
 }
@@ -185,38 +179,6 @@ const P = ({ children }: { children: ReactNode }) => (
   <p className="mt-[1rlh] first:mt-0">{children}</p>
 );
 
-/** 민영·공공 비교 표. SupplyMap 과 같은 꼴(칸마다 선). 칸에는 짧은 구절만, 출처는 줄 이름에 단다(화면엔 안 보이고 쪽 아래 목록으로). */
-function DiffTable({
-  rows,
-}: {
-  rows: { label: string; private: string; public: string; cite: Source[] }[];
-}) {
-  return (
-    <table className="mt-[1rlh] w-full table-fixed border-collapse text-base [&_td]:border [&_td]:p-2 [&_td]:align-top sm:[&_td]:p-3 [&_th]:border [&_th]:p-2 [&_th]:text-left [&_th]:align-top sm:[&_th]:p-3">
-      <thead>
-        <tr>
-          <th className="w-[5.5rem] sm:w-[9rem]" />
-          <th>민영</th>
-          <th>공공</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r) => (
-          <tr key={r.label}>
-            <th scope="row">
-              {r.label}
-              {r.cite.map((c) => (
-                <C key={c.label} s={c} />
-              ))}
-            </th>
-            <td>{r.private}</td>
-            <td>{r.public}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
 const L = ({ items }: { items: ReactNode[] }) => (
   <ul className="list mt-[0.5rlh]">
     {items.map((x, i) => (
@@ -233,7 +195,7 @@ const PAGES: Page[] = [
       options: ["자격과 순위", "분양가와 면적", "지역과 날짜"],
       answer: 0,
     },
-    title: "청약이 뭔가요",
+    title: "청약이란",
     body: (
       <>
         <P>
@@ -500,7 +462,11 @@ const PAGES: Page[] = [
           특별공급은 한 세대가 원칙적으로 평생 한 번만 당첨될 수 있습니다.
           <C s={rule("제55조")} /> 종류마다 소득과 자산 기준도 따로 있습니다.
           민영은 소득 기준이 특별공급에만 있습니다.
+          <C s={rule("제41조")} /> 민영 신혼부부, 생애최초, 신생아 특별공급은
+          전용 85㎡ 이하 집에만 있습니다.
+          <C s={rule("제35조의3")} />
           <C s={rule("제41조")} />
+          <C s={rule("제43조")} />
         </P>
         <P>
           당첨되면 계약하지 않아도 이 한 번을 쓴 것으로 남고, 그 청약통장도 다시
@@ -579,11 +545,9 @@ const PAGES: Page[] = [
           <C s={PUBLIC_RULE} />
         </P>
         <P>
-          도시근로자 가구당 월평균소득은 통계청 가계동향조사를 국토교통부가
-          해마다 연간으로 환산해 정합니다.
-          <C s={INCOME_ORIGIN} /> 공고일에 적용되는 금액을 쓰므로 공고마다 다를
-          수 있고, 공고문에 그 금액이 있습니다. 2026년에 적용되는 금액으로 보면
-          이렇습니다.
+          도시근로자 가구당 월평균소득은 국토교통부가 해마다 정합니다.
+          <C s={INCOME_ORIGIN} /> 공고일 기준 금액을 쓰니 공고마다 다를 수 있고,
+          공고문에 나옵니다. 2026년 금액은 이렇습니다.
           <C s={INCOME_TABLE} />
         </P>
         <IncomeTable />
@@ -626,16 +590,26 @@ const PAGES: Page[] = [
       options: ["그 공고는 끝입니다", "다음 구간으로 내려가 다시 경쟁합니다"],
       answer: 1,
     },
-    title: "신혼부부 특공의 소득 구간",
+    title: "신혼부부 소득 구간",
     body: (
       <>
         <P>
           신혼부부 특별공급은 물량을 가구 소득에 따라 구간으로 나눠 뽑습니다.
-          맞벌이 기준으로 이렇게 나뉩니다.
+          맞벌이인지 외벌이인지에 따라 구간 경계가 다릅니다.
           <C s={rule("제41조")} />
           <C s={PUBLIC_RULE} />
         </P>
         <TierChart />
+        <P>
+          민영 추첨 구간에 소득 상한이 없는 건, 소득이 일반 구간 상한을 넘어도
+          가구가 가진 부동산 가액이 기준(건강보험 재산 29등급의 평균 금액)
+          이하면 넣을 수 있어서입니다. 생애최초와 신생아도 160%를 넘으면 같은
+          기준을 봅니다. 공공은 상한을 넘으면 넣을 수 없습니다.
+          <C s={rule("제41조")} />
+          <C s={rule("제43조")} />
+          <C s={rule("제35조의3")} />
+          <C s={PUBLIC_RULE} />
+        </P>
         <P>
           소득이 낮은 구간에서 떨어진 사람은 다음 구간으로 내려가 다시
           경쟁합니다. 그래서 소득이 낮을수록 기회가 여러 번입니다.
@@ -653,7 +627,7 @@ const PAGES: Page[] = [
       options: ["점수 순", "추첨"],
       answer: 0,
     },
-    title: "같은 소득 구간 안에서 누가 먼저",
+    title: "같은 구간 안의 순서",
     body: (
       <>
         <P>
@@ -685,12 +659,12 @@ const PAGES: Page[] = [
           items={[
             <>
               민영은 혼인 중이거나 자녀가 있어야 하지만, 혼자 사는 사람도 전용
-              60㎡ 이하 집에는 넣을 수 있습니다. 소득은 160% 이하입니다.
+              60㎡ 이하 집의 추첨 몫에는 넣을 수 있습니다.
               <C s={rule("제43조")} />
             </>,
             <>
-              공공은 혼인 중이거나 자녀가 있어야 하고, 통장에 600만 원 이상 모여
-              있어야 합니다. 소득은 130% 이하(맞벌이 200%)입니다.
+              공공은 혼인 중이거나 자녀가 있어야 하고, 통장에 600만 원 이상
+              있어야 합니다.
               <C s={PUBLIC_RULE} />
             </>,
           ]}
@@ -701,10 +675,7 @@ const PAGES: Page[] = [
           <C s={rule("제43조")} />
           <C s={PUBLIC_RULE} />
         </P>
-        <TierChart
-          rows={FIRST_HOME_ROWS}
-          note="민영은 맞벌이를 따로 보지 않습니다."
-        />
+        <TierChart rows={FIRST_HOME_ROWS} />
       </>
     ),
   },
@@ -727,12 +698,12 @@ const PAGES: Page[] = [
         <L
           items={[
             <>
-              민영은 소득 160% 이하입니다. 같은 구간 안에서는 추첨입니다.
+              민영은 같은 구간 안에서 추첨입니다.
               <C s={rule("제35조의3")} />
             </>,
             <>
-              공공은 소득 140% 이하(맞벌이 200%)이고, 같은 구간 안에서는 소득,
-              자녀 수, 그 지역에 산 기간, 납입 횟수로 매긴 점수 순입니다.
+              공공은 같은 구간 안에서 소득, 자녀 수, 그 지역에 산 기간, 납입
+              횟수로 매긴 점수 순입니다.
               <C s={PUBLIC_RULE} />
             </>,
           ]}
@@ -742,10 +713,7 @@ const PAGES: Page[] = [
           <C s={rule("제35조의3")} />
           <C s={PUBLIC_RULE} />
         </P>
-        <TierChart
-          rows={NEWBORN_ROWS}
-          note="민영은 맞벌이를 따로 보지 않습니다."
-        />
+        <TierChart rows={NEWBORN_ROWS} />
       </>
     ),
   },
@@ -788,90 +756,6 @@ const PAGES: Page[] = [
     ),
   },
   {
-    slug: "special-diff",
-    quiz: {
-      q: "결혼하지 않은 1인 가구가 생애최초 특별공급에 넣을 수 있는 쪽은 어디인가요?",
-      options: ["민영", "공공"],
-      answer: 0,
-    },
-    title: "민영 특공과 공공 특공의 차이",
-    body: (
-      <>
-        <P>
-          이름이 같은 특별공급도 민영과 공공은 규칙이 꽤 다릅니다. 헷갈리기 쉬운
-          것만 추리면 이렇습니다.
-        </P>
-        <DiffTable
-          rows={[
-            {
-              label: "소득·자산 기준",
-              private:
-                "신혼부부, 생애최초, 신생아에만 소득 기준. 다자녀, 노부모 부양은 없음",
-              public: "모든 특별공급에 소득과 자산 기준",
-              cite: [
-                rule("제40조"),
-                rule("제41조"),
-                rule("제43조"),
-                rule("제46조"),
-                PUBLIC_RULE,
-              ],
-            },
-            {
-              label: "소득 상한(맞벌이)",
-              private: "160%",
-              public: "200%",
-              cite: [rule("제41조"), PUBLIC_RULE],
-            },
-            {
-              label: "소득을 넘으면",
-              private: "가진 부동산이 기준 이하면 마지막 추첨 몫에 넣음",
-              public: "넣을 수 없음",
-              cite: [
-                rule("제35조의3"),
-                rule("제41조"),
-                rule("제43조"),
-                PUBLIC_RULE,
-              ],
-            },
-            {
-              label: "같은 구간 안에서",
-              private: "추첨(생애최초, 신생아)",
-              public: "점수 순(신혼부부, 신생아)",
-              cite: [rule("제35조의3"), rule("제43조"), PUBLIC_RULE],
-            },
-            {
-              label: "생애최초 1인 가구",
-              private: "넣을 수 있음(전용 60㎡ 이하)",
-              public: "못 넣음. 혼인 중이거나 자녀가 있어야 함",
-              cite: [rule("제43조"), PUBLIC_RULE],
-            },
-          ]}
-        />
-        <P>
-          공공 생애최초는 통장에 600만 원 이상 모여 있어야 합니다.
-          <C s={rule("제43조")} />
-          <C s={PUBLIC_RULE} /> 민영 신혼부부, 생애최초, 신생아 특별공급은 전용
-          85㎡ 이하 집에만 있습니다.
-          <C s={rule("제35조의3")} />
-          <C s={rule("제41조")} />
-          <C s={rule("제43조")} />
-        </P>
-        <P>
-          특별공급마다 줄 수 있는 물량의 상한도 다릅니다.
-          <C s={rule("제35조의3")} />
-          <C s={rule("제40조")} />
-          <C s={rule("제41조")} />
-          <C s={rule("제43조")} />
-          <C s={rule("제46조")} />
-          <C s={PUBLIC_RULE} />
-          <C s={PUBLIC_RULE_SHARED} />
-        </P>
-        <SpecialShareChart />
-        <P>자세한 기준은 공고문의 특별공급 자격 표에 있습니다.</P>
-      </>
-    ),
-  },
-  {
     slug: "regulated",
     quiz: {
       q: "다음 중 규제지역이 아닌 것은 무엇인가요?",
@@ -904,7 +788,7 @@ const PAGES: Page[] = [
       options: ["6개월", "1년", "2년"],
       answer: 2,
     },
-    title: "일반공급: 1순위와 2순위",
+    title: "1순위와 2순위",
     body: (
       <>
         <P>
@@ -917,17 +801,20 @@ const PAGES: Page[] = [
         <L
           items={[
             <>
-              통장 가입 기간: 수도권 1년, 규제지역 2년
+              통장 가입 기간: 수도권 밖 6개월, 수도권 1년, 규제지역 2년
               <C s={rule("제27조")} />
               <C s={rule("제28조")} />
             </>,
             <>
-              민영은 예치금, 공공은 납입 횟수(수도권 12회, 규제지역 24회)
+              민영은 예치금, 공공은 납입 횟수(수도권 밖 6회, 수도권 12회,
+              규제지역 24회)
               <C s={rule("제27조")} />
             </>,
             <>
               규제지역은 세대주(주민등록표의 세대주)여야 하고, 가구가 5년 안에
-              당첨된 적이 없어야 합니다
+              당첨된 적이 없어야 합니다. 민영은 가구가 집을 두 채 이상 갖고
+              있어도 안 됩니다
+              <C s={rule("제27조")} />
               <C s={rule("제28조")} />
             </>,
           ]}
@@ -937,12 +824,10 @@ const PAGES: Page[] = [
           <C s={rule("제28조")} />
         </P>
         <P>
-          내 상황을 골라 보면 이렇습니다. 시·도가 기간을 늘려 공고하기도 하니
-          공고문을 함께 보세요.
+          시·도가 기간을 늘려 공고하기도 하니 공고문을 함께 보세요.
           <C s={rule("제27조")} />
           <C s={rule("제28조")} />
         </P>
-        <Rank1Check />
       </>
     ),
   },
@@ -953,7 +838,7 @@ const PAGES: Page[] = [
       options: ["64점", "84점", "100점"],
       answer: 1,
     },
-    title: "민영 일반공급: 가점제와 추첨제",
+    title: "민영: 가점제와 추첨제",
     body: (
       <>
         <P>민영 1순위 안에서는 두 방식으로 나눠 뽑습니다.</P>
@@ -998,7 +883,7 @@ const PAGES: Page[] = [
       options: ["2세 미만 자녀가 있는 가구", "저축총액이 가장 많은 가구"],
       answer: 0,
     },
-    title: "공공 일반공급의 순서",
+    title: "공공: 순차와 추첨",
     body: (
       <>
         <P>
@@ -1041,7 +926,7 @@ const PAGES: Page[] = [
       options: ["24회", "60회"],
       answer: 0,
     },
-    title: "통장은 시간으로 쌓입니다",
+    title: "선납과 연체",
     body: (
       <>
         <P>
@@ -1082,12 +967,23 @@ const PAGES: Page[] = [
       options: ["6개월", "1년", "2년 이상"],
       answer: 2,
     },
-    title: "그 지역에 사는 사람이 먼저",
+    title: "해당지역 우선",
     body: (
       <>
         <P>
           같은 순위라면 공고가 난 시·군에 사는 사람(해당지역)이 먼저 뽑힙니다.
           해당지역에서 다 안 차야 다른 지역 사람에게 기회가 갑니다.
+          <C s={rule("제4조")} />
+          <C s={rule("제25조")} />
+        </P>
+        <P>
+          다른 지역 사람끼리는 해당지역 안에서와 같은 방식(민영은 가점제·추첨제,
+          공공은 순차)으로 뽑습니다. 순위가 먼저라, 다른 지역 1순위가 해당지역
+          2순위보다 앞섭니다. 다른 지역 사람도 같은 권역(수도권처럼 규칙이 묶어
+          둔 시·도)에 살아야 넣을 수 있습니다.
+          <C s={rule("제25조")} />
+          <C s={rule("제27조")} />
+          <C s={rule("제28조")} />
           <C s={rule("제4조")} />
         </P>
         <P>
@@ -1121,7 +1017,7 @@ const PAGES: Page[] = [
       options: ["특별공급", "일반공급"],
       answer: 0,
     },
-    title: "일정은 이렇게 흐릅니다",
+    title: "공고부터 입주까지",
     body: (
       <>
         <L
@@ -1186,8 +1082,8 @@ const PAGES: Page[] = [
           받을 수 있는 대출은 집값의 몇 %(LTV)와 금액 상한 중 작은 쪽입니다.
           생애 처음 사는 집이면 LTV 70%,
           <C s={LTV_FIRST} /> 규제지역 15억 이하 집은 상한 6억 같은 식입니다.
-          <C s={LTV_CAP} /> 이 서비스의 "필요 자기자본"이 이 계산이고, 개인화의
-          "자기자본"보다 작으면 살 수 있는 집으로 봅니다.
+          <C s={LTV_CAP} /> 대출 규제는 자주 바뀌어서 이 서비스는 돈으로 공고를
+          거르지 않습니다.
         </P>
         <P>
           취득세, 발코니 확장, 옵션, 이사 비용은 따로 듭니다. 그리고 계약금은
@@ -1238,7 +1134,7 @@ const PAGES: Page[] = [
       options: ["사라집니다", "남습니다"],
       answer: 1,
     },
-    title: "당첨된 뒤 조심할 것",
+    title: "당첨 뒤 제한",
     body: (
       <>
         <L
@@ -1280,7 +1176,7 @@ const PAGES: Page[] = [
       options: ["청약홈 공지사항", "입주자모집공고문", "이 서비스의 설명"],
       answer: 1,
     },
-    title: "공고는 어디에 올라오나",
+    title: "공고 보는 곳",
     body: (
       <>
         <P>
@@ -1312,18 +1208,18 @@ const PAGES: Page[] = [
   },
   {
     slug: "use",
-    title: "이 서비스로 하는 법",
+    title: "청약 알리미 쓰는 법",
     body: (
       <>
         <L
           items={[
             <>
-              <a href="/settings">개인화</a>에서 지역, 가구, 통장, 돈을
+              <a href="/settings">개인화</a>에서 지역, 가구, 통장, 소득을
               넣습니다. 모르는 건 비워 둬도 됩니다.
             </>,
             <>
               <a href="/notices">공고</a>에서 후보를 봅니다. 후보는 고른 지역
-              안에서 내 돈으로 살 수 있는 주택형이 있는 공고입니다.
+              안에서 자산 기준에 걸리지 않는 공고입니다.
             </>,
             "공고를 누르면 누가 어떤 공급에 넣을 수 있는지, 넣으면 어느 소득 구간에 드는지 나옵니다.",
             "지도 링크로 위치와 출퇴근 길을 보고, 공고문으로 자격을 확인한 뒤 청약홈에서 접수합니다.",
@@ -1340,6 +1236,13 @@ const PAGES: Page[] = [
 ];
 
 // /guide 는 목차, /guide/<slug> 는 그 쪽. 없는 쪽이면 목차로. 쪽 맨 위의 "목록"(개인화 질문의 "뒤로"와 같은 자리)이 목차로 간다.
+/** 고른 쪽들을 가이드 순서대로. 공고 상세의 "관련 가이드"가 쓴다. */
+export const guidePages = (slugs: string[]) =>
+  PAGES.filter((p) => slugs.includes(p.slug)).map(({ slug, title }) => ({
+    slug,
+    title,
+  }));
+
 export function Guide({ slug }: { slug?: string }) {
   const i = PAGES.findIndex((p) => p.slug === slug);
   const page = PAGES[i];
@@ -1414,18 +1317,49 @@ function GuidePage({ page, i }: { page: Page; i: number }) {
   );
 }
 
+// 목차의 구역. 각 구역은 start 쪽부터 다음 구역 앞까지다. 특별공급·일반공급은 지도(SupplyMap)의 두 열이라
+// 넓은 화면에선 나란히 둔다. 민영·공공은 대부분 한 쪽 안에서 함께 다뤄 구역으로 나누지 않는다.
+const PARTS = [
+  { start: "what", title: "기초" },
+  { start: "newlywed", title: "특별공급" },
+  { start: "regulated", title: "일반공급" },
+  { start: "schedule", title: "실제로 넣기" },
+];
+const GROUPS = PARTS.map((part, k) => {
+  const from = PAGES.findIndex((p) => p.slug === part.start);
+  const next = PARTS[k + 1];
+  const to = next
+    ? PAGES.findIndex((p) => p.slug === next.start)
+    : PAGES.length;
+  if (from < 0 || to < 0)
+    throw new Error(`목차 구역의 쪽이 없음: ${part.start}`);
+  return { title: part.title, from, pages: PAGES.slice(from, to) };
+});
+
 function Contents() {
-  return (
-    <>
-      <h1>가이드</h1>
-      <ol className="mt-[1rlh] space-y-[0.25rlh]">
-        {PAGES.map((p, i) => (
-          <li key={p.slug}>
-            <span className="meta inline-block w-[3ch]">{i + 1}</span>
+  const section = (g: (typeof GROUPS)[number]) => (
+    <section key={g.title} className="mt-[2rlh]">
+      <h2 className="mb-[0.5rlh]">{g.title}</h2>
+      <ol className="space-y-[0.25rlh]">
+        {g.pages.map((p, i) => (
+          <li key={p.slug} className="flex gap-3">
+            <span className="meta w-[2ch] shrink-0 text-right">
+              {g.from + i + 1}
+            </span>
             <a href={`/guide/${p.slug}`}>{p.title}</a>
           </li>
         ))}
       </ol>
+    </section>
+  );
+  return (
+    <>
+      <h1>가이드</h1>
+      {GROUPS.slice(0, 1).map(section)}
+      <div className="grid gap-x-8 sm:grid-cols-2">
+        {GROUPS.slice(1, 3).map(section)}
+      </div>
+      {GROUPS.slice(3).map(section)}
     </>
   );
 }
