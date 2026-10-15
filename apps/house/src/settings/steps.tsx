@@ -303,7 +303,7 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     group: "가구",
     label: "혼인신고일",
     question: "혼인신고를 했나요?",
-    hint: "민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할 사이(예비신혼)도 됩니다. 확인: 혼인관계증명서(정부24).",
+    hint: "민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할 사이(예비신혼)도 됩니다. 확인: 혼인관계증명서(정부24나 카카오톡 지갑의 전자증명서에서 발급).",
     input: ({ d, set, inputId }) => (
       <div className="space-y-[0.5rlh]">
         <RadioGroup
