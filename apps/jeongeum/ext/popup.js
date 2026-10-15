@@ -8,8 +8,13 @@ const $ = (id) => document.getElementById(id);
 
   let host = null;
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    const res = await chrome.tabs.sendMessage(tab.id, { type: "monttang:status" });
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    const res = await chrome.tabs.sendMessage(tab.id, {
+      type: "monttang:status",
+    });
     host = res && res.host;
   } catch (_) {
     // chrome:// 페이지, 웹 스토어 등 확장이 들어갈 수 없는 탭
@@ -23,18 +28,22 @@ const $ = (id) => document.getElementById(id);
     $("site").disabled = true;
     siteRow.classList.add("disabled");
   }
-  const syncSiteRow = () => siteRow.classList.toggle("disabled", !host || !$("enabled").checked);
+  const syncSiteRow = () =>
+    siteRow.classList.toggle("disabled", !host || !$("enabled").checked);
   syncSiteRow();
 
   $("enabled").addEventListener("change", (e) => {
     chrome.storage.sync.set({ enabled: e.target.checked });
     syncSiteRow();
   });
-  $("numbers").addEventListener("change", (e) => chrome.storage.sync.set({ numbers: e.target.checked }));
+  $("numbers").addEventListener("change", (e) =>
+    chrome.storage.sync.set({ numbers: e.target.checked }),
+  );
   $("site").addEventListener("change", async (e) => {
     const { disabledHosts } = await chrome.storage.sync.get(DEFAULTS);
     const set = new Set(disabledHosts);
-    if (e.target.checked) set.delete(host); else set.add(host);
+    if (e.target.checked) set.delete(host);
+    else set.add(host);
     chrome.storage.sync.set({ disabledHosts: [...set] });
   });
 })();

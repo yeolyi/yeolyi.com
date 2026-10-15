@@ -8,13 +8,7 @@ import {
   HalfAdderNode,
   MuxNode,
 } from "./BoxNode";
-import {
-  AndNode,
-  NandNode,
-  NorNode,
-  NotNode,
-  OrNode,
-} from "./GateNode";
+import { AndNode, NandNode, NorNode, NotNode, OrNode } from "./GateNode";
 import { LabelNode } from "./LabelNode";
 import type { NodeProps } from "./type";
 

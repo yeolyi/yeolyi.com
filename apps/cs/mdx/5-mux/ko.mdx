@@ -10,8 +10,7 @@ import Flow from "@yeolyi/logic";
 import mux from "./assets/mux.json";
 
 AND, OR, NOT, 그리고 이 모두를 대신할 수 있는
-[NAND 게이트](/nand-is-all-you-need)만 있으면 어떤 논리 회로든 만들 수
-있습니다.
+[NAND 게이트](/nand-is-all-you-need)만 있으면 어떤 논리 회로든 만들 수 있습니다.
 
 지금까지 만든 회로는 입력이 들어오면 항상 같은 방식으로 처리합니다. 하지만 실제
 컴퓨터는 상황에 따라 다르게 동작해야 합니다. 덧셈을 할 때는 덧셈 회로에 데이터를
@@ -51,8 +50,7 @@ AND, OR, NOT, 그리고 이 모두를 대신할 수 있는
 2. S가 1인 행만 살펴봅시다. Out이 항상 B와 같습니다.
 
 즉 S가 0이면 A를, 1이면 B를 그대로 출력합니다. 논리식으로 쓰면
-`(NOT S AND A) OR (S AND B)`. [AND, OR, NOT](/and-or-not)으로 만들 수
-있습니다.
+`(NOT S AND A) OR (S AND B)`. [AND, OR, NOT](/and-or-not)으로 만들 수 있습니다.
 
 <Flow id="mux" initialJSON={mux} hideNodeButtons client:idle />
 

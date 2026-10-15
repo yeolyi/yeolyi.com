@@ -18,6 +18,9 @@ export default defineConfig({
   vite: { plugins: [tailwindcss()] },
   markdown: {
     shikiConfig: { theme: mono, transformers: [stripBackground] },
-    processor: unified({ remarkPlugins: [remarkFormatCode], rehypePlugins: [rehypeExternalLinks] }),
+    processor: unified({
+      remarkPlugins: [remarkFormatCode],
+      rehypePlugins: [rehypeExternalLinks],
+    }),
   },
 });

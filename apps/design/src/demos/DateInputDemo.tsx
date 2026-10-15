@@ -16,7 +16,14 @@ export default function DateInputDemo() {
           실제 있는 날짜를 넣으세요
         </span>
       )}
-      <DateInput id="ds-birth" aria-label="생년월일" autoComplete="bday" value={value} onChange={setValue} className="mt-1" />
+      <DateInput
+        id="ds-birth"
+        aria-label="생년월일"
+        autoComplete="bday"
+        value={value}
+        onChange={setValue}
+        className="mt-1"
+      />
     </div>
   );
 }

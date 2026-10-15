@@ -14,7 +14,10 @@ export default function PostMeta({ date, site }: PostMetaProps) {
 
   useEffect(() => {
     actions.pageView
-      .getCount({ site, path: window.location.pathname.replace(/(.)\/$/, "$1") })
+      .getCount({
+        site,
+        path: window.location.pathname.replace(/(.)\/$/, "$1"),
+      })
       .then(({ data }) => {
         if (data) setViewCount(data.viewCount);
       });

@@ -13,6 +13,10 @@ export async function loadConverter() {
     const t = line.indexOf("\t");
     en.set(line.slice(0, t), line.slice(t + 1));
   }
-  converter = globalThis.MonttangEngine.createConverter({ en, zh: D.zh.split("|"), ko: D.ko.split("|") });
+  converter = globalThis.MonttangEngine.createConverter({
+    en,
+    zh: D.zh.split("|"),
+    ko: D.ko.split("|"),
+  });
   return converter;
 }

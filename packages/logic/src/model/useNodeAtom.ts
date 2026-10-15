@@ -1,9 +1,5 @@
 import { useCallback, useRef } from "react";
-import {
-  isRegistryKey,
-  type RegistryKey,
-  registry,
-} from "../atoms";
+import { isRegistryKey, type RegistryKey, registry } from "../atoms";
 import type {
   JotaiStore,
   NodeAtoms,

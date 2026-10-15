@@ -4,12 +4,12 @@ import { useSyncExternalStore } from "react";
 const QUERY = "(max-width: 760px)";
 
 export function useMobile() {
-	return useSyncExternalStore(
-		(fn) => {
-			const m = matchMedia(QUERY);
-			m.addEventListener("change", fn);
-			return () => m.removeEventListener("change", fn);
-		},
-		() => matchMedia(QUERY).matches,
-	);
+  return useSyncExternalStore(
+    (fn) => {
+      const m = matchMedia(QUERY);
+      m.addEventListener("change", fn);
+      return () => m.removeEventListener("change", fn);
+    },
+    () => matchMedia(QUERY).matches,
+  );
 }

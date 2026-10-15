@@ -16,5 +16,7 @@ export type SiteName = keyof typeof SITES;
 
 /** 다른 앱으로 가는 주소. 개발 서버(Vite·Astro dev)에선 그 앱의 로컬 주소, 빌드에선 실제 도메인이라 루트 pnpm dev 로 띄운 앱끼리 오갈 수 있다. */
 export function siteUrl(name: SiteName): string {
-  return import.meta.env?.DEV ? `http://localhost:${SITES[name].port}` : SITES[name].url;
+  return import.meta.env?.DEV
+    ? `http://localhost:${SITES[name].port}`
+    : SITES[name].url;
 }

@@ -1,7 +1,12 @@
 import { Moon, Sun, SunMoon } from "lucide-react";
 import { useEffect, useState } from "react";
 import IconButton from "./IconButton.tsx";
-import { cycleTheme, readTheme, THEME_LABEL, type Theme } from "./themeStore.ts";
+import {
+  cycleTheme,
+  readTheme,
+  THEME_LABEL,
+  type Theme,
+} from "./themeStore.ts";
 
 const ICON = { auto: SunMoon, light: Sun, dark: Moon } as const;
 
@@ -12,7 +17,11 @@ export default function ThemeToggle() {
   useEffect(() => setTheme(readTheme()), []);
   const Icon = ICON[theme];
   return (
-    <IconButton aria-label={THEME_LABEL[theme]} title={THEME_LABEL[theme]} onClick={(e) => cycleTheme(theme, e.currentTarget, setTheme)}>
+    <IconButton
+      aria-label={THEME_LABEL[theme]}
+      title={THEME_LABEL[theme]}
+      onClick={(e) => cycleTheme(theme, e.currentTarget, setTheme)}
+    >
       <Icon aria-hidden />
     </IconButton>
   );

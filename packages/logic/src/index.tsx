@@ -18,11 +18,7 @@ import {
 } from "@xyflow/react";
 import { createStore, Provider } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  type RegistryKey,
-  registryKeys,
-  registryNames,
-} from "./atoms";
+import { type RegistryKey, registryKeys, registryNames } from "./atoms";
 import { nodeTypes } from "./components";
 import { Controls } from "./components/Controls";
 import {
@@ -31,10 +27,7 @@ import {
   StepSignalEdge,
 } from "./components/SignalEdge";
 import { minZoomOptions } from "./constants";
-import {
-  saveJSONToFile,
-  selectJSONFromFile,
-} from "./file";
+import { saveJSONToFile, selectJSONFromFile } from "./file";
 import { useTouchDeviceState } from "./hooks/useMobileState";
 import type { SaveFile } from "./model/type";
 import { useNodeAtom } from "./model/useNodeAtom";
@@ -129,7 +122,8 @@ function FlowImpl({
         }
       }
       // 선택·크기 재기는 React Flow 가 알아서 보내는 것이라 고친 게 아니다.
-      if (changes.some((c) => c.type !== "select" && c.type !== "dimensions")) onEdit?.();
+      if (changes.some((c) => c.type !== "select" && c.type !== "dimensions"))
+        onEdit?.();
       setNodes((nds) => applyNodeChanges(changes, nds));
     },
     [removeAtom, onEdit],
@@ -242,7 +236,13 @@ function FlowImpl({
             className={`overflow-hidden font-sans ${HANDLE_VISIBILITY_CLASS} ${fill ? "min-h-0 flex-1 touch-none" : ""}`}
             data-handles={handleVisibility}
             data-connecting={isConnecting || undefined}
-            style={viewOnly ? { height: fitHeight } : fill ? undefined : { height: `${height}px` }}
+            style={
+              viewOnly
+                ? { height: fitHeight }
+                : fill
+                  ? undefined
+                  : { height: `${height}px` }
+            }
           >
             <ReactFlow
               onInit={setRfInstance}
@@ -291,31 +291,31 @@ function FlowImpl({
           </div>
           {/* 좁은 화면에선 줄바꿈 대신 가로 스크롤. 끝 항목이 가장자리에 붙지 않게 오른쪽 여백. */}
           {!viewOnly && (
-          <div className="bg-background flex max-w-full gap-1 overflow-x-auto pt-2 pr-4">
-            <Controls
-              rfInstance={rfInstance}
-              touchOnlyState={touchOnlyState}
-              setTouchOnlyState={setTouchOnlyState}
-              onSave={onSave}
-              onRestore={onRestore}
-              onDeleteNode={(id) => onNodesChange([{ type: "remove", id }])}
-              onDeleteEdge={(id) => onEdgesChange([{ type: "remove", id }])}
-            />
-            {!hideNodeButtons &&
-              registryKeys.map((key) => (
-                <button
-                  type="button"
-                  className="focus-fill min-h-control hover:bg-foreground hover:text-background press-down shrink-0 px-2 whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                  key={key}
-                  onClick={addNode(key)}
-                  disabled={
-                    touchOnlyState.type === "mobile" && !touchOnlyState.value
-                  }
-                >
-                  {registryNames[key]}
-                </button>
-              ))}
-          </div>
+            <div className="bg-background flex max-w-full gap-1 overflow-x-auto pt-2 pr-4">
+              <Controls
+                rfInstance={rfInstance}
+                touchOnlyState={touchOnlyState}
+                setTouchOnlyState={setTouchOnlyState}
+                onSave={onSave}
+                onRestore={onRestore}
+                onDeleteNode={(id) => onNodesChange([{ type: "remove", id }])}
+                onDeleteEdge={(id) => onEdgesChange([{ type: "remove", id }])}
+              />
+              {!hideNodeButtons &&
+                registryKeys.map((key) => (
+                  <button
+                    type="button"
+                    className="focus-fill min-h-control hover:bg-foreground hover:text-background press-down shrink-0 px-2 whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    key={key}
+                    onClick={addNode(key)}
+                    disabled={
+                      touchOnlyState.type === "mobile" && !touchOnlyState.value
+                    }
+                  >
+                    {registryNames[key]}
+                  </button>
+                ))}
+            </div>
           )}
         </div>
       </ReactFlowProvider>
@@ -336,7 +336,11 @@ function FitToContent({ onHeight }: { onHeight: (h: number) => void }) {
     const pad = 16;
     const zoom = Math.min(1, (width - 2 * pad) / b.width);
     onHeight(Math.ceil(b.height * zoom + 2 * pad));
-    setViewport({ x: (width - b.width * zoom) / 2 - b.x * zoom, y: pad - b.y * zoom, zoom });
+    setViewport({
+      x: (width - b.width * zoom) / 2 - b.x * zoom,
+      y: pad - b.y * zoom,
+      zoom,
+    });
   }, [ready, width, getNodes, getNodesBounds, setViewport, onHeight]);
   return null;
 }

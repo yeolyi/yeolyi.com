@@ -1,15 +1,30 @@
 // 스토어 캡처화면용 장면. 실제 content script 를 돌려서 찍는다.
 // 사이트들은 데모용으로 직접 쓴 가상의 페이지다(실제 서비스 흉내 아님).
 import fs from "fs";
+
 const ICON = "file:///home/claude/monttang/ext/icons/32.png";
-const popupHtml = fs.readFileSync("/home/claude/monttang/ext/popup.html", "utf8");
-const popupStyle = popupHtml.match(/<style>([\s\S]*?)<\/style>/)[1]
+const popupHtml = fs.readFileSync(
+  "/home/claude/monttang/ext/popup.html",
+  "utf8",
+);
+const popupStyle = popupHtml
+  .match(/<style>([\s\S]*?)<\/style>/)[1]
   .replace(/:root/g, ".pp")
   .replace(/@media \(prefers-color-scheme: dark\) \{[\s\S]*?\}\s*\}/, "")
   .replace(/\bbody\s*\{/, ".pp {")
-  .replace(/(^|\})(\s*)([^{}@]+?)\s*\{/g, (m, a, ws, sel) =>
-    a + ws + sel.split(",").map((x) => (x.trim().startsWith(".pp") ? x : ".pp " + x.trim())).join(", ") + " {");
-const popupBody = popupHtml.match(/<body>([\s\S]*?)<script/)[1]
+  .replace(
+    /(^|\})(\s*)([^{}@]+?)\s*\{/g,
+    (m, a, ws, sel) =>
+      a +
+      ws +
+      sel
+        .split(",")
+        .map((x) => (x.trim().startsWith(".pp") ? x : ".pp " + x.trim()))
+        .join(", ") +
+      " {",
+  );
+const popupBody = popupHtml
+  .match(/<body>([\s\S]*?)<script/)[1]
   .replace('id="enabled"', 'id="enabled" checked')
   .replace('id="site"', 'id="site" checked')
   .replace("이 탭에서는 쓸 수 없어요", "%HOST%");

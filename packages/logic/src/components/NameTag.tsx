@@ -1,10 +1,7 @@
 import { useAtom } from "jotai";
 import { Tag } from "lucide-react";
 import { useState } from "react";
-import type {
-  OutputAtom,
-  OutputValue,
-} from "../model/type";
+import type { OutputAtom, OutputValue } from "../model/type";
 
 export default function NameTag({ atom }: { atom: OutputAtom }) {
   const [label, setLabel] = useAtom(atom);

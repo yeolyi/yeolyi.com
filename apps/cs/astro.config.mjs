@@ -24,7 +24,10 @@ export default defineConfig({
   },
   markdown: {
     shikiConfig: { theme: mono, transformers: [stripBackground] },
-    processor: unified({ remarkPlugins: [remarkFormatCode], rehypePlugins: [rehypeExternalLinks] }),
+    processor: unified({
+      remarkPlugins: [remarkFormatCode],
+      rehypePlugins: [rehypeExternalLinks],
+    }),
   },
   prefetch: true,
 });

@@ -1,9 +1,9 @@
 import { Handle, Position } from "@xyflow/react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
+import { RIGHT_HANDLE_STYLE } from "../constants";
 import { TargetHandle } from "./TargetHandle";
 import type { NodeProps } from "./type";
-import { RIGHT_HANDLE_STYLE } from "../constants";
 
 type BoxKey = "mux" | "decoder" | "dLatch" | "fullAdder" | "halfAdder";
 

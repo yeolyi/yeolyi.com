@@ -1,20 +1,25 @@
+import chromium from "@sparticuz/chromium";
 import fs from "fs";
 import { createRequire } from "module";
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-import { scenes, page } from "./scenes.mjs";
+import { page, scenes } from "./scenes.mjs";
 
 const require = createRequire(import.meta.url);
 const ext = "/home/claude/monttang/ext/";
 require(ext + "data.js");
 const E = require(ext + "engine.js");
 const D = globalThis.MONTTANG_DATA;
-const conv = E.createConverter({ en: new Map(D.en.split("\n").map((l) => l.split("\t"))), zh: D.zh.split("|"), ko: D.ko.split("|") });
+const conv = E.createConverter({
+  en: new Map(D.en.split("\n").map((l) => l.split("\t"))),
+  zh: D.zh.split("|"),
+  ko: D.ko.split("|"),
+});
 
 const out = "/home/claude/monttang/store/src/out/";
 fs.mkdirSync(out, { recursive: true });
 const browser = await puppeteer.launch({
-  executablePath: await chromium.executablePath(), headless: "shell",
+  executablePath: await chromium.executablePath(),
+  headless: "shell",
   args: [...chromium.args, "--allow-file-access-from-files"],
   defaultViewport: { width: 1280, height: 800, deviceScaleFactor: 1 },
 });
@@ -30,9 +35,16 @@ async function shot(name, { popup, converted }, file) {
   await p.evaluate(() => document.fonts.ready);
   if (converted) {
     await p.evaluate(() => {
-      window.chrome = { storage: { sync: { get: (d, cb) => cb(d) }, onChanged: { addListener() {} } }, runtime: { onMessage: { addListener() {} } } };
+      window.chrome = {
+        storage: {
+          sync: { get: (d, cb) => cb(d) },
+          onChanged: { addListener() {} },
+        },
+        runtime: { onMessage: { addListener() {} } },
+      };
     });
-    for (const f of ["data.js", "engine.js", "content.js"]) await p.evaluate(fs.readFileSync(ext + f, "utf8"));
+    for (const f of ["data.js", "engine.js", "content.js"])
+      await p.evaluate(fs.readFileSync(ext + f, "utf8"));
     await new Promise((r) => setTimeout(r, 300));
   }
   await p.screenshot({ path: out + file });

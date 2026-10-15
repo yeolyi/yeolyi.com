@@ -1,35 +1,35 @@
 {
-	"iphone": {
-		"label": "iPhone",
-		"file": "assets/iphone-frame.png",
-		"screen": [90, 77, 1646, 3451],
-		"capture": { "width": 393, "height": 852, "scale": 3 }
-	},
-	"ipad": {
-		"label": "iPad",
-		"file": "assets/ipad-frame.png",
-		"screen": [72, 72, 1740, 2476],
-		"capture": { "width": 820, "height": 1180, "scale": 2 }
-	},
-	"watch": {
-		"label": "Watch",
-		"file": "assets/watch-frame.png",
-		"screen": [30, 216, 582, 888],
-		"capture": { "width": 184, "height": 224, "scale": 3 },
-		"auto": { "maxWidth": 600, "tolerance": 0.05 }
-	},
-	"macbook": {
-		"label": "MacBook",
-		"file": "assets/macbook-frame.png",
-		"screen": [372, 64, 3828, 2298],
-		"capture": { "width": 1728, "height": 1117, "scale": 2 },
-		"auto": { "minWidth": 2560, "tolerance": 0.02 }
-	},
-	"imac": {
-		"label": "iMac",
-		"file": "assets/imac-frame.png",
-		"screen": [80, 80, 4560, 2600],
-		"capture": { "width": 2240, "height": 1260, "scale": 2 },
-		"auto": { "minWidth": 3840, "tolerance": 0.02 }
-	}
+  "iphone": {
+    "label": "iPhone",
+    "file": "assets/iphone-frame.png",
+    "screen": [90, 77, 1646, 3451],
+    "capture": { "width": 393, "height": 852, "scale": 3 }
+  },
+  "ipad": {
+    "label": "iPad",
+    "file": "assets/ipad-frame.png",
+    "screen": [72, 72, 1740, 2476],
+    "capture": { "width": 820, "height": 1180, "scale": 2 }
+  },
+  "watch": {
+    "label": "Watch",
+    "file": "assets/watch-frame.png",
+    "screen": [30, 216, 582, 888],
+    "capture": { "width": 184, "height": 224, "scale": 3 },
+    "auto": { "maxWidth": 600, "tolerance": 0.05 }
+  },
+  "macbook": {
+    "label": "MacBook",
+    "file": "assets/macbook-frame.png",
+    "screen": [372, 64, 3828, 2298],
+    "capture": { "width": 1728, "height": 1117, "scale": 2 },
+    "auto": { "minWidth": 2560, "tolerance": 0.02 }
+  },
+  "imac": {
+    "label": "iMac",
+    "file": "assets/imac-frame.png",
+    "screen": [80, 80, 4560, 2600],
+    "capture": { "width": 2240, "height": 1260, "scale": 2 },
+    "auto": { "minWidth": 3840, "tolerance": 0.02 }
+  }
 }

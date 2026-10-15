@@ -10,8 +10,8 @@ order: 133
 import { InstructionDecoder } from "./components/InstructionDecoder";
 
 CPU는 메모리에서 명령어를 가져오고(Fetch), 해석하고(Decode), 실행하는(Execute)
-[명령어 사이클](/cpu)을 끝없이 반복합니다. 이 글에서는 가운데 단계인 해석을
-맡는 **제어 장치**를 들여다봅시다.
+[명령어 사이클](/cpu)을 끝없이 반복합니다. 이 글에서는 가운데 단계인 해석을 맡는
+**제어 장치**를 들여다봅시다.
 
 ## opcode와 operand
 
@@ -48,8 +48,8 @@ operand 쪽도 비슷합니다. 명령어에 레지스터 번호(2비트)가 포
 [폰 노이만 시뮬레이터](/cpu/simulator)에서 Fetch-Decode-Execute 사이클을 한
 단계씩 실행해봅시다.
 
-[0과 1](/zero-and-one)에서 시작해 [논리 게이트](/and-or-not),
-[가산기](/adder), [래치](/sequential), [튜링 머신](/turing-machine),
+[0과 1](/zero-and-one)에서 시작해 [논리 게이트](/and-or-not), [가산기](/adder),
+[래치](/sequential), [튜링 머신](/turing-machine),
 [폰 노이만 구조](/von-neumann)를 거쳐 동작하는 컴퓨터를 조립했습니다.
 
 그런데 한 가지 문제가 있습니다. 오늘날 CPU는 1초에 수십억 개의 명령어를 처리할

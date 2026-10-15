@@ -18,8 +18,16 @@ export function startTracking(site: string) {
     fetch(`${url}/rest/v1/rpc/track`, {
       method: "POST",
       keepalive: true,
-      headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ p_site: site, p_path: path, p_referrer: referrer }),
+      headers: {
+        apikey: key,
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        p_site: site,
+        p_path: path,
+        p_referrer: referrer,
+      }),
     }).catch(() => {});
     referrer = null;
   };

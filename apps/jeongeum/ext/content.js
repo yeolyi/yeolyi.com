@@ -1,8 +1,25 @@
 // 정음 — 페이지의 글자를 한글 음차로 바꾸고, 끄면 원래대로 돌려놓는다.
 (() => {
-  "use strict";
+  
   const DEFAULTS = { enabled: true, numbers: false, disabledHosts: [] };
-  const SKIP = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "INPUT", "SELECT", "OPTION", "CODE", "PRE", "KBD", "SAMP", "VAR", "MATH", "TEMPLATE", "IFRAME", "CANVAS"]);
+  const SKIP = new Set([
+    "SCRIPT",
+    "STYLE",
+    "NOSCRIPT",
+    "TEXTAREA",
+    "INPUT",
+    "SELECT",
+    "OPTION",
+    "CODE",
+    "PRE",
+    "KBD",
+    "SAMP",
+    "VAR",
+    "MATH",
+    "TEMPLATE",
+    "IFRAME",
+    "CANVAS",
+  ]);
   const HAS_FOREIGN = /[A-Za-zÀ-ɏぁ-ヿ一-鿿]/;
   const host = location.hostname;
 
@@ -21,7 +38,11 @@
       const t = line.indexOf("\t");
       en.set(line.slice(0, t), line.slice(t + 1));
     }
-    convert = globalThis.MonttangEngine.createConverter({ en, zh: D.zh.split("|"), ko: D.ko.split("|") });
+    convert = globalThis.MonttangEngine.createConverter({
+      en,
+      zh: D.zh.split("|"),
+      ko: D.ko.split("|"),
+    });
     return convert;
   }
 
@@ -34,7 +55,14 @@
 
   function skippable(node) {
     for (let el = node.parentElement; el; el = el.parentElement) {
-      if (SKIP.has(el.tagName) || el.isContentEditable || (el.hasAttribute("contenteditable") && el.getAttribute("contenteditable") !== "false") || el.getAttribute("translate") === "no") return true;
+      if (
+        SKIP.has(el.tagName) ||
+        el.isContentEditable ||
+        (el.hasAttribute("contenteditable") &&
+          el.getAttribute("contenteditable") !== "false") ||
+        el.getAttribute("translate") === "no"
+      )
+        return true;
     }
     return false;
   }
@@ -76,7 +104,10 @@
   }
   function flush() {
     scheduled = false;
-    if (!active) { pending.clear(); return; }
+    if (!active) {
+      pending.clear();
+      return;
+    }
     const nodes = pending;
     pending = new Set();
     observer.disconnect();
@@ -90,19 +121,31 @@
     observe();
   }
   function observe() {
-    observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
   }
 
   function start() {
     if (active) return;
     active = true;
     walk(document.documentElement);
-    observer = observer || new MutationObserver((muts) => {
-      for (const m of muts) {
-        if (m.type === "characterData") schedule(m.target);
-        else for (const n of m.addedNodes) if (n.nodeType === Node.TEXT_NODE || n.nodeType === Node.ELEMENT_NODE) schedule(n);
-      }
-    });
+    observer =
+      observer ||
+      new MutationObserver((muts) => {
+        for (const m of muts) {
+          if (m.type === "characterData") schedule(m.target);
+          else
+            for (const n of m.addedNodes)
+              if (
+                n.nodeType === Node.TEXT_NODE ||
+                n.nodeType === Node.ELEMENT_NODE
+              )
+                schedule(n);
+        }
+      });
     observe();
   }
 
@@ -136,7 +179,8 @@
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
-    for (const [k, { newValue }] of Object.entries(changes)) settings[k] = newValue ?? DEFAULTS[k];
+    for (const [k, { newValue }] of Object.entries(changes))
+      settings[k] = newValue ?? DEFAULTS[k];
     apply();
   });
 

@@ -18,19 +18,11 @@
       "32": "icons/32.png"
     }
   },
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "data.js",
-        "engine.js",
-        "content.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["data.js", "engine.js", "content.js"],
       "run_at": "document_idle"
     }
   ]

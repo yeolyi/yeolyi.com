@@ -1,9 +1,5 @@
 import { atom } from "jotai";
-import type {
-  NodeAtoms,
-  NodeCreator,
-  OutputValue,
-} from "../model/type";
+import type { NodeAtoms, NodeCreator, OutputValue } from "../model/type";
 
 type BooleanAtoms = NodeAtoms<never, "out" | "label", false>;
 

@@ -18,9 +18,27 @@ type Props = {
 };
 
 const FIELDS = [
-  { key: "y", label: "연도", max: 4, width: "w-[calc(4ch+2rem)]", ac: "bday-year" },
-  { key: "m", label: "월", max: 2, width: "w-[calc(2ch+2rem)]", ac: "bday-month" },
-  { key: "d", label: "일", max: 2, width: "w-[calc(2ch+2rem)]", ac: "bday-day" },
+  {
+    key: "y",
+    label: "연도",
+    max: 4,
+    width: "w-[calc(4ch+2rem)]",
+    ac: "bday-year",
+  },
+  {
+    key: "m",
+    label: "월",
+    max: 2,
+    width: "w-[calc(2ch+2rem)]",
+    ac: "bday-month",
+  },
+  {
+    key: "d",
+    label: "일",
+    max: 2,
+    width: "w-[calc(2ch+2rem)]",
+    ac: "bday-day",
+  },
 ] as const;
 
 export function isRealDate(value: string) {
@@ -28,7 +46,11 @@ export function isRealDate(value: string) {
   if (!m) return false;
   const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
   const t = new Date(Date.UTC(y, mo - 1, d));
-  return t.getUTCFullYear() === y && t.getUTCMonth() === mo - 1 && t.getUTCDate() === d;
+  return (
+    t.getUTCFullYear() === y &&
+    t.getUTCMonth() === mo - 1 &&
+    t.getUTCDate() === d
+  );
 }
 
 function split(value: string) {
@@ -42,14 +64,25 @@ function join(y: string, m: string, d: string) {
   return y.length === 4 && m && d && isRealDate(iso) ? iso : `${y}-${m}-${d}`;
 }
 
-export default function DateInput({ value, onChange, id, autoComplete, className, "aria-label": ariaLabel }: Props) {
+export default function DateInput({
+  value,
+  onChange,
+  id,
+  autoComplete,
+  className,
+  "aria-label": ariaLabel,
+}: Props) {
   const base = useId();
   // 칸 글자와 그 글자로 만든 값을 같이 든다. 받은 값이 그것과 다르면 바깥에서 바꾼 것이니 칸을 다시 채운다.
   const [state, setState] = useState(() => ({ v: split(value), value }));
   if (value !== state.value) setState({ v: split(value), value });
   const { v } = state;
   return (
-    <div role="group" aria-label={ariaLabel} className={clsx("flex gap-4", className)}>
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className={clsx("flex gap-4", className)}
+    >
       {FIELDS.map((f) => {
         const fieldId = f.key === "y" && id ? id : `${base}-${f.key}`;
         return (
@@ -64,12 +97,18 @@ export default function DateInput({ value, onChange, id, autoComplete, className
               autoComplete={autoComplete ? f.ac : "off"}
               value={v[f.key]}
               onChange={(e) => {
-                const next = { ...v, [f.key]: e.target.value.replace(/\D/g, "").slice(0, f.max) };
+                const next = {
+                  ...v,
+                  [f.key]: e.target.value.replace(/\D/g, "").slice(0, f.max),
+                };
                 const joined = join(next.y, next.m, next.d);
                 setState({ v: next, value: joined });
                 onChange(joined);
               }}
-              className={clsx("mt-1 min-w-0! tabular-nums [field-sizing:fixed]!", f.width)}
+              className={clsx(
+                "mt-1 [field-sizing:fixed]! min-w-0! tabular-nums",
+                f.width,
+              )}
             />
           </div>
         );

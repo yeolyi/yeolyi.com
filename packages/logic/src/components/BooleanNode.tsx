@@ -1,9 +1,9 @@
 import { Handle, Position } from "@xyflow/react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
+import { RIGHT_HANDLE_STYLE } from "../constants";
 import NameTag from "./NameTag";
 import type { NodeProps } from "./type";
-import { RIGHT_HANDLE_STYLE } from "../constants";
 
 export const BooleanNode = (props: NodeProps<"number">) => {
   const { atoms } = props.data;
@@ -17,7 +17,9 @@ export const BooleanNode = (props: NodeProps<"number">) => {
       <button
         className={clsx(
           "border-foreground focus-border press-down relative flex h-10 w-10 cursor-pointer items-center justify-center border-2",
-          out ? "bg-foreground text-background" : "bg-background text-foreground",
+          out
+            ? "bg-foreground text-background"
+            : "bg-background text-foreground",
           props.selected && "outline-foreground outline-1",
         )}
         onClick={() => setOut(!out)}

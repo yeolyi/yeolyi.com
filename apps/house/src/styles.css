@@ -4,51 +4,51 @@
 @import "@yeolyi/site/base.css";
 
 @layer components {
-	/* 날짜·숫자·라벨처럼 기계가 붙이는 정보 */
-	.meta {
-		font-family: var(--font-mono);
-		font-size: var(--text-base);
-		color: var(--color-muted-foreground);
-	}
-	/* 표: 세로선 없이 헤더 아래만 굵은 선(블로그 .md-table 과 같다). */
-	.table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: var(--text-base);
-		th {
-			font-weight: 700;
-			text-align: left;
-			border-bottom: 2px solid var(--color-foreground);
-		}
-		th,
-		td {
-			padding: 6px 12px 6px 0;
-			white-space: nowrap;
-		}
-		td {
-			border-bottom: 1px solid var(--color-border);
-			font-variant-numeric: tabular-nums;
-		}
-	}
-	/* 글 속 목록: 불릿은 고정폭 * (블로그 prose 와 같다). */
-	.list > li {
-		position: relative;
-		padding-left: 1.5ch;
-		&::before {
-			content: "*";
-			position: absolute;
-			left: 0;
-			font-family: var(--font-mono);
-			color: var(--color-muted-foreground);
-		}
-	}
-	/* 용어 풀이 팝업: 1px 가는 선 상자, 모서리·그림자 없음. */
-	.tip {
-		max-width: min(20rem, calc(100vw - 32px));
-		padding: 8px 12px;
-		border: 1px solid var(--color-foreground);
-		background: var(--color-background);
-		font-size: var(--text-base);
-		line-height: 1.6;
-	}
+  /* 날짜·숫자·라벨처럼 기계가 붙이는 정보 */
+  .meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--color-muted-foreground);
+  }
+  /* 표: 세로선 없이 헤더 아래만 굵은 선(블로그 .md-table 과 같다). */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-base);
+    th {
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 2px solid var(--color-foreground);
+    }
+    th,
+    td {
+      padding: 6px 12px 6px 0;
+      white-space: nowrap;
+    }
+    td {
+      border-bottom: 1px solid var(--color-border);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+  /* 글 속 목록: 불릿은 고정폭 * (블로그 prose 와 같다). */
+  .list > li {
+    position: relative;
+    padding-left: 1.5ch;
+    &::before {
+      content: "*";
+      position: absolute;
+      left: 0;
+      font-family: var(--font-mono);
+      color: var(--color-muted-foreground);
+    }
+  }
+  /* 용어 풀이 팝업: 1px 가는 선 상자, 모서리·그림자 없음. */
+  .tip {
+    max-width: min(20rem, calc(100vw - 32px));
+    padding: 8px 12px;
+    border: 1px solid var(--color-foreground);
+    background: var(--color-background);
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
 }

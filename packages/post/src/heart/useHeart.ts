@@ -1,7 +1,7 @@
 import { actions } from "astro:actions";
 import { useEffect } from "react";
-import { tempUserId } from "./tempUser";
 import { useHeartStore } from "./heartStore";
+import { tempUserId } from "./tempUser";
 
 // 한 글에 아일랜드가 여러 개(상단·하단)라 postId 별로 최초 1회만 fetch 한다.
 const inflightByPostId = new Map<string, Promise<void>>();

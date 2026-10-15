@@ -1,9 +1,9 @@
 import { Handle, Position } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { useId } from "react";
+import { RIGHT_HANDLE_STYLE } from "../constants";
 import { TargetHandle } from "./TargetHandle";
 import type { NodeProps } from "./type";
-import { RIGHT_HANDLE_STYLE } from "../constants";
 
 type GateKey = "and" | "nand" | "or" | "nor" | "not";
 
