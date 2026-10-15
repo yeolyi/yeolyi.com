@@ -56,12 +56,16 @@ packages/track  @yeolyi/track. 방문 기록 `startTracking(사이트)`. 모든 
   없으니 새 API 는 쓰기 전에 Baseline 상태를 본다. tsconfig `lib` 는 ESNext 로
   둔다.
 - **배포는 Vercel GitHub 연동.** 앱마다 프로젝트 하나(Root Directory =
-  `apps/<앱>`), main 에 푸시하면 배포된다. 각 앱 `vercel.json` 의
-  `ignoreCommand` 가 그 앱 폴더·`packages/`·잠금 파일이 안 바뀌었으면 빌드를
-  건너뛴다(이전 배포가 없거나 비교할 수 없으면 빌드한다. HEAD^ 로 대신 비교하면
-  첫 배포가 건너뛰어진다). 새 앱은 `sites.ts` 한 줄 → Route 53
-  CNAME(`cname.vercel-dns.com`) → Vercel 프로젝트 → 로그인을 쓰면 Supabase
-  redirect 허용 목록.
+  `apps/<앱>`), main 에 푸시하면 배포된다. 바뀐 앱만 배포되게 프로젝트마다 "Skip
+  unaffected projects"(`enableAffectedProjectsDeployments`)를 켜 두었다 (그 앱
+  폴더나 그 앱이 의존하는 workspace 패키지·잠금 파일이 바뀐 커밋만. 루트 파일만
+  바꿔도 전부 배포된다). `ignoreCommand` 는 쓰지 않는다: 만들었다가 취소하는
+  배포도 Hobby 의 하루 배포 한도(100)에 들어가서, 푸시마다 7개씩 쌓여 하루 만에
+  막힌 적이 있다(2026-10-16). 커밋은 자주 해도 푸시는 모아서 한다. 막혔거나
+  수동으로 올릴 땐 `vercel api /v13/deployments`(gitSource 로 main 커밋 지정)나
+  대시보드 Redeploy 로 그 프로젝트만 배포한다. 새 앱은 `sites.ts` 한 줄 → Route
+  53 CNAME(`cname.vercel-dns.com`) → Vercel 프로젝트(Skip unaffected 켜기) →
+  로그인을 쓰면 Supabase redirect 허용 목록.
 - 블로그·cs·carousel·house 는 같은 Supabase 프로젝트를 쓴다(앱마다 스키마 하나:
   `carousel`·`house`, SQL 은 각 앱의 `supabase/sql`). 추천은 블로그와 cs 가
   public 의 같은 표를 쓴다. 방문·조회수는 `analytics` 스키마(API 로 열지 않음,
