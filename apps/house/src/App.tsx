@@ -46,7 +46,7 @@ export function App() {
       />
       {/* 베타 동안 모든 화면에. 의견 화면에는 보던 주소를 넘긴다(의견 화면 자신에선 원래 주소를 그대로). */}
       <PhaseBanner
-        className="measure-col mt-[0.5rlh]"
+        className="measure-col"
         feedbackHref={
           tab === "feedback"
             ? `/feedback${location.search}`
