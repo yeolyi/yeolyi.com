@@ -151,21 +151,18 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
 
 /** 한 줄 요약. 제외는 걸린 이유를 먼저. */
 function summary(n: Notice, v: Verdict, scope: Scope): string {
-  const why =
-    scope !== "rejected"
-      ? ""
-      : v.region === "out"
-        ? "사는 곳의 권역 밖"
-        : v.assetBlocked
-          ? `자산 기준 초과(${v.assetBlocked})`
-          : "";
+  // 제외 묶음은 걸린 이유만 보인다(지역·분양가 같은 부가 정보는 상세에).
+  if (scope === "rejected")
+    return v.region === "out"
+      ? `사는 곳의 권역 밖(${n.sido})`
+      : v.assetBlocked
+        ? `자산 기준 초과(${v.assetBlocked})`
+        : "";
   const price =
     v.maxPriceEok === undefined
       ? "분양가 미상"
       : v.minPriceEok === v.maxPriceEok
         ? `${v.maxPriceEok}억`
         : `${v.minPriceEok}~${v.maxPriceEok}억`;
-  return [why, n.sido, ...facts(n).slice(0, 2), price]
-    .filter(Boolean)
-    .join(" · ");
+  return [n.sido, ...facts(n).slice(0, 2), price].filter(Boolean).join(" · ");
 }
