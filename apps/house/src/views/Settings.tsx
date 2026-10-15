@@ -34,6 +34,7 @@ export function SettingsView({
         settings={settings}
         stepId={stepId}
         fromSummary={query.get("then") === "summary"}
+        back={query.get("back") ?? undefined}
       />
     );
   return <Summary settings={settings} />;
@@ -43,10 +44,13 @@ function Question({
   settings,
   stepId,
   fromSummary,
+  back,
 }: {
   settings: Settings;
   stepId: string;
   fromSummary: boolean;
+  /** 다른 화면(공고 상세)에서 질문 하나만 고치러 왔으면 그 경로. 저장하면 거기로 돌아간다. */
+  back?: string;
 }) {
   const save = useSaveSettings();
   const [d, setD] = useState(settings);
@@ -65,11 +69,12 @@ function Question({
       </p>
     );
   const i = walk.indexOf(step);
-  const alone = fromSummary || step.assumption;
+  const returnTo = back?.startsWith("/") ? back.slice(1) : undefined;
+  const alone = fromSummary || step.assumption || !!returnTo;
   const prevStep = alone ? undefined : walk[i - 1];
   const nextStep = alone ? undefined : walk[i + 1];
-  const prev = prevStep ? `settings/${prevStep.id}` : "settings";
-  const next = nextStep ? `settings/${nextStep.id}` : "settings";
+  const prev = returnTo ?? (prevStep ? `settings/${prevStep.id}` : "settings");
+  const next = returnTo ?? (nextStep ? `settings/${nextStep.id}` : "settings");
 
   const submit = async () => {
     const problem = step.check?.(d);

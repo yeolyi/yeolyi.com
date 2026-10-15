@@ -7,7 +7,7 @@ import {
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Slider from "@yeolyi/ui/Slider";
 import { clsx } from "clsx";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Box, Row } from "./GuideCalcs.tsx";
 
 // 가이드의 쪽마다 하나씩 끼우는 만져 보는 부품. 숫자는 각 쪽에 단 조문 그대로다.
@@ -172,7 +172,7 @@ const TIER_FILL = [
   "bg-muted-foreground text-background",
   "bg-muted text-foreground",
 ];
-type TierRow = { label: string } & Record<Earners, readonly Tier[]>;
+export type TierRow = { label: string } & Record<Earners, readonly Tier[]>;
 // 숫자는 규칙 제35조의3·제41조·제43조(2026-06-15)와 별표 6(2026-06-22) 원문과 대조했다. 외벌이는 부부 중 한 명만 소득이 있는 가구(공공은 미혼 포함).
 // 공공 외벌이는 자격 상한이 일반 구간 상한과 같아 추첨 칸이 없다. 추첨 몫엔 앞 구간에서 떨어진 사람으로 들어간다(별표 6 2.나 2)다)).
 // 마지막 줄 물량은 100에서 앞 줄을 뺀 값.
@@ -226,7 +226,16 @@ export const NEWBORN_ROWS: TierRow[] = [
     ],
   },
 ];
-export function TierChart({ rows = NEWLYWED_ROWS }: { rows?: TierRow[] }) {
+export function TierChart({
+  rows = NEWLYWED_ROWS,
+  marker,
+  caption,
+}: {
+  rows?: TierRow[];
+  /** 공고 상세: 내 소득 % 자리에 세로 잉크 선과 이름. 축 끝을 넘으면 끝에. */
+  marker?: { pct: number; label: string };
+  caption?: ReactNode;
+}) {
   const pct = (v: number) => `${(v / AXIS_MAX) * 100}%`;
   // 외벌이·맞벌이 경계가 같은 분양(민영 생애최초·신생아)은 한 줄로 둔다.
   const lines = rows.flatMap((r) =>
@@ -263,6 +272,13 @@ export function TierChart({ rows = NEWLYWED_ROWS }: { rows?: TierRow[] }) {
             <div key={r.label} className="contents">
               <span className="self-center">{r.label}</span>
               <div className="relative h-8">
+                {marker && (
+                  <div
+                    className="bg-foreground absolute -inset-y-1 z-10 w-[3px] -translate-x-1/2 outline-2 outline-[var(--color-background)]"
+                    style={{ left: pct(Math.min(marker.pct, AXIS_MAX)) }}
+                    title={marker.label}
+                  />
+                )}
                 {r.tiers.map((t, i) => {
                   // 상한이 없는 줄은 축 끝까지 한 칸으로 칠하고, 오른쪽을 흐리게 사라지게 해 계속 이어짐을 보인다.
                   const open = t.capPct === undefined;
@@ -308,10 +324,8 @@ export function TierChart({ rows = NEWLYWED_ROWS }: { rows?: TierRow[] }) {
         })}
       </div>
       <figcaption className="text-muted-foreground mt-[0.5rlh] text-base">
-        막대 아래 숫자는 도시근로자 월평균소득 대비 %의 구간 경계, 칸 안 숫자는
-        그 구간의 물량입니다. 같은 분양의 외벌이·맞벌이 두 줄은 물량을 함께
-        쓰고, 구간에 들어가는 소득만 다릅니다. 민영 추첨 구간은 소득 상한이
-        없고, 공공 외벌이는 일반 구간 상한이 자격 상한이라 추첨 칸이 없습니다.
+        {caption ??
+          "막대 아래 숫자는 도시근로자 월평균소득 대비 %의 구간 경계, 칸 안 숫자는 그 구간의 물량입니다. 같은 분양의 외벌이·맞벌이 두 줄은 물량을 함께 쓰고, 구간에 들어가는 소득만 다릅니다. 민영 추첨 구간은 소득 상한이 없고, 공공 외벌이는 일반 구간 상한이 자격 상한이라 추첨 칸이 없습니다."}
       </figcaption>
       <div className="sr-only">
         <table>
