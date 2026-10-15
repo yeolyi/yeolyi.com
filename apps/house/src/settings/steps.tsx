@@ -126,7 +126,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "사는 곳",
       question: i === 0 ? "어디에 사나요?" : "배우자는 어디에 사나요?",
-      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다.",
+      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다. 확인: 주민등록표 등본(정부24에서 무료 발급).",
       input: ({ d, set }) => (
         <div className="flex flex-wrap items-center gap-2">
           <Select
@@ -171,7 +171,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "전입일",
       question: `${subject}지금 주소로 언제 전입했나요?`.trim(),
-      hint: "투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다.",
+      hint: "투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다. 확인: 주민등록표 등본의 전입일.",
       input: date("movedInAt"),
       check: (s) => dateProblem(p(s).movedInAt),
       answer: (s) => dateText(p(s).movedInAt),
@@ -181,7 +181,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "세대주",
       question: i === 0 ? "세대주인가요?" : "배우자가 세대주인가요?",
-      hint: "주민등록등본 맨 위의 사람입니다. 규제지역 1순위는 세대주만 됩니다.",
+      hint: "주민등록표 등본 맨 위의 사람입니다. 규제지역 1순위는 세대주만 됩니다.",
       input: ({ d, set }) => (
         <RadioGroup
           aria-label="세대주"
@@ -202,7 +202,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "청약통장 가입일",
       question: `${subject}청약통장을 언제 만들었나요?`.trim(),
-      hint: "주택청약종합저축 가입일. 통장이 없으면 비워 두세요.",
+      hint: "주택청약종합저축 가입일. 통장이 없으면 비워 두세요. 확인: 청약홈이나 통장을 만든 은행에서 받는 청약통장 순위확인서.",
       input: date("accountOpenedAt"),
       check: (s) => dateProblem(p(s).accountOpenedAt),
       answer: (s) => dateText(p(s).accountOpenedAt) || "없음",
@@ -215,7 +215,7 @@ function personSteps(i: 0 | 1): Step[] {
         i === 0
           ? "청약통장에 몇 번 넣었나요?"
           : "배우자는 청약통장에 몇 번 넣었나요?",
-      hint: "은행 앱의 '인정 회차'. 공공분양은 이 횟수를 봅니다.",
+      hint: "공공분양은 이 횟수를 봅니다. 확인: 청약통장 순위확인서나 은행 앱의 납입 인정 회차.",
       input: ({ d, set, inputId }) => (
         <span className="inline-flex items-center gap-2">
           <Input
@@ -245,7 +245,7 @@ function personSteps(i: 0 | 1): Step[] {
         i === 0
           ? "청약통장에 모두 얼마를 넣었나요?"
           : "배우자는 청약통장에 모두 얼마를 넣었나요?",
-      hint: "민영분양은 이 금액(예치금)을 봅니다.",
+      hint: "민영분양은 이 금액(예치금)을 봅니다. 확인: 청약통장 순위확인서나 은행 앱의 납입 인정 금액.",
       input: ({ d, set, inputId }) => (
         <span className="inline-flex items-center gap-2">
           <Input
@@ -303,7 +303,7 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     group: "가구",
     label: "혼인신고일",
     question: "혼인신고를 했나요?",
-    hint: "민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할 사이(예비신혼)도 됩니다.",
+    hint: "민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할 사이(예비신혼)도 됩니다. 확인: 혼인관계증명서(정부24).",
     input: ({ d, set, inputId }) => (
       <div className="space-y-[0.5rlh]">
         <RadioGroup
@@ -359,7 +359,7 @@ const STEPS_AFTER_PEOPLE: Step[] = [
     group: "소득과 자산",
     label: "총자산",
     question: "가구의 총자산은 얼마인가요?",
-    hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다. 모르면 비워 두세요.",
+    hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다. 모르면 비워 두세요. 확인: 부동산은 공시가격, 자동차는 보험개발원 차량기준가액.",
     unit: "억",
   }),
   numberStep("incomeMan", {
@@ -367,7 +367,7 @@ const STEPS_AFTER_PEOPLE: Step[] = [
     group: "소득과 자산",
     label: "월소득",
     question: "가구의 한 달 소득은 세전으로 얼마인가요?",
-    hint: "함께 신청하는 사람 모두의 건강보험 보수월액을 더한 것. 특별공급은 이 소득으로 구간을 나눕니다. 모르면 비워 두세요. 부모님 등 다른 가구원이 함께 살면 공고문의 소득 기준표로 확인하세요.",
+    hint: "함께 신청하는 사람 모두의 건강보험 보수월액을 더한 것(확인: 국민건강보험공단 홈페이지의 보험료조회 → 직장보험료 조회). 특별공급은 이 소득으로 구간을 나눕니다. 모르면 비워 두세요. 부모님 등 다른 가구원이 함께 살면 공고문의 소득 기준표로 확인하세요.",
     unit: "만 원",
     fmt: (v) => won(v),
   }),
