@@ -202,7 +202,7 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "청약통장 가입일",
       question: `${subject}청약통장을 언제 만들었나요?`.trim(),
-      hint: "주택청약종합저축 가입일. 통장이 없으면 비워 두세요. 확인: 청약홈이나 통장을 만든 은행에서 받는 청약통장 순위확인서.",
+      hint: "주택청약종합저축 가입일. 통장이 없으면 비워 두세요. 확인: 통장을 만든 은행 앱의 청약통장 조회.",
       input: date("accountOpenedAt"),
       check: (s) => dateProblem(p(s).accountOpenedAt),
       answer: (s) => dateText(p(s).accountOpenedAt) || "없음",
@@ -215,7 +215,7 @@ function personSteps(i: 0 | 1): Step[] {
         i === 0
           ? "청약통장에 몇 번 넣었나요?"
           : "배우자는 청약통장에 몇 번 넣었나요?",
-      hint: "공공분양은 이 횟수를 봅니다. 확인: 청약통장 순위확인서나 은행 앱의 납입 인정 회차.",
+      hint: "공공분양은 이 횟수를 봅니다. 확인: 통장을 만든 은행 앱의 청약통장 조회(납입 인정 회차).",
       input: ({ d, set, inputId }) => (
         <span className="inline-flex items-center gap-2">
           <Input
@@ -245,7 +245,7 @@ function personSteps(i: 0 | 1): Step[] {
         i === 0
           ? "청약통장에 모두 얼마를 넣었나요?"
           : "배우자는 청약통장에 모두 얼마를 넣었나요?",
-      hint: "민영분양은 이 금액(예치금)을 봅니다. 확인: 청약통장 순위확인서나 은행 앱의 납입 인정 금액.",
+      hint: "민영분양은 이 금액(예치금)을 봅니다. 확인: 통장을 만든 은행 앱의 청약통장 조회(납입 인정 금액).",
       input: ({ d, set, inputId }) => (
         <span className="inline-flex items-center gap-2">
           <Input
