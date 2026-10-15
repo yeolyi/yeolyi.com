@@ -313,3 +313,18 @@ test("월소득을 안 넣으면 소득 구간을 정하지 않고, 총자산을
   });
   assert.equal(judge(sh, blank).assetBlocked, undefined);
 });
+
+test("공공 일반공급: 소득 상한(순차 칸)은 60㎡ 이하에만. 60㎡ 초과만 있으면 소득이 높아도 순차 칸을 막지 않는다", () => {
+  const rich = settings({ incomeMan: 1200 }); // 159%, 맞벌이 140% 넘음
+  const general = (type: string) => {
+    const n = notice({ publicHousing: true, units: [unit(50000, { type })] });
+    return ladders(갑, n, judge(n, rich), rich, TODAY).find(
+      (l) => l.title === "일반공급 (공공)",
+    )!;
+  };
+  assert.match(general("059.9000A").tierNote, /못 들어감/);
+  assert.doesNotMatch(general("084.9800A").tierNote, /못 들어감/);
+  assert.ok(
+    !general("084.9800A").prerequisites.some((p) => p.label.startsWith("소득")),
+  );
+});

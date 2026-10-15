@@ -305,12 +305,17 @@ export function ladders(
     const e = earners(s);
     const firstTier = homelessYears >= PUBLIC_RANK1_HOMELESS_YEARS;
     const pct = incomePct(s);
-    const small = (n.units ?? []).some((u) => u.area > 0 && u.area <= 60 * 1.3);
+    // 소득 요건(자격·자녀 우선·순차 칸)은 전용 60㎡ 이하에만 있다. 60㎡ 초과는 같은 50→30→20 이지만 소득을 안 본다(별표 6 1.나 2)).
+    const areas = (n.units ?? []).map(exclusiveArea).filter((a) => a > 0);
+    const small = areas.some((a) => a <= 60);
+    const large = areas.some((a) => a > 60);
     // 월소득을 안 넣었으면 소득으로 거르지 않는다.
-    const incomeOk =
-      !small || pct === undefined || pct <= PUBLIC_GENERAL.smallAreaCapPct[e];
-    const inOrdered =
+    const smallIncomeOk =
+      pct === undefined || pct <= PUBLIC_GENERAL.smallAreaCapPct[e];
+    const smallOrderedOk =
       pct === undefined || pct <= PUBLIC_GENERAL.orderedCapPct[e];
+    const incomeOk = !small || large || smallIncomeOk;
+    const inOrdered = !small || large || smallOrderedOk;
     out.push({
       title: "일반공급 (공공)",
       supply: generalSupply(n),
@@ -329,7 +334,7 @@ export function ladders(
         ...(small
           ? [
               {
-                ok: pct === undefined ? null : incomeOk,
+                ok: pct === undefined ? null : smallIncomeOk,
                 label: `소득: 60㎡ 이하는 ${e} ${PUBLIC_GENERAL.smallAreaCapPct[e]}% 이하`,
                 detail:
                   pct === undefined ? "월소득을 넣으면 확인" : `소득 ${pct}%`,
@@ -353,9 +358,11 @@ export function ladders(
       ],
       tierNote: !inOrdered
         ? `소득 ${pct}%가 ${e} ${PUBLIC_GENERAL.orderedCapPct[e]}%를 넘어 자녀 우선·순차 칸은 못 들어감. 추첨 ${PUBLIC_GENERAL.lotterySharePct}%만`
-        : firstTier
-          ? `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸 1순차. 저축총액 ${p.accountPaidMan}만`
-          : `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸은 2순차라 사실상 불가(${addYears(start.date, PUBLIC_RANK1_HOMELESS_YEARS)}부터 1순차). 추첨 ${PUBLIC_GENERAL.lotterySharePct}%가 실제 표`,
+        : `${small && large && !smallOrderedOk ? `60㎡ 이하 주택형은 소득 ${pct}%가 ${e} ${PUBLIC_GENERAL.orderedCapPct[e]}%를 넘어 추첨만, 60㎡ 초과는 소득을 안 봄. ` : ""}앞 칸에서 떨어지면 다음 칸으로. ${
+            firstTier
+              ? `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸 1순차. 저축총액 ${p.accountPaidMan}만`
+              : `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸은 2순차라 사실상 불가(${addYears(start.date, PUBLIC_RANK1_HOMELESS_YEARS)}부터 1순차). 추첨 ${PUBLIC_GENERAL.lotterySharePct}%가 실제 표`
+          }`,
       within: [localStep],
     });
   } else {
@@ -394,11 +401,15 @@ export function ladders(
   return out;
 }
 
+/** 전용면적. 주택형 이름("084.9800A")에서 읽고, 없으면 공급면적을 1.3 으로 나눠 어림한다. */
+const exclusiveArea = (u: { type: string; area: number }) =>
+  Number.parseFloat(u.type) || u.area / 1.3;
+
 /** 민영 일반공급의 가점·추첨 비율을 공고의 면적대마다 한 줄로. 전용면적은 주택형 이름("084.9800A")에서 읽는다. */
 function privateGeneralNote(n: Notice): string {
   const bands = new Map<string, number | "공고">();
   for (const u of n.units ?? []) {
-    const area = Number.parseFloat(u.type);
+    const area = exclusiveArea(u);
     if (!area) continue;
     const band =
       area <= 60 ? "60㎡ 이하" : area <= 85 ? "85㎡ 이하" : "85㎡ 초과";
