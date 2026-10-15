@@ -46,7 +46,7 @@ export type Notice = {
   priceCap?: boolean; // 분양가상한제
   regulated?: boolean; // 투기과열지구
   adjusted?: boolean; // 조정대상지역(청약과열지역). 청약홈 MDAT_TRGET_AREA_SECD
-  houseSecd?: string; // 청약홈 공급 구분(HOUSE_SECD): 01 APT · 09 신혼희망타운 · 04 무순위 · 06 불법행위 재공급 · 11 임의공급
+  houseSecd?: string; // 청약홈 공급 구분(HOUSE_SECD): 01 APT · 10 신혼희망타운 · 04 무순위 · 06 불법행위 재공급 · 11 임의공급
   rental?: boolean; // 분양전환 가능 임대(공공임대). 청약홈 RENT_SECD_NM
   units?: Unit[];
   enrichError?: string;

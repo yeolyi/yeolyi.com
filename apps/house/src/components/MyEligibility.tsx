@@ -20,6 +20,7 @@ import {
 import {
   bonusPoints,
   homelessStart,
+  INCOME_BASE_YEAR,
   incomeBaseMan,
   LOTTERY_HOMELESS_PCT,
   lotteryHomelessFirst,
@@ -382,6 +383,7 @@ export function MyEligibility({
   const _specialAll = filledPeople.flatMap((p) =>
     specialAccountChecks(p, people.indexOf(p), n, today),
   );
+  const thisYearTable = n.announcedAt.startsWith(String(INCOME_BASE_YEAR));
   const overIncome = pct !== undefined && cap !== undefined && pct > cap;
   const privateLotteryOnly =
     !n.publicHousing &&
@@ -434,6 +436,18 @@ export function MyEligibility({
             noRankChecks(n, s, local).map((c) => (
               <CheckRow key={c.id} c={c} Fill={Fill} />
             ))}
+          {cls.supply === "모름" && (
+            <CheckRow
+              c={{
+                id: "unknown",
+                label: "처음 보는 공급 구분",
+                law: "",
+                ok: null,
+                mine: "이 서비스가 아직 분류하지 못함 · 공고문 확인",
+              }}
+              Fill={Fill}
+            />
+          )}
           {cls.supply === "공공임대" && (
             <CheckRow
               c={{
@@ -489,8 +503,14 @@ export function MyEligibility({
                 law: n.publicHousing
                   ? "공공주택 특별법 시행규칙 별표 6"
                   : "규칙 제41조 ②",
-                ok: pct === undefined ? null : !overIncome,
-                mine: pct === undefined ? "" : `우리 가구 ${pct}%`,
+                // 소득 기준표는 2026년 것만 있다. 다른 해 공고는 그해 표가 기준이라 판정하지 않는다.
+                ok: pct === undefined || !thisYearTable ? null : !overIncome,
+                mine:
+                  pct === undefined
+                    ? ""
+                    : thisYearTable
+                      ? `우리 가구 ${pct}%`
+                      : `${n.announcedAt.slice(0, 4)}년 공고라 그해 공고문 기준표 확인`,
                 need: "income",
               }}
               Fill={Fill}

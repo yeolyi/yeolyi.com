@@ -26,7 +26,7 @@ const SALE = /오피스텔|매입임대|다세대|미분양매입|일반매각|�
 
 export function supplyOf(n: Notice): Supply {
   if (n.source === "myhome") return SALE.test(n.name) ? "매각" : "LH잔여";
-  // 청약홈 공급 구분(HOUSE_SECD): 01 APT · 09 신혼희망타운 · 04 무순위 · 06 불법행위 재공급 · 11 임의공급. 그 밖(민간사전청약 등)은 모름.
+  // 청약홈 공급 구분(HOUSE_SECD): 01 APT · 10 신혼희망타운 · 04 무순위 · 06 불법행위 재공급 · 11 임의공급. 그 밖(민간사전청약 등)은 모름.
   switch (n.houseSecd) {
     case "04":
       return "무순위";
@@ -35,7 +35,7 @@ export function supplyOf(n: Notice): Supply {
     case "11":
       return "임의공급";
     case "01":
-    case "09":
+    case "10":
     case undefined: // 구분을 받기 전에 쌓인 공고는 kind 로 본다
       break;
     default:

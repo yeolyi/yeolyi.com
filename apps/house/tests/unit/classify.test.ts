@@ -19,6 +19,10 @@ test("공급 구분은 청약홈 HOUSE_SECD 로: 04 무순위 · 06 재공급 ·
     classify(notice({ kind: "임의공급", houseSecd: "11" })).supply,
     "임의공급",
   );
+  assert.equal(
+    classify(notice({ kind: "신혼희망타운", houseSecd: "10" })).supply,
+    "본청약",
+  );
   assert.equal(classify(notice({ houseSecd: "02" })).supply, "모름");
   assert.equal(classify(notice({ rental: true })).supply, "공공임대");
   assert.equal(

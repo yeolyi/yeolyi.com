@@ -11,12 +11,14 @@ src/                       화면(Vite + React). 판정은 브라우저에서 �
   settings/steps.tsx       개인화 질문 목록(한 페이지에 질문 하나). 요약 페이지와 질문 페이지가 이것 하나를 본다
   views/Guide.tsx          가이드(처음 보는 사람용 안내, 한 페이지에 개념 하나)
 supabase/functions/_shared/ 도메인. 화면(@shared 별칭)과 Edge Function 이 같은 파일을 쓴다. CLI 가 functions 밖 파일을 함수에 싣지 않아 여기 둔다
-  types · dates · rules(규칙의 숫자) · site(단지 키·살아있음) · verdict(판정) · eligibility(누가·사다리) · checks(기준 줄) · links(지도 링크)
+  classify(공고 분류: 국민·민영 × 공급 구분 × 지역 등급) · requirements(조문 단위 요건 → 충족/미충족/모름) · rules(규칙의 숫자)
+  verdict(목록의 후보·제외) · eligibility(사람·통장·소득 구간) · site(단지 키·살아있음) · types · dates · links(지도 링크)
 supabase/sql/              house 스키마. 적용은 carousel 과 같이 `supabase db query --linked -f`(db push 금지)
 supabase/functions/
   house-collect            매시 7분 pg_cron. 청약홈 API + 마이홈 내부 조회 → house.notices (전국, 판정 없이)
   _lib/                    원천 클라이언트·수집. collect.ts 는 Deno 전역을 안 써서 Node 테스트가 부른다
 tests/unit/                node --test. 원천은 가짜를 주입하고, fixtures/ 는 실제 응답 표본
+scripts/                   backfill(지난 공고 넣기) · enrich(지난 공고에 주택형·분류 칸 채우기, 한 번이면 됨)
 ```
 
 ## 결정과 이유
@@ -44,9 +46,12 @@ tests/unit/                node --test. 원천은 가짜를 주입하고, fixtur
 - **예약 실행은 pg_cron → pg_net → Edge Function.** 두 함수는 verify_jwt 를 끄고
   `x-cron-secret` 헤더(Vault `house_cron_secret` = 함수 비밀값 `CRON_SECRET`)로
   막는다.
-- 규칙 숫자(`_shared/rules.ts`)는 한 가구(경기 성남, 예비신혼)를 기준으로 원문과
-  대조한 것이다. 민영 1순위 예치금(지역·면적별), 다자녀·노부모 특공 등은 아직
-  일반화하지 않았다.
+- **판정은 공고 분류 → 요건 표 → 맞춰 보기.** 요건은 조문 하나가 한
+  줄(`requirements.ts`)이고, 공고 분류(`classify.ts`)가 어떤 요건이 붙는지
+  정한다. 화면 문구는 요건의 이름에서 나온다. 원본에 없는 조건(시·도가 늘린
+  1순위 기간, 무순위 거주 요건 등)은 추측하지 않고 "모름"으로 둔다. 알고리즘
+  전체는 가이드 부록(/guide/algorithm)에 있고, 요건을 바꾸면 부록도 같이 고친다.
+  다자녀·노부모·생애최초·신생아·청년 특공과 공공임대는 아직 판정하지 않는다.
 - **규칙 숫자는 법령 원문으로 확인한다.** 청약홈 안내 표는 줄여 쓴 데가
   있다(공공 추첨이 "부부 모두 소득이 있는 경우"로만 적혀 있지만, 별표 6은 앞
   구간에서 떨어진 외벌이도 넣는다). 국가법령정보센터 본문은
