@@ -11,7 +11,7 @@ import { Box, Row } from "./GuideCalcs.tsx";
 const man = (v: number) =>
   v >= 10000 ? `${v / 10000}억` : `${v.toLocaleString()}만`;
 /** 규칙 제10조 ②(선납은 24회분까지)·③(연체하면 회차별 납입인정일 = 약정납입일 + (연체총일수 − 선납총일수) ÷ 납입횟수).
- *  공고일 없이 "미리 내면 / 밀린 걸 내면"만 본다. 밀린 것은 가입 직후부터 연달아 밀렸고 오늘 한꺼번에 낸다고 가정한다(선납 없음). */
+ *  공고일 없이 "미리 내기 / 늦게 내기"만 본다. 밀린 것은 가입 직후부터 연달아 밀렸고 오늘 한꺼번에 낸다고 가정한다(선납 없음). */
 const DAYS_PER_MONTH = 365.25 / 12;
 const span = (days: number) => {
   const months = Math.round(days / DAYS_PER_MONTH);
@@ -39,7 +39,7 @@ export function PrepayCalc() {
         aria-label="경우"
         options={[
           { value: "prepay", label: "미리 내기" },
-          { value: "late", label: "밀린 것 내기" },
+          { value: "late", label: "늦게 내기" },
         ]}
         value={mode}
         onValueChange={setMode}
