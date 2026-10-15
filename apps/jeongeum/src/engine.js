@@ -1,7 +1,5 @@
 // 정음 — 음차 엔진. 브라우저(content script)와 Node(빌드·테스트) 양쪽에서 쓴다.
 ((root) => {
-  
-
   // ───────── 한글 조합 ─────────
   const CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
   const JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
@@ -157,9 +155,7 @@
       w = w.slice(0, -1);
     w = w.replace(/^y(?=[aeiou])/, "_");
     const groups = [];
-    const re = /[aeiouy]+/g;
-    let m;
-    while ((m = re.exec(w)))
+    for (const m of w.matchAll(/[aeiouy]+/g))
       groups.push({
         g: m[0],
         at: m.index,

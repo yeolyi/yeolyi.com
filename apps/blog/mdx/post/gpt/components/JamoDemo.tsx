@@ -42,7 +42,6 @@ export default function JamoDemo() {
       />
       <p className="m-0 break-all">
         {jamo.map((c, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: 위치가 곧 정체성인 정적 나열
           <span key={i} className={i % 2 ? "bg-muted" : ""}>
             {displayJamo(c)}
           </span>

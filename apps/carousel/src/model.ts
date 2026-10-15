@@ -230,14 +230,23 @@ export function runsToMarkup(runs: Run[]): string {
     parts.forEach((p, i) => {
       if (i > 0) {
         for (const [k, m] of [...order].reverse())
-          if (st[k]) ((out += m), (st[k] = false));
+          if (st[k]) {
+            out += m;
+            st[k] = false;
+          }
         out += "\n";
       }
       if (!p) return;
       for (const [k, m] of [...order].reverse())
-        if (st[k] && !r[k]) ((out += m), (st[k] = false));
+        if (st[k] && !r[k]) {
+          out += m;
+          st[k] = false;
+        }
       for (const [k, m] of order)
-        if (!st[k] && r[k]) ((out += m), (st[k] = true));
+        if (!st[k] && r[k]) {
+          out += m;
+          st[k] = true;
+        }
       out += p;
     });
   }

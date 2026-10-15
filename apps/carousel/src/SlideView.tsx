@@ -55,7 +55,6 @@ export function TextRuns({
     <>
       {parseMarkup(text).map((r, i) => (
         <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: 런 순서가 곧 정체성
           key={i}
           style={{
             fontWeight: r.bold ? 700 : undefined,
@@ -184,6 +183,7 @@ export function LayerView({
 }: LayerProps) {
   if (l.type === "code") {
     return (
+      // biome-ignore lint/a11y/noStaticElementInteractions: 캔버스 위 레이어. 편집기에서만 포인터를 받고 키보드는 Editor 단축키가 맡는다
       <div
         ref={ref}
         data-id={l.id}
@@ -199,6 +199,7 @@ export function LayerView({
   }
   if (l.type === "text") {
     return (
+      // biome-ignore lint/a11y/noStaticElementInteractions: 캔버스 위 레이어. 편집기에서만 포인터를 받고 키보드는 Editor 단축키가 맡는다
       <div
         ref={ref}
         data-id={l.id}
@@ -214,6 +215,7 @@ export function LayerView({
     );
   }
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: 캔버스 위 레이어. 편집기에서만 포인터를 받고 키보드는 Editor 단축키가 맡는다
     <div
       ref={ref}
       data-id={l.id}

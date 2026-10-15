@@ -71,6 +71,7 @@ module.exports = {
   their: "데어",
   them: "뎀",
   than: "댄",
+  // biome-ignore lint/suspicious/noThenProperty: 영어 낱말 사전이라 then 도 열쇠다
   then: "덴",
   its: "잇츠",
   into: "인투",

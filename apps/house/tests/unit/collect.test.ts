@@ -29,7 +29,7 @@ test("처음 보는 공고는 주택형별 분양가를 붙여 돌려준다", as
   const { d } = deps([notice({ id: "ah:1:1" })], { "ah:1:1": [unit(90000)] });
   const r = await collect(new Map(), d);
   assert.equal(r.added, 1);
-  assert.equal(r.changed[0]!.units?.[0]!.topPriceMan, 90000);
+  assert.equal(r.changed[0]?.units?.[0]?.topPriceMan, 90000);
 });
 
 test("다시 본 공고는 날짜가 바뀌었을 때만 돌려준다. 주택형을 채운 공고는 다시 묻지 않는다", async () => {
@@ -53,7 +53,7 @@ test("잔여세대 조회엔 분양가가 없어 같은 단지의 앞선 공고�
     "ah:1:2": [unit(0, { type: "084A", topPriceMan: undefined })],
   });
   const got = (await collect(known, d)).changed.find((n) => n.id === "ah:1:2")!;
-  assert.equal(got.units?.[0]!.topPriceMan, 90000);
+  assert.equal(got.units?.[0]?.topPriceMan, 90000);
 });
 
 test("원천 오류는 사유만 남기고 공고는 버리지 않는다. 마이홈 공고는 주택형을 묻지 않는다", async () => {

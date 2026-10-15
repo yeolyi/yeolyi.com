@@ -1,6 +1,5 @@
 // 정음 — 페이지의 글자를 한글 음차로 바꾸고, 끄면 원래대로 돌려놓는다.
 (() => {
-  
   const DEFAULTS = { enabled: true, numbers: false, disabledHosts: [] };
   const SKIP = new Set([
     "SCRIPT",
@@ -84,8 +83,8 @@
     const conv = getConverter();
     const opts = { numbers: settings.numbers, hanMode: hanModeFor() };
     const tw = document.createTreeWalker(rootNode, NodeFilter.SHOW_TEXT);
-    let n;
-    while ((n = tw.nextNode())) processNode(n, conv, opts);
+    for (let n = tw.nextNode(); n; n = tw.nextNode())
+      processNode(n, conv, opts);
     if (rootNode === document.documentElement || rootNode === document.body) {
       // <title> 은 TreeWalker 에도 잡히지만 SPA 가 document.title 로 바꾸는 경우를 위해 한 번 더
       const t = document.querySelector("title");

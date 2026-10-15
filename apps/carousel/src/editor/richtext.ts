@@ -63,7 +63,7 @@ export function htmlToMarkup(root: HTMLElement): string {
     const block = tag === "DIV" || tag === "P";
     if (block && runs.length && !runs[runs.length - 1].text.endsWith("\n"))
       push("\n", st);
-    node.childNodes.forEach((c) => walk(c, next));
+    for (const c of node.childNodes) walk(c, next);
   };
   const base = { bold: false, red: false, underline: false, blur: false };
   const kids = [...root.childNodes];

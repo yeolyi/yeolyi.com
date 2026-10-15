@@ -78,11 +78,7 @@ export default function DateInput({
   if (value !== state.value) setState({ v: split(value), value });
   const { v } = state;
   return (
-    <div
-      role="group"
-      aria-label={ariaLabel}
-      className={clsx("flex gap-4", className)}
-    >
+    <fieldset aria-label={ariaLabel} className={clsx("flex gap-4", className)}>
       {FIELDS.map((f) => {
         const fieldId = f.key === "y" && id ? id : `${base}-${f.key}`;
         return (
@@ -113,6 +109,6 @@ export default function DateInput({
           </div>
         );
       })}
-    </div>
+    </fieldset>
   );
 }

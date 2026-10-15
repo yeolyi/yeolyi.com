@@ -211,7 +211,10 @@ export function Stage(p: StageProps) {
       if (!ev.altKey) {
         const edge = west ? b0.x + b0.w - w : b0.x + w;
         const s = snap([edge], xs, thr);
-        if (s) ((w += west ? -s.d : s.d), g.v.push(s.t));
+        if (s) {
+          w += west ? -s.d : s.d;
+          g.v.push(s.t);
+        }
       }
       w = Math.max(MIN, w);
       const h = w * ratio;
@@ -294,6 +297,7 @@ export function Stage(p: StageProps) {
   const S = (v: number) => v * scale;
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: 캔버스 바탕. 키보드는 Editor 단축키가 맡는다
     <div
       ref={stageRef}
       className="stage"
@@ -529,7 +533,6 @@ function RichEdit({
   onDone: (text: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 편집 시작 때 한 번만
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -547,6 +550,7 @@ function RichEdit({
   }, []);
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: contentEditable 글 상자. 포인터 이벤트가 캔버스로 새지 않게만 막는다
     <div
       ref={(el) => {
         ref.current = el;

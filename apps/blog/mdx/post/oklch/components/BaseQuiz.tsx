@@ -32,7 +32,6 @@ export default function BaseQuiz({
     return { targetColor, options };
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 마운트 시 1회만 생성
   useEffect(() => {
     setQuiz(generateQuiz());
   }, []);
@@ -64,11 +63,7 @@ export default function BaseQuiz({
 
       <div className="flex gap-4">
         {(quiz?.options ?? ["", "", ""]).map((color, index) => (
-          <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: 고정 길이 3
-            key={index}
-            className="flex flex-col items-center gap-1"
-          >
+          <div key={index} className="flex flex-col items-center gap-1">
             {/* 누를 수 있는 색 칸: 2px 잉크 테두리, 초점은 주황 테두리, 누르면 살짝 내려간다.
                 답을 고른 뒤엔 정답 칸만 굵은 선을 남기고 나머지는 가는 선 색으로 물린다. */}
             <button

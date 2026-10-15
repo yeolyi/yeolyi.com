@@ -50,7 +50,6 @@ export function MonitorSimulator() {
           >
             {memory.map((colorIndex, i) => (
               <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length pixel grid
                 key={i}
                 className="h-full w-full"
                 style={{ backgroundColor: PALETTE[colorIndex] }}

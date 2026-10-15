@@ -55,6 +55,7 @@ export function Mark({
 }) {
   return (
     <span
+      role="img"
       className={clsx(
         "w-4 shrink-0 text-center",
         ok == null ? "text-muted-foreground" : !ok && "font-bold",
