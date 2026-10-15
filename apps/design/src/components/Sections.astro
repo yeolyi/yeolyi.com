@@ -35,17 +35,11 @@ const SECTIONS = [
           {s.key === "components" && <ComponentsBanner client:visible />}
           {s.key === "patterns" && <PatternsBanner client:visible />}
         </div>
-        {/* 설명까지 한 링크. 반전은 이름에만 걸리게 링크의 호버 반전은 끄고 group 으로 이름 span 에 준다 */}
         <p class="mt-[0.25rlh]">
-          <a
-            class="group hover:text-foreground py-1.5 no-underline hover:bg-transparent"
-            href={s.href}
-          >
-            <span class="group-hover:bg-foreground group-hover:text-background underline decoration-1 underline-offset-[0.2em]">
-              {s.name}
-            </span>
-            <span class="text-muted-foreground"> {s.summary}</span>
+          <a class="py-1.5" href={s.href}>
+            {s.name}
           </a>
+          <span class="text-muted-foreground"> {s.summary}</span>
         </p>
       </li>
     ))
