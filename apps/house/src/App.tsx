@@ -67,7 +67,11 @@ export function App() {
         ) : tab === "settings" ? (
           <SettingsView settings={settings.data} stepId={id} query={query} />
         ) : id ? (
-          <NoticeDetail id={decodeURIComponent(id)} s={settings.data} />
+          <NoticeDetail
+            id={decodeURIComponent(id)}
+            s={settings.data}
+            query={query}
+          />
         ) : (
           <Notices query={query} s={settings.data} />
         )}

@@ -9,6 +9,7 @@ import {
 import { isMainRound } from "@shared/site.ts";
 import type { Notice, Settings, Unit } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
+import Tabs from "@yeolyi/ui/Tabs";
 import { clsx } from "clsx";
 import { ArrowLeft } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
@@ -16,15 +17,26 @@ import { Facts } from "../components/Facts.tsx";
 import { IncomeBar } from "../components/IncomeBar.tsx";
 import { MapLinks } from "../components/MapLinks.tsx";
 import { Mark } from "../components/Mark.tsx";
-import { NoticeGuides } from "../components/NoticeGuides.tsx";
 import { Schedule } from "../components/Schedule.tsx";
 import { useNotice } from "../data.ts";
-import { ic } from "../util.ts";
+import { ic, setQuery } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
 
-// 한 단짜리 글처럼: 목록으로 → 제목·성격 → 단지(기본 정보 + 주택형) → 넣을 수 있나(가구 판정 + 사람별 사다리) → 일정 → 관련 가이드.
-// 아직 개인화하지 않았으면 "넣을 수 있나"는 개인화로 잇는 한 줄뿐이다.
-export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
+// 목록으로 → 제목·성격 → 탭(공고 정보 | 내 자격 | 일정). 한 번에 한 덩어리만 보이게 탭으로 나눈다.
+// 고른 탭은 ?tab= 에. 기본은 개인화했으면 "내 자격", 아니면 "공고 정보".
+// 아직 개인화하지 않았으면 "내 자격"은 개인화로 잇는 한 줄뿐이다.
+const TABS = ["complex", "eligibility", "schedule"] as const;
+type Tab = (typeof TABS)[number];
+
+export function NoticeDetail({
+  id,
+  s,
+  query,
+}: {
+  id: string;
+  s: Settings;
+  query: URLSearchParams;
+}) {
   const { notice: n, isPending } = useNotice(id);
   const today = todayYmd();
   const back = (
@@ -46,6 +58,9 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
     );
   const v = judge(n, s);
   const fresh = isFresh(s);
+  const defaultTab: Tab = fresh ? "complex" : "eligibility";
+  const asked = query.get("tab") as Tab | null;
+  const tab: Tab = asked && TABS.includes(asked) ? asked : defaultTab;
   const price =
     v.maxPriceEok === undefined
       ? undefined
@@ -74,14 +89,6 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
           ? `${price}(주택형별 최고가)`
           : "공고문 참고",
     ],
-    [
-      "공고문",
-      n.url ? (
-        <a href={n.url} target="_blank" rel="noreferrer">
-          청약홈에서 보기
-        </a>
-      ) : undefined,
-    ],
   ];
 
   return (
@@ -91,65 +98,109 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
       <div className="mt-[0.25rlh]">
         <Facts n={n} />
       </div>
-      <dl className="mt-[1rlh] grid grid-cols-[max-content_1fr] gap-x-4">
-        {info
-          .filter(([, val]) => val)
-          .map(([k, val]) => (
-            <div key={k} className="contents">
-              <dt className="text-muted-foreground">{k}</dt>
-              <dd>{val}</dd>
-            </div>
-          ))}
-      </dl>
-
-      {n.units && n.units.length > 0 && (
-        <div className="mt-[1rlh]">
-          <Units n={n} />
-        </div>
+      {/* 공고문이 그 공고의 규칙 원본이라 제목 바로 아래에 둔다. */}
+      {n.url && (
+        <p className="mt-[0.5rlh]">
+          <a href={n.url} target="_blank" rel="noreferrer">
+            청약홈에서 공고문 보기
+          </a>
+        </p>
       )}
+      {/* 공고마다 새로(다른 공고로 가면 고른 탭을 잇지 않는다). */}
+      <Tabs
+        key={n.id}
+        className="mt-[1rlh]"
+        aria-label="공고 내용"
+        value={tab}
+        onValueChange={(v) => setQuery("tab", v === defaultTab ? undefined : v)}
+        items={[
+          {
+            value: "complex",
+            label: "공고 정보",
+            content: (
+              <>
+                {/* 이름-값 두 칸 표. 아래 주택형 표와 같은 꼴이라 "단지" 한 묶음으로 읽힌다. */}
+                <table className="table">
+                  <tbody>
+                    {info
+                      .filter(([, val]) => val)
+                      .map(([k, val]) => (
+                        <tr key={k}>
+                          <th scope="row" className="w-[6rem]">
+                            {k}
+                          </th>
+                          <td className="whitespace-normal">{val}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
 
-      <Section title="넣을 수 있나">
-        {fresh ? (
-          <p>
-            <a href="/settings">개인화</a>하면 이 공고에 넣을 수 있는지, 넣으면
-            어느 소득 구간에 드는지 계산합니다.
-          </p>
-        ) : (
-          <>
-            <p className="font-bold">{verdictLine(v)}</p>
-            <ul className="mt-[0.5rlh]">
-              {checks(n, v, s).map((c) => (
-                <li
-                  key={c.key}
-                  className="flex flex-wrap items-baseline gap-x-2"
-                >
-                  <Mark ok={c.ok} />
-                  <span>{c.label}</span>
-                  <span className={clsx(c.ok === false && "font-bold")}>
-                    {c.value}
-                  </span>
-                  <span className="text-muted-foreground">{c.detail}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-[1rlh]">
-              <People n={n} v={v} s={s} today={today} />
-            </div>
-            <p className="text-muted-foreground mt-[1rlh] text-base">
-              개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
-              확인하세요.
-            </p>
-          </>
-        )}
-      </Section>
-
-      <Section title="일정">
-        <Schedule n={n} today={today} fixedWeeks={false} />
-      </Section>
-
-      <Section title="관련 가이드">
-        <NoticeGuides n={n} v={v} />
-      </Section>
+                {n.units && n.units.length > 0 && (
+                  <div className="mt-[1rlh]">
+                    <Units n={n} />
+                  </div>
+                )}
+              </>
+            ),
+          },
+          {
+            value: "eligibility",
+            label: "내 자격",
+            content: (
+              <>
+                {fresh ? (
+                  <p>
+                    <a href="/settings">개인화</a>하면 이 공고에 넣을 수 있는지,
+                    넣으면 어느 소득 구간에 드는지 계산합니다.
+                  </p>
+                ) : (
+                  <>
+                    <p className="font-bold">{verdictLine(v)}</p>
+                    <ul className="mt-[0.5rlh]">
+                      {checks(n, v, s).map((c) => (
+                        <li
+                          key={c.key}
+                          className="flex flex-wrap items-baseline gap-x-2"
+                        >
+                          <Mark ok={c.ok} />
+                          <span>{c.label}</span>
+                          <span className={clsx(c.ok === false && "font-bold")}>
+                            {c.value}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {c.detail}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-[1rlh]">
+                      <People n={n} v={v} s={s} today={today} />
+                    </div>
+                    <p className="text-muted-foreground mt-[1rlh] text-base">
+                      개인화에 넣은 답으로 계산한 참고용입니다. 자격은
+                      공고문으로 확인하세요.
+                    </p>
+                  </>
+                )}
+              </>
+            ),
+          },
+          {
+            value: "schedule",
+            label: "일정",
+            content: (
+              <>
+                <Schedule
+                  n={n}
+                  today={today}
+                  fixedWeeks={false}
+                  listAll={false}
+                />
+              </>
+            ),
+          },
+        ]}
+      />
     </article>
   );
 }
@@ -221,15 +272,6 @@ function Units({ n }: { n: Notice }) {
         </tbody>
       </table>
     </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="mt-[2rlh]">
-      <h2 className="mb-[0.5rlh]">{title}</h2>
-      {children}
-    </section>
   );
 }
 

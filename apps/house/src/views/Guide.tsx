@@ -1248,12 +1248,6 @@ const PAGES: Page[] = [
 ];
 
 // /guide 는 목차, /guide/<slug> 는 그 쪽. 없는 쪽이면 목차로. 쪽 맨 위의 "목록"(개인화 질문의 "뒤로"와 같은 자리)이 목차로 간다.
-/** 고른 쪽들을 가이드 순서대로. 공고 상세의 "관련 가이드"가 쓴다. */
-export const guidePages = (slugs: string[]) =>
-  PAGES.filter((p) => slugs.includes(p.slug)).map(({ slug, title }) => ({
-    slug,
-    title,
-  }));
 
 export function Guide({ slug }: { slug?: string }) {
   const i = PAGES.findIndex((p) => p.slug === slug);

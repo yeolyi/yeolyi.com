@@ -25,6 +25,14 @@
       padding: 6px 12px 6px 0;
       white-space: nowrap;
     }
+    /* 이름-값 세로 표(공고 기본 정보): 줄 머리는 굵게 하지 않고 보조 색, 줄 사이 선은 값 칸과 같게. 값은 줄바꿈. */
+    tbody th[scope="row"] {
+      font-weight: 400;
+      color: var(--color-muted-foreground);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
     td {
       border-bottom: 1px solid var(--color-border);
       font-variant-numeric: tabular-nums;

@@ -54,6 +54,15 @@ const navigate = (url: string) => {
   dispatchEvent(new Event(CHANGE));
   window.scrollTo(0, 0);
 };
+/** 같은 화면에서 쿼리만 바꾼다(탭 등). 뒤로 가기 기록을 쌓지 않고 스크롤도 그대로. */
+export const setQuery = (key: string, value: string | undefined) => {
+  const q = new URLSearchParams(location.search);
+  if (value) q.set(key, value);
+  else q.delete(key);
+  const s = q.toString();
+  history.replaceState(null, "", `${location.pathname}${s ? `?${s}` : ""}`);
+  dispatchEvent(new Event(CHANGE));
+};
 export const go = (path: string, query?: Record<string, string>) => {
   const q = new URLSearchParams(query).toString();
   navigate(`/${path}${q ? `?${q}` : ""}`);

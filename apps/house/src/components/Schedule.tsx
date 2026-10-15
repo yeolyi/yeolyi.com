@@ -69,10 +69,13 @@ export function Schedule({
   n,
   today,
   fixedWeeks = true,
+  listAll = true,
 }: {
   n: Notice;
   today: string;
   fixedWeeks?: boolean;
+  /** 날짜 목록에 달력에 있는 일정까지 다 적는다. 끄면 달력 밖(입주)만. */
+  listAll?: boolean;
 }) {
   const ms = milestones(n);
   return (
@@ -88,7 +91,10 @@ export function Schedule({
         today={today}
         fixedWeeks={fixedWeeks}
       />
-      <ScheduleList ms={ms} today={today} />
+      <ScheduleList
+        ms={listAll ? ms : ms.filter((m) => m.month)}
+        today={today}
+      />
     </>
   );
 }
