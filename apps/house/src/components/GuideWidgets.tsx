@@ -107,7 +107,9 @@ export function PrepayCalc() {
               )}
             </Row>
             <dl className="mt-[1rlh] grid grid-cols-[1fr_auto] gap-x-4 border-t pt-[0.5rlh]">
-              <dt className="font-bold">회차마다 인정일이 밀리는 만큼</dt>
+              <dt className="font-bold">
+                회차마다 낸 날로 쳐 주는 날이 늦어지는 기간
+              </dt>
               <dd className="text-right font-mono font-bold">
                 {miss ? span(shift) : "없음"}
               </dd>
