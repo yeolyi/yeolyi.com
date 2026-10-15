@@ -37,7 +37,8 @@ export type Step = {
 };
 
 const PERSON_LABEL = ["나", "배우자"] as const;
-const NOT_YET = "아직 안 넣음";
+// 안 넣은 답은 빈 문자열. 요약 화면이 다른 빈 답과 똑같이 "비어 있음"으로 보인다.
+const NOT_YET = "";
 const won = (man: number) =>
   man >= 10000 ? `${man / 10000}억` : `${man.toLocaleString()}만 원`;
 const dateText = (ymd: string) =>
@@ -205,7 +206,7 @@ function personSteps(i: 0 | 1): Step[] {
       hint: "주택청약종합저축 가입일. 통장이 없으면 비워 두세요. 확인: 통장을 만든 은행 앱의 청약통장 조회.",
       input: date("accountOpenedAt"),
       check: (s) => dateProblem(p(s).accountOpenedAt),
-      answer: (s) => dateText(p(s).accountOpenedAt) || "없음",
+      answer: (s) => dateText(p(s).accountOpenedAt),
     },
     {
       id: `p${i}-count`,
