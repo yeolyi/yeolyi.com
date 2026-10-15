@@ -3,6 +3,7 @@
 //   pnpm push <폴더>     고친 사본을 올린다. 마지막 pull 뒤 앱에서 바뀌었으면 거절(--force 로 덮어쓰기)
 //                        deck.json 에 id 가 없으면 새 덱으로 만든다
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { normalizeDeck } from "../src/model.ts";
@@ -46,6 +47,19 @@ const json = (v: unknown) => {
 };
 
 type Local = { id?: string; updated_at?: string; [k: string]: unknown };
+
+const md5 = (file: string) =>
+  createHash("md5").update(fs.readFileSync(file)).digest("hex");
+
+// 덱의 Storage 이미지: 파일 이름 → md5. eTag 가 md5 라(한 번에 올린 파일) 같은 이름이라도 내용이 바뀌었는지 안다.
+function remoteAssets(id: string): Map<string, string> {
+  const rows = query(
+    `select name, metadata->>'eTag' as etag from storage.objects where bucket_id = 'carousel' and name like ${lit(`${id}/assets/%`)}`,
+  );
+  return new Map(
+    rows.map((r) => [path.basename(r.name), String(r.etag).replace(/"/g, "")]),
+  );
+}
 
 function folders() {
   if (!fs.existsSync(DECKS)) return [];
@@ -106,9 +120,13 @@ function pull() {
     const deck = normalizeDeck(r);
     fs.mkdirSync(path.join(DECKS, folder, "assets"), { recursive: true });
     writeLocal(folder, { id: r.id, updated_at: r.updated_at, ...deck });
+    const remote = remoteAssets(r.id);
     for (const src of imageSrcs(deck)) {
       const local = path.join(DECKS, folder, src);
-      if (!fs.existsSync(local))
+      if (
+        !fs.existsSync(local) ||
+        md5(local) !== remote.get(path.basename(src))
+      )
         cli([
           "storage",
           "cp",
@@ -162,20 +180,19 @@ function push(folder: string, force: boolean) {
       );
   }
 
-  const remoteFiles = new Set(
-    (
-      JSON.parse(
-        cli([
-          "storage",
-          "ls",
-          `ss:///carousel/${id}/assets/`,
-          "--experimental",
-        ]),
-      ).paths as string[]
-    ).map((p) => p.replace(/\/$/, "")),
-  );
+  const remote = remoteAssets(id as string);
   for (const src of imageSrcs(deck)) {
-    if (remoteFiles.has(path.basename(src))) continue;
+    const was = remote.get(path.basename(src));
+    if (was === md5(path.join(dir, src))) continue;
+    // cp 는 있는 파일을 덮어쓰지 못하므로 지우고 올린다
+    if (was)
+      cli([
+        "storage",
+        "rm",
+        `ss:///carousel/${id}/${src}`,
+        "--experimental",
+        "--yes",
+      ]);
     cli([
       "storage",
       "cp",
