@@ -3,12 +3,13 @@ import { regionsOf } from "@shared/rules.ts";
 import { applyEnd, isLive } from "@shared/site.ts";
 import type { Notice, Settings } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
+import Input from "@yeolyi/ui/Input";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import { useMemo } from "react";
 import { facts } from "../components/Facts.tsx";
 import { nextMilestone } from "../components/Schedule.tsx";
 import { useNotices } from "../data.ts";
-import { go } from "../util.ts";
+import { go, setQuery } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
 
 // 블로그 글 목록과 같은 꼴: 날짜(고정폭) + 제목 링크, 아래에 한 줄. 판정의 근거와 나머지는 상세에.
@@ -39,14 +40,27 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   const scope: Scope = asked && scopes.includes(asked) ? asked : scopes[0];
   const today = todayYmd();
 
+  // 검색은 단지 이름·주소·사업주체에서 띄어쓰기를 무시하고 찾는다. 묶음 숫자도 검색 결과로 센다.
+  const q = query.get("q") ?? "";
+  const needle = q.replace(/\s+/g, "").toLowerCase();
   const judged = useMemo(
     () =>
-      (notices.data ?? []).map((n) => ({
-        n,
-        v: judge(n, s),
-        live: isLive(n, today),
-      })),
-    [notices.data, s, today],
+      (notices.data ?? [])
+        .filter(
+          (n) =>
+            !needle ||
+            [n.name, n.address, n.builder]
+              .join(" ")
+              .replace(/\s+/g, "")
+              .toLowerCase()
+              .includes(needle),
+        )
+        .map((n) => ({
+          n,
+          v: judge(n, s),
+          live: isLive(n, today),
+        })),
+    [notices.data, s, today, needle],
   );
   const since = addDays(today, -CLOSED_DAYS);
   const inScope = (x: (typeof judged)[number], sc: Scope) =>
@@ -98,11 +112,28 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
         <RadioGroup
           aria-label="공고 묶음"
           value={scope}
-          onValueChange={(v) => go("", v === scopes[0] ? {} : { status: v })}
+          onValueChange={(v) =>
+            go("", {
+              ...(v === scopes[0] ? {} : { status: v }),
+              ...(q ? { q } : {}),
+            })
+          }
           options={scopes.map((sc) => ({
             value: sc,
             label: `${SCOPES[sc].label} ${judged.filter((x) => inScope(x, sc)).length}`,
           }))}
+        />
+      </div>
+
+      <div className="mt-[0.5rlh]">
+        <Input
+          type="search"
+          aria-label="공고 검색"
+          placeholder="단지 이름이나 주소로 찾기"
+          value={q}
+          onChange={(e) => setQuery("q", e.target.value || undefined)}
+          // 브라우저 기본 지우기 버튼(파란 ×)은 DS 색이 아니라 숨긴다.
+          className="w-full max-w-md [&::-webkit-search-cancel-button]:appearance-none"
         />
       </div>
 
@@ -112,7 +143,9 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           <p className="mark px-2">공고를 못 읽음: {notices.error.message}</p>
         )}
         {notices.data && rows.length === 0 && (
-          <p className="text-muted-foreground">{SCOPES[scope].empty}</p>
+          <p className="text-muted-foreground">
+            {q ? `"${q}"에 맞는 공고가 없습니다.` : SCOPES[scope].empty}
+          </p>
         )}
         <ul className="space-y-[0.5rlh]">
           {rows.map(({ n, v, next, when }) => (

@@ -1,4 +1,5 @@
 import Button from "@yeolyi/ui/Button";
+import Checkbox from "@yeolyi/ui/Checkbox";
 import Textarea from "@yeolyi/ui/Textarea";
 import { useId, useState } from "react";
 import { supabase } from "../supabase.ts";
@@ -10,15 +11,17 @@ const MAX = 2000;
 export function Feedback({ from }: { from: string }) {
   const bodyId = useId();
   const [body, setBody] = useState("");
+  const [withPage, setWithPage] = useState(true);
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
   );
 
   const send = async () => {
     setState("sending");
-    const { error } = await supabase
-      .from("feedback")
-      .insert({ body: body.trim(), page: from.slice(0, 200) || null });
+    const { error } = await supabase.from("feedback").insert({
+      body: body.trim(),
+      page: (withPage && from.slice(0, 200)) || null,
+    });
     setState(error ? "error" : "sent");
   };
 
@@ -37,8 +40,8 @@ export function Feedback({ from }: { from: string }) {
     <>
       <h1>의견 보내기</h1>
       <p className="mt-[0.5rlh]">
-        청약 알리미는 아직 만들고 있는 서비스입니다. 틀린 설명, 헷갈리는 화면,
-        있었으면 하는 기능을 알려 주세요.
+        청약 알리미는 베타 서비스입니다. 틀린 설명, 헷갈리는 화면, 있었으면 하는
+        기능을 알려 주세요.
       </p>
       <form
         className="mt-[1rlh]"
@@ -51,11 +54,6 @@ export function Feedback({ from }: { from: string }) {
           <label htmlFor={bodyId} className="leading-[1.4]">
             의견
           </label>
-          {from && (
-            <span className="text-muted-foreground leading-[1.4]">
-              보던 화면({from})도 같이 보냅니다.
-            </span>
-          )}
           <Textarea
             id={bodyId}
             rows={6}
@@ -65,6 +63,14 @@ export function Feedback({ from }: { from: string }) {
             className="mt-1"
           />
         </div>
+        {/* 보던 화면 주소는 보낼지 고를 수 있다(기본은 보냄). */}
+        {from && (
+          <div className="mt-[0.5rlh]">
+            <Checkbox checked={withPage} onCheckedChange={setWithPage}>
+              보던 화면({from})도 같이 보내기
+            </Checkbox>
+          </div>
+        )}
         {state === "error" && (
           <p role="alert" className="mt-[1rlh] font-bold">
             보내지 못했습니다. 잠시 뒤 다시 보내 주세요.
@@ -81,7 +87,8 @@ export function Feedback({ from }: { from: string }) {
         </div>
       </form>
       <p className="text-muted-foreground mt-[2rlh] text-base">
-        쓴 글과 보던 화면 주소만 저장합니다. 개인화에 넣은 답은 보내지 않습니다.
+        쓴 글과 (고르면) 보던 화면 주소만 저장합니다. 개인화에 넣은 답은 보내지
+        않습니다.
       </p>
     </>
   );
