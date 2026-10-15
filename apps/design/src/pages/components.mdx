@@ -13,6 +13,7 @@ import { Select } from "@yeolyi/ui/Select";
 import SliderDemo from "../demos/SliderDemo";
 import example from "../demos/example.png";
 import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import PhaseBanner from "@yeolyi/ui/PhaseBanner";
 import { components as mdx } from "../components/mdx.ts";
 export const components = mdx;
 
@@ -163,4 +164,15 @@ yeolyi.com 아래 서비스의 맨 위 한 줄. 경로, 메뉴, 테마 버튼. �
       { label: "가이드", href: "#" },
     ]}
   />
+</div>
+
+## 단계 배너
+
+아직 만드는 중(베타)인 서비스는 서비스 헤더 바로 아래에 한 줄을 둡니다. 단계
+이름은 테두리 꼬리표, 문장은 보조 색으로 짧은 부탁 하나, 끝에 의견 보내는 곳
+링크. 배경 띠는 두지 않습니다. 의견 링크에는 보던 화면 주소를 붙여 어느 화면
+얘기인지 알 수 있게 합니다.
+
+<div class="demo">
+  <PhaseBanner feedbackHref="#" />
 </div>
