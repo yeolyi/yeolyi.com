@@ -1,4 +1,6 @@
 // 가운데 캔버스: 선택·이동·리사이즈·스냅·크롭·텍스트 직접 편집·이미지 드롭.
+
+import { clamp } from "es-toolkit";
 import { GripVertical } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useAssetUrl } from "../assets";
@@ -49,8 +51,6 @@ function snap(vals: number[], targets: number[], thr: number) {
   return best;
 }
 
-const clamp = (v: number, lo: number, hi: number) =>
-  Math.min(hi, Math.max(lo, v));
 const r2 = (v: number) => Math.round(v * 100) / 100;
 
 export function Stage(p: StageProps) {

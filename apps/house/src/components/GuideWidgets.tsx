@@ -7,6 +7,7 @@ import {
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Slider from "@yeolyi/ui/Slider";
 import { clsx } from "clsx";
+import { sum, sumBy } from "es-toolkit";
 import { type ReactNode, useState } from "react";
 import { Box, Row } from "./GuideCalcs.tsx";
 
@@ -465,7 +466,7 @@ const SCORE_ITEMS = [
     points: [1, 2, 3],
   },
 ] as const;
-const SCORE_MAX = SCORE_ITEMS.reduce((a, it) => a + Math.max(...it.points), 0);
+const SCORE_MAX = sumBy(SCORE_ITEMS, (it) => Math.max(...it.points));
 // 보기는 점수가 낮은 것부터라 오른쪽으로 갈수록 높다. 처음엔 첫 보기(최저점).
 const pointOf = (it: (typeof SCORE_ITEMS)[number], pick: number | undefined) =>
   it.points[pick ?? 0] ?? 0;
@@ -487,7 +488,7 @@ export function SameLineOrder() {
           "같으면 우선 구간은 점수 순, 일반 구간은 추첨",
           "점수까지 같으면 추첨",
         ];
-  const score = SCORE_ITEMS.reduce((a, it, i) => a + pointOf(it, picks[i]), 0);
+  const score = sum(SCORE_ITEMS.map((it, i) => pointOf(it, picks[i])));
   return (
     <Box>
       <RadioGroup

@@ -3,6 +3,7 @@
 // 접수가 끝난 공고만 늘어나므로 메일(house-digest, 접수 중인 것만 본다)에는 영향이 없다.
 //   node scripts/backfill.ts [일수=365]      레포 루트 .env 의 APPLYHOME_KEY·PUBLIC_SUPABASE_URL·SUPABASE_SERVICE_ROLE_KEY 를 쓴다
 import path from "node:path";
+import { chunk } from "es-toolkit";
 import { Applyhome } from "../supabase/functions/_lib/applyhome.ts";
 import { Myhome } from "../supabase/functions/_lib/myhome.ts";
 import { addDays, todayYmd } from "../supabase/functions/_shared/dates.ts";
@@ -39,7 +40,7 @@ const rows = [...ah, ...mh].map((n) => ({
 }));
 console.log(`청약홈 ${ah.length}건, 마이홈 ${mh.length}건 (${since}~${today})`);
 
-for (let i = 0; i < rows.length; i += 500) {
+for (const batch of chunk(rows, 500)) {
   const res = await fetch(
     `${PUBLIC_SUPABASE_URL}/rest/v1/notices?on_conflict=id`,
     {
@@ -51,7 +52,7 @@ for (let i = 0; i < rows.length; i += 500) {
         "content-profile": "house",
         prefer: "resolution=ignore-duplicates,return=minimal",
       },
-      body: JSON.stringify(rows.slice(i, i + 500)),
+      body: JSON.stringify(batch),
     },
   );
   if (!res.ok) throw new Error(`저장 실패 ${res.status}: ${await res.text()}`);

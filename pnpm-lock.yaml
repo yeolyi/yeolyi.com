@@ -173,6 +173,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      es-toolkit:
+        specifier: ^1.49.0
+        version: 1.49.0
       fflate:
         specifier: ^0.8.3
         version: 0.8.3
@@ -377,6 +380,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      es-toolkit:
+        specifier: ^1.49.0
+        version: 1.49.0
       lucide-react:
         specifier: ^1.52.0
         version: 1.55.0(@types/react@19.3.0)(react@19.3.0)

@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS, type Settings } from "@shared/types.ts";
 import Button from "@yeolyi/ui/Button";
+import { uniq } from "es-toolkit";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { Progress } from "../components/Progress.tsx";
@@ -141,7 +142,7 @@ function Summary({ settings }: { settings: Settings }) {
   const clear = useClearSettings();
   const fileRef = useRef<HTMLInputElement>(null);
   const steps = stepsFor(settings);
-  const groups = [...new Set(steps.map((s) => s.group))];
+  const groups = uniq(steps.map((s) => s.group));
   return (
     <>
       <h1>개인화</h1>

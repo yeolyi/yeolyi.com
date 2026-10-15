@@ -5,6 +5,7 @@ import IconButton from "@yeolyi/ui/IconButton";
 import Input from "@yeolyi/ui/Input";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import { minBy } from "es-toolkit";
 import { Download, ImagePlus, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import FRAMES from "../skills/device-frame/frames.json";
@@ -67,12 +68,8 @@ function pickKind(w: number, h: number): Kind {
   };
   const fits = Object.entries(DEVICES).filter(ok);
   if (!fits.length) return "browser";
-  return fits.reduce((best, cur) =>
-    Math.abs(ratio - screenRatio(cur[1])) <
-    Math.abs(ratio - screenRatio(best[1]))
-      ? cur
-      : best,
-  )[0];
+  // biome-ignore lint/style/noNonNullAssertion: 위에서 비어 있지 않음을 확인했다
+  return minBy(fits, ([, d]) => Math.abs(ratio - screenRatio(d)))![0];
 }
 
 // 기기: 화면 자리를 빈틈없이 채우게 캡처를 깔고(넘치면 위아래는 위 기준, 좌우는 가운데 기준으로 자름) 프레임을 덮는다. frame.py 와 같은 방식.

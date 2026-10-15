@@ -35,6 +35,7 @@ import { isMainRound } from "@shared/site.ts";
 import type { Notice, Person, Settings } from "@shared/types.ts";
 import { assetGated, type Verdict } from "@shared/verdict.ts";
 import { clsx } from "clsx";
+import { sumBy, uniq } from "es-toolkit";
 import { Check as Check2, CircleHelp, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { ic } from "../util.ts";
@@ -172,8 +173,8 @@ export function MyEligibility({
   const main = isMainRound(n);
   const sector = n.publicHousing ? "public" : "private";
   const units = n.units ?? [];
-  const total = units.reduce((a, u) => a + u.total, 0);
-  const special = units.reduce((a, u) => a + u.special, 0);
+  const total = sumBy(units, (u) => u.total);
+  const special = sumBy(units, (u) => u.special);
   const general = total - special;
   const t = v.tickets;
   const kind =
@@ -212,14 +213,12 @@ export function MyEligibility({
   const hasNewlywed = main && t.newlywed > 0;
 
   // 일반공급 면적대
-  const bands = [
-    ...new Set(
-      units
-        .map(exclusiveArea)
-        .filter((a) => a > 0)
-        .map((a) => (a <= 60 ? 60 : a <= 85 ? 85 : 999)),
-    ),
-  ].sort((a, b) => a - b);
+  const bands = uniq(
+    units
+      .map(exclusiveArea)
+      .filter((a) => a > 0)
+      .map((a) => (a <= 60 ? 60 : a <= 85 ? 85 : 999)),
+  ).sort((a, b) => a - b);
   const bandLabel = (b: number) =>
     b === 60 ? "60㎡ 이하" : b === 85 ? "60~85㎡" : "85㎡ 초과";
   const shareOf = (b: number) =>

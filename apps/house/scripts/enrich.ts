@@ -5,6 +5,7 @@
 // 여러 번 돌려도 된다(이미 채운 칸은 그대로). 새 공고는 수집기가 하므로 정기적으로 돌릴 필요는 없다.
 //   node scripts/enrich.ts [일수=365]      레포 루트 .env 의 APPLYHOME_KEY·PUBLIC_SUPABASE_URL·SUPABASE_SERVICE_ROLE_KEY
 import path from "node:path";
+import { chunk } from "es-toolkit";
 import { Applyhome } from "../supabase/functions/_lib/applyhome.ts";
 import { addDays, todayYmd } from "../supabase/functions/_shared/dates.ts";
 import { applyEnd } from "../supabase/functions/_shared/site.ts";
@@ -82,7 +83,7 @@ for (const n of stored) {
     console.log(`… ${changed.length}건`);
 }
 
-for (let i = 0; i < changed.length; i += 200) {
+for (const batch of chunk(changed, 200)) {
   const res = await fetch(`${URL_}/rest/v1/notices?on_conflict=id`, {
     method: "POST",
     headers: {
@@ -90,14 +91,12 @@ for (let i = 0; i < changed.length; i += 200) {
       prefer: "resolution=merge-duplicates,return=minimal",
     },
     body: JSON.stringify(
-      changed
-        .slice(i, i + 200)
-        .map((n) => ({
-          id: n.id,
-          data: n,
-          apply_end: applyEnd(n),
-          updated_at: now.toISOString(),
-        })),
+      batch.map((n) => ({
+        id: n.id,
+        data: n,
+        apply_end: applyEnd(n),
+        updated_at: now.toISOString(),
+      })),
     ),
   });
   if (!res.ok) throw new Error(`저장 실패 ${res.status}: ${await res.text()}`);

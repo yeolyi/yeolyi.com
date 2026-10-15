@@ -4,6 +4,7 @@ import IconButton from "@yeolyi/ui/IconButton";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Textarea from "@yeolyi/ui/Textarea";
 import { clsx } from "clsx";
+import { sumBy } from "es-toolkit";
 import {
   AlignCenter,
   AlignCenterHorizontal,
@@ -88,8 +89,7 @@ function stackVertically(layers: Layer[]): Layer[] {
   if (!groups.length) return layers;
 
   const total =
-    groups.reduce((sum, g) => sum + g.bottom - g.top, 0) +
-    STACK_GAP * (groups.length - 1);
+    sumBy(groups, (g) => g.bottom - g.top) + STACK_GAP * (groups.length - 1);
   const shift = new Map<string, number>();
   let y = (H - total) / 2;
   for (const g of groups) {

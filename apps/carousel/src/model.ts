@@ -1,4 +1,5 @@
 // 덱 데이터 모델. 브라우저와 서버(vite 플러그인·export 스크립트)가 함께 쓰므로 DOM·React 를 import 하지 않는다.
+import { clamp } from "es-toolkit";
 
 export const W = 1080;
 export const H = 1350;
@@ -170,8 +171,7 @@ function normalizeLayer(raw: any): Layer | null {
   return null;
 }
 
-const clamp01 = (v: number) =>
-  Math.round(Math.min(1, Math.max(0, v)) * 1e5) / 1e5;
+const clamp01 = (v: number) => Math.round(clamp(v, 0, 1) * 1e5) / 1e5;
 
 export function serializeDeck(d: Deck): string {
   return `${JSON.stringify(d, null, 2)}\n`;
