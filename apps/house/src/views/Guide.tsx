@@ -1323,7 +1323,7 @@ const PARTS = [
   { start: "what", title: "기초" },
   { start: "newlywed", title: "특별공급" },
   { start: "regulated", title: "일반공급" },
-  { start: "schedule", title: "실제로 넣기" },
+  { start: "schedule", title: "청약 신청" },
 ];
 const GROUPS = PARTS.map((part, k) => {
   const from = PAGES.findIndex((p) => p.slug === part.start);

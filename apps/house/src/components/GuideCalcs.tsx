@@ -57,9 +57,14 @@ function DateField({
 }) {
   const id = useId();
   return (
-    <div className="mt-[0.5rlh]">
-      <label htmlFor={id}>{label}</label>
-      {hint && <p className="text-muted-foreground text-base">{hint}</p>}
+    // 날짜 칸 사이는 1줄 띄우고, 한 칸 안(라벨·설명·입력)은 DS 입력 꼴처럼 좁게 붙인다.
+    <div className="mt-[1rlh] flex flex-col">
+      <label htmlFor={id} className="leading-[1.4]">
+        {label}
+      </label>
+      {hint && (
+        <p className="text-muted-foreground text-base leading-[1.4]">{hint}</p>
+      )}
       <DateInput
         id={id}
         className="mt-1"
@@ -116,7 +121,7 @@ export function PointsCalc() {
         value={since}
         onChange={setSince}
       />
-      <p className="text-muted-foreground mt-[0.5rlh] text-base">
+      <p className="text-muted-foreground mt-[1rlh] text-base">
         {!start
           ? "생년월일을 넣으면 계산합니다."
           : start.date > today
