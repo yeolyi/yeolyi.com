@@ -149,3 +149,22 @@ export const LOTTERY_HOMELESS_PCT = 75;
 const METRO = ["서울", "경기", "인천", "부산", "대구", "광주", "대전", "울산"];
 export const lotteryHomelessFirst = (sido: string, regulated: boolean) =>
   regulated || METRO.includes(sido);
+
+/** 도시근로자 가구당 월평균소득(전년도) 100% 금액(원), 2026년 적용. LH 공공분양 안내(2026-09)·공고문 표 그대로.
+ *  3인 이하는 한 칸(가구원 수로 나누지 않은 가구당 평균), 4인부터 가구원 수별(규칙 제41조·제43조, 별표 6). 해마다 바꾼다. */
+export const INCOME_BASE_2026 = {
+  "3인 이하": 7533763,
+  "4인": 8802202,
+  "5인": 9326985,
+  "6인": 9906263,
+  "7인": 10485541,
+  "8인": 11064819,
+} as const;
+/** 가구원 수에 맞는 100% 금액(만 원). 8인을 넘으면 공고문이 정하므로 8인 칸을 쓴다. */
+export function incomeBaseMan(householdSize: number): number {
+  const key =
+    householdSize <= 3
+      ? "3인 이하"
+      : (`${Math.min(8, householdSize)}인` as keyof typeof INCOME_BASE_2026);
+  return INCOME_BASE_2026[key] / 10000;
+}

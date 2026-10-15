@@ -1,4 +1,9 @@
-import { type Earners, NEWLYWED_TIERS, type Tier } from "@shared/rules.ts";
+import {
+  type Earners,
+  INCOME_BASE_2026,
+  NEWLYWED_TIERS,
+  type Tier,
+} from "@shared/rules.ts";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Slider from "@yeolyi/ui/Slider";
 import { clsx } from "clsx";
@@ -124,16 +129,6 @@ export function PrepayCalc() {
   );
 }
 
-/** 도시근로자 가구당 월평균소득(전년도) 100% 금액, 2026년 적용. LH 공공분양 안내(2026-09) 표 그대로(원).
- *  3인 이하는 한 칸(가구당 평균), 4인부터 가구원 수별. 비율은 이 가이드에 나오는 것만. */
-const INCOME_BASE_2026 = {
-  "3인 이하": 7533763,
-  "4인": 8802202,
-  "5인": 9326985,
-  "6인": 9906263,
-  "7인": 10485541,
-  "8인": 11064819,
-};
 type HouseholdSize = keyof typeof INCOME_BASE_2026;
 const INCOME_PCTS = [100, 120, 130, 140, 160, 200];
 export function IncomeTable() {

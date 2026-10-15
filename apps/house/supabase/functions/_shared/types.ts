@@ -72,7 +72,6 @@ export type Settings = {
   totalAssetsEok: number | null; // 안 넣었으면 null(자산으로 거르지 않음). 공공주택 총자산(전세보증금 포함, 부채 차감)
   incomeMan: number | null; // 안 넣었으면 null(소득 구간을 모름). 가구 세전 월소득 합산
   dualIncome: boolean | null; // 안 넣었으면 null. 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
-  incomeBaseMan: number; // 도시근로자 가구당 월평균소득 100%. 3인 이하 가구는 '3인 이하' 칸(가구당 평균), 4인 이상만 가구원수별 — 별표6·규칙41조
 };
 
 export const emptyPerson = (name: string): Person => ({
@@ -95,7 +94,6 @@ export const DEFAULT_SETTINGS: Settings = {
   totalAssetsEok: null,
   incomeMan: null,
   dualIncome: null,
-  incomeBaseMan: 753.4, // 2026-08 LH 공고문(성남복정2)의 '3인 이하 100%' 7,533,763 (가구당 평균). 가구원수별 표의 '3인'(8,168,429)과 다른 칸이다
 };
 
 /** 저장된 값을 기본값 위에 얹는다. 항목이 늘어도 예전 값이 그대로 뜨고, 없어진 항목은 따라 사라진다. */
@@ -113,7 +111,6 @@ export function withDefaults(
 export const SETTINGS_LIMITS = {
   totalAssetsEok: [0, 100],
   incomeMan: [0, 10000],
-  incomeBaseMan: [1, 10000],
   children: [0, 10],
 } as const;
 export type NumericSetting = keyof typeof SETTINGS_LIMITS;

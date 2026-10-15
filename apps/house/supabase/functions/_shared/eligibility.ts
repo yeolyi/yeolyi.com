@@ -3,6 +3,7 @@ import {
   bonusPoints,
   type Earners,
   homelessStart,
+  incomeBaseMan,
   LOCAL_YEARS_REGULATED,
   LOTTERY_HOMELESS_PCT,
   lotteryHomelessFirst,
@@ -139,10 +140,13 @@ export const earners = (s: Settings): Earners =>
   s.people.length > 1 && s.dualIncome !== false ? "맞벌이" : "외벌이";
 
 /** 소득 %. 월소득을 안 넣었으면 undefined 이고, 그때는 구간을 정하지 않는다. */
+/** 가구원 수: 함께 신청하는 사람 + 자녀. 부모님 등 다른 가구원은 묻지 않아 빠진다(공고문으로 확인). */
+export const householdSize = (s: Settings) => s.people.length + s.children;
+
 export const incomePct = (s: Settings) =>
   s.incomeMan === null
     ? undefined
-    : Math.round((s.incomeMan / s.incomeBaseMan) * 100);
+    : Math.round((s.incomeMan / incomeBaseMan(householdSize(s))) * 100);
 
 export function incomeTiers(
   n: Notice,
@@ -217,7 +221,7 @@ export function ladders(
           : {
               pct,
               incomeMan: s.incomeMan,
-              baseMan: s.incomeBaseMan,
+              baseMan: incomeBaseMan(householdSize(s)),
               tiers: tiers.map(({ label, capPct, sharePct }) => ({
                 label,
                 capPct,
