@@ -36,6 +36,18 @@ export type Step = {
   check?: (s: Settings) => string | undefined;
 };
 
+// 증명서 이름을 카카오톡 전자증명서(정부24 전자증명서를 카카오톡에서 무료 발급)의 발급 모달로 잇는다.
+// digitaldocs.kakao.com/qr/<이름> 은 그 증명서의 QR·URL 모달을 바로 연다(2026-10 확인). 이름은 그 사이트 목록 표기 그대로.
+const Doc = ({ name }: { name: string }) => (
+  <a
+    href={`https://digitaldocs.kakao.com/qr/${encodeURIComponent(name)}`}
+    target="_blank"
+    rel="noreferrer"
+  >
+    {name}
+  </a>
+);
+
 const PERSON_LABEL = ["나", "배우자"] as const;
 // 안 넣은 답은 빈 문자열. 요약 화면이 다른 빈 답과 똑같이 "비어 있음"으로 보인다.
 const NOT_YET = "";
@@ -157,7 +169,14 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "사는 곳",
       question: i === 0 ? "어디에 사나요?" : "배우자는 어디에 사나요?",
-      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다. 확인: 주민등록등본(정부24나 카카오톡 지갑의 전자증명서에서 발급).",
+      hint: (
+        <>
+          주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼
+          묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다. 확인:{" "}
+          <Doc name="주민등록등본" />
+          (카카오톡 전자증명서, 정부24에서도 발급).
+        </>
+      ),
       input: ({ d, set }) => (
         <div className="flex flex-wrap items-center gap-2">
           <Select
@@ -202,7 +221,12 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "전입일",
       question: `${subject}지금 주소로 언제 전입했나요?`.trim(),
-      hint: "투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다. 확인: 주민등록등본의 전입일.",
+      hint: (
+        <>
+          투기과열지구는 그 지역에 2년 넘게 살아야 지역 우선을 받습니다. 확인:{" "}
+          <Doc name="주민등록등본" />의 전입일.
+        </>
+      ),
       input: date("movedInAt"),
       check: (s) => dateProblem(p(s).movedInAt),
       answer: (s) => dateText(p(s).movedInAt),
@@ -342,7 +366,13 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     group: "가구",
     label: "혼인신고일",
     question: "혼인신고를 했나요?",
-    hint: "민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할 사이(예비신혼)도 됩니다. 확인: 혼인관계증명서(정부24나 카카오톡 지갑의 전자증명서에서 발급).",
+    hint: (
+      <>
+        민영 신혼부부 특별공급은 혼인신고를 해야 넣을 수 있고, 공공은 결혼할
+        사이(예비신혼)도 됩니다. 확인: <Doc name="혼인관계증명서" />
+        (카카오톡 전자증명서, 정부24에서도 발급).
+      </>
+    ),
     input: ({ d, set, inputId }) => (
       <div className="space-y-[0.5rlh]">
         <RadioGroup
@@ -387,7 +417,14 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     group: "가구",
     label: "자녀",
     question: "미성년 자녀가 몇 명인가요?",
-    hint: "임신 중인 아이와 입양한 자녀도 셉니다. 신혼부부 특별공급은 자녀가 있으면 1순위이고, 다자녀 특별공급은 2명 이상입니다. 없으면 0. 확인: 주민등록등본.",
+    hint: (
+      <>
+        임신 중인 아이와 입양한 자녀도 셉니다. 신혼부부 특별공급은 자녀가 있으면
+        1순위이고, 다자녀 특별공급은 2명 이상입니다. 없으면 0. 확인:{" "}
+        <Doc name="주민등록등본" />
+        이나 <Doc name="가족관계증명서" />.
+      </>
+    ),
     unit: "명",
   }),
   yesNoStep("ownsHome", {
@@ -425,7 +462,12 @@ const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
     label: "노부모 부양",
     question:
       "만 65세 이상 부모(배우자의 부모 포함)를 3년 이상 같은 주민등록등본에 올려 모시고 있나요?",
-    hint: "노부모 부양 특별공급 조건입니다. 민영은 신청자가 세대주여야 합니다. 확인: 주민등록등본(정부24나 카카오톡 지갑의 전자증명서).",
+    hint: (
+      <>
+        노부모 부양 특별공급 조건입니다. 민영은 신청자가 세대주여야 합니다.
+        확인: <Doc name="주민등록등본" />.
+      </>
+    ),
   }),
 ];
 
@@ -485,7 +527,13 @@ const NEWBORN_STEP = yesNoStep("newbornChild", {
   group: "가구",
   label: "2세 미만 자녀",
   question: "2세 미만 자녀가 있나요(임신 중 포함)?",
-  hint: "공고일에 2세가 되는 날까지 셉니다. 신생아 특별공급과 공공분양 일반공급의 자녀 우선 몫이 이것을 봅니다. 확인: 주민등록등본, 임신 중이면 임신진단서.",
+  hint: (
+    <>
+      공고일에 2세가 되는 날까지 셉니다. 신생아 특별공급과 공공분양 일반공급의
+      자녀 우선 몫이 이것을 봅니다. 확인: <Doc name="주민등록등본" />, 임신
+      중이면 임신진단서.
+    </>
+  ),
 });
 
 /** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문과 맞벌이 질문이 빠진다. */

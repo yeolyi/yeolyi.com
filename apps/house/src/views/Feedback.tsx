@@ -28,8 +28,7 @@ export function Feedback({ from }: { from: string }) {
   if (state === "sent")
     return (
       <>
-        <h1>고맙습니다</h1>
-        <p className="mt-[0.5rlh]">보내 주신 의견은 고치는 데 씁니다.</p>
+        <h1>감사합니다</h1>
         <p className="mt-[1rlh]">
           <a href={from || "/"}>보던 화면으로 돌아가기</a>
         </p>

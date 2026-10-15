@@ -161,7 +161,6 @@ function Summary({ settings }: { settings: Settings }) {
           </Button>
           <div className="mt-[0.5rlh]">
             <p className="text-muted-foreground text-base">
-              질문이 {steps.filter((s) => !s.assumption).length}개쯤 됩니다.
               모르는 건 비워 두고 넘어가도 됩니다.
             </p>
           </div>
