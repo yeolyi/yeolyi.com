@@ -1,7 +1,7 @@
 import { supplyOf } from "@shared/classify.ts";
 import { addDays, fmtDate, todayYmd } from "@shared/dates.ts";
 import { regionsOf } from "@shared/rules.ts";
-import { applyEnd, isLive } from "@shared/site.ts";
+import { applyEnd, isLive, isMainRound } from "@shared/site.ts";
 import type { Notice, Settings } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
 import Input from "@yeolyi/ui/Input";
@@ -46,7 +46,7 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   const needle = q.replace(/\s+/g, "").toLowerCase();
   const judged = useMemo(
     () =>
-      (notices.data ?? [])
+      dedupe(notices.data ?? [])
         .filter(
           (n) =>
             !needle ||
@@ -66,9 +66,10 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   const since = addDays(today, -CLOSED_DAYS);
   const inScope = (x: (typeof judged)[number], sc: Scope) =>
     sc === "closed"
-      ? !x.live && applyEnd(x.n) >= since
+      ? !x.live && applyEnd(x.n) >= since && !x.v.notSubscription
       : sc === "live"
-        ? x.live
+        ? // 개인화 전에도 청약이 아닌 판매(선착순·매각)는 뺀다. 사람 답과 상관없는 분류라서
+          x.live && !x.v.notSubscription
         : x.live && x.v.status === sc;
   const rows = judged
     .filter((x) => inScope(x, scope))
@@ -161,33 +162,82 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
             {q ? `"${q}"에 맞는 공고가 없습니다.` : SCOPES[scope].empty}
           </p>
         )}
-        <ul className="space-y-[0.5rlh]">
-          {rows.map(({ n, v, next, when }) => (
-            <li key={n.id}>
-              <span className="meta">
-                {scope === "closed"
-                  ? fmtDate(applyEnd(n))
-                  : when
-                    ? `${when !== next?.date ? "~" : ""}${fmtDate(when)}`
-                    : ""}{" "}
-              </span>
-              {scope !== "closed" && next && (
-                <span className="text-muted-foreground">
-                  {next.label
-                    .replace(" 접수", "")
-                    .replace("(첫날 특공)", "")}{" "}
-                </span>
-              )}
-              <a href={`/notices/${encodeURIComponent(n.id)}`}>{n.name}</a>
-              <p className="text-muted-foreground text-base">
-                {summary(n, v, scope)}
-              </p>
-            </li>
-          ))}
-        </ul>
+        {/* 후보는 본청약과 무순위·임의공급을 나눠 보인다. 무순위·임의공급은 사는 곳을 따지지 않아 전국에서 들어와 본청약을 가린다. */}
+        {scope === "candidate" || scope === "live" ? (
+          (
+            [
+              ["본청약", rows.filter((x) => isMainRound(x.n)), ""],
+              [
+                "무순위·임의공급",
+                rows.filter((x) => !isMainRound(x.n)),
+                "남거나 취소된 집을 다시 파는 공고입니다. 사는 곳을 따지지 않아 전국 공고가 들어옵니다.",
+              ],
+            ] as const
+          ).map(
+            ([title, part, note]) =>
+              part.length > 0 && (
+                <section key={title} className="mt-[1.5rlh] first:mt-0">
+                  <h2 className="text-base font-bold">
+                    {title} {part.length}
+                  </h2>
+                  {note && (
+                    <p className="text-muted-foreground text-base">{note}</p>
+                  )}
+                  <List rows={part} scope={scope} />
+                </section>
+              ),
+          )
+        ) : (
+          <List rows={rows} scope={scope} />
+        )}
       </div>
     </>
   );
+}
+
+type Row = {
+  n: Notice;
+  v: Verdict;
+  next: ReturnType<typeof nextMilestone>;
+  when: string | undefined;
+};
+function List({ rows, scope }: { rows: Row[]; scope: Scope }) {
+  return (
+    <ul className="mt-[0.5rlh] space-y-[0.5rlh]">
+      {rows.map(({ n, v, next, when }) => (
+        <li key={n.id}>
+          <span className="meta">
+            {scope === "closed"
+              ? fmtDate(applyEnd(n))
+              : when
+                ? `${when !== next?.date ? "~" : ""}${fmtDate(when)}`
+                : ""}{" "}
+          </span>
+          {scope !== "closed" && next && (
+            <span className="text-muted-foreground">
+              {next.label.replace(" 접수", "").replace("(첫날 특공)", "")}{" "}
+            </span>
+          )}
+          <a href={`/notices/${encodeURIComponent(n.id)}`}>{n.name}</a>
+          <p className="text-muted-foreground text-base">
+            {summary(n, v, scope)}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** 마이홈은 같은 공고를 다른 번호로 두 번 싣기도 한다(이름·공고일·발표일이 같다). 하나만 남긴다. */
+function dedupe(ns: Notice[]): Notice[] {
+  const seen = new Set<string>();
+  return ns.filter((n) => {
+    if (n.source !== "myhome") return true;
+    const k = `${n.name}|${n.announcedAt}|${n.winnerAt ?? ""}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
 }
 
 /** 한 줄 요약. 제외는 걸린 이유를 먼저. */

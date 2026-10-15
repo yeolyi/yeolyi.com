@@ -133,3 +133,22 @@ test("전남광주통합특별시: 시도 칸이 한 이름으로 와도 주소�
   );
   assert.equal(sidoOf("전라남도"), "전남");
 });
+
+test("선착순(동·호 지정) LH 잔여는 청약이 아닌 판매로 본다", () => {
+  assert.equal(
+    classify(
+      notice({
+        source: "myhome",
+        kind: "LH잔여",
+        name: "[선착순 동·호지정] 영천문외 센트럴타운 공공분양주택 추가입주자 모집 공고",
+      }),
+    ).supply,
+    "매각",
+  );
+  assert.equal(
+    classify(
+      notice({ source: "myhome", kind: "LH잔여", name: "양주옥정 추가모집" }),
+    ).supply,
+    "LH잔여",
+  );
+});
