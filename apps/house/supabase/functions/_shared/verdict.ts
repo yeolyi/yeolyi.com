@@ -1,8 +1,8 @@
-import { PUBLIC_ASSET_CAP_EOK } from "./rules.ts";
+import { PUBLIC_ASSET_CAP_EOK, regionsOf } from "./rules.ts";
 import type { Notice, Settings } from "./types.ts";
 
 // 공고 하나를 설정에 대고 판정한다. 서버(알림 여부)와 화면(설정을 바꿔 보며 즉시 재계산)이 같은 함수를 쓴다.
-// 후보: 고른 시도 안 + 자산 자격 · 탈락: 하나라도 못 넘음.
+// 후보: 사는 곳의 권역 안 + 자산 자격 · 탈락: 하나라도 못 넘음.
 // 감당할 수 있는지(자기자본·대출·계약금)는 판정하지 않는다. 돈은 그때 가서 마련하는 경우가 많고, 대출 규제는 자주 바뀐다.
 // 법이 정한 자격(소득·자산 상한)만 본다. 통근은 판정하지 않고 길찾기 링크로 사람이 본다.
 
@@ -26,8 +26,12 @@ export type Verdict = {
 
 export const manToEok = (man: number) => Math.round(man / 1000) / 10;
 
-export const regionOf = (n: Notice, s: Settings): Region =>
-  s.areas.includes(n.sido) ? "in" : "out";
+/** 두 사람이 사는 시도의 권역(규칙 제4조 ③) 안이면 넣을 수 있다. 사는 곳을 아직 안 넣었으면 거르지 않는다. */
+export const regionOf = (n: Notice, s: Settings): Region => {
+  const regions = regionsOf(s.people.map((p) => p.sido).filter(Boolean));
+  if (!regions.length) return "in";
+  return regions.some((r) => r.sidos.includes(n.sido)) ? "in" : "out";
+};
 
 export function ticketsOf(n: Notice): Tickets {
   const t: Tickets = { young: 0, newlywed: 0, firstHome: 0, newborn: 0 };

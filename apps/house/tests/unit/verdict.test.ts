@@ -55,3 +55,15 @@ test("신혼희망타운·나눔·선택형은 총자산 3.62억을 넘으면 �
     undefined,
   );
 });
+
+test("지역: 사는 시도의 권역(제4조 ③) 안이면 후보. 경기에 살면 서울·인천도, 대전에 사는 배우자가 있으면 세종도", () => {
+  assert.equal(judge(notice({ sido: "인천" }), s).region, "in");
+  const s2 = settings({
+    people: [s.people[0]!, { ...s.people[1]!, sido: "대전" }],
+  });
+  assert.equal(judge(notice({ sido: "세종" }), s2).region, "in");
+  assert.equal(judge(notice({ sido: "부산" }), s2).region, "out");
+  // 사는 곳을 안 넣었으면 거르지 않는다
+  const none = settings({ people: [{ ...s.people[0]!, sido: "" }] });
+  assert.equal(judge(notice({ sido: "부산" }), none).region, "in");
+});

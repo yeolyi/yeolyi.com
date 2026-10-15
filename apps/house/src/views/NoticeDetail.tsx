@@ -146,7 +146,8 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
 /** 판정 한 줄. 제외면 걸린 이유. */
 function verdictLine(v: Verdict): string {
   if (v.status === "candidate") return "후보입니다.";
-  if (v.region === "out") return "제외: 개인화에서 고른 시도 밖의 공고입니다.";
+  if (v.region === "out")
+    return "제외: 사는 곳의 권역 밖 공고입니다. 혁신도시·산업단지 등 일부 지역은 사는 곳과 상관없이 넣을 수 있어 공고문을 확인하세요.";
   return `제외: 총자산이 기준(${v.assetBlocked})을 넘습니다.`;
 }
 

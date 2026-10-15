@@ -18,7 +18,7 @@ export function checks(n: Notice, v: Verdict, s: Settings): Check[] {
     label: "지역",
     value: n.sido || "미상",
     ok: v.region === "in",
-    detail: v.region === "in" ? "" : "고른 시도 밖",
+    detail: v.region === "in" ? "" : "사는 곳의 권역 밖",
   });
   const t = v.tickets;
   const tickets = [

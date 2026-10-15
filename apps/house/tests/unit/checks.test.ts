@@ -20,7 +20,7 @@ test("기준 줄은 지역 + 특공. 돈은 보지 않는다", () => {
     [true, undefined],
   );
   const far = notice({ sido: "부산" });
-  assert.equal(checks(far, judge(far, s), s)[0]!.detail, "고른 시도 밖");
+  assert.equal(checks(far, judge(far, s), s)[0]!.detail, "사는 곳의 권역 밖");
 });
 
 test("자산 자격 줄은 나눔·선택형·신혼희망타운에만 붙는다", () => {

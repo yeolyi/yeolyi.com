@@ -7,7 +7,6 @@ import {
   SETTINGS_LIMITS,
   type Settings,
 } from "@shared/types.ts";
-import Checkbox from "@yeolyi/ui/Checkbox";
 import DateInput, { isRealDate } from "@yeolyi/ui/DateInput";
 import Input from "@yeolyi/ui/Input";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
@@ -127,19 +126,17 @@ function personSteps(i: 0 | 1): Step[] {
       group,
       label: "사는 곳",
       question: i === 0 ? "어디에 사나요?" : "배우자는 어디에 사나요?",
-      hint: "주민등록상 주소입니다. 공고가 난 시·군에 살면 그 지역 사람이 먼저 뽑힙니다.",
+      hint: "주민등록상 주소입니다. 넣을 수 있는 공고는 사는 곳의 권역(수도권처럼 묶인 시도)으로 정해지고, 공고가 난 시·군에 살면 먼저 뽑힙니다.",
       input: ({ d, set }) => (
         <div className="flex flex-wrap items-center gap-2">
           <Select
             aria-label="시도"
             value={p(d).sido || undefined}
             placeholder="시도"
-            // 시도를 바꾸면 그 안에 없는 시군구는 지운다. 사는 시도는 볼 지역에도 더한다
-            // (배우자만 그 지역에서 유리할 수 있어, 두 사람이 사는 시도의 공고는 늘 후보에 들게).
+            // 시도를 바꾸면 그 안에 없는 시군구는 지운다.
             onValueChange={(v) =>
               set({
                 ...d,
-                areas: d.areas.includes(v) ? d.areas : [...d.areas, v],
                 people: setP(d, {
                   sido: v,
                   sigungu: SIGUNGU[v]?.includes(p(d).sigungu)
@@ -276,33 +273,6 @@ function personSteps(i: 0 | 1): Step[] {
 }
 
 const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
-  {
-    id: "areas",
-    group: "공고",
-    label: "지역",
-    question: "어느 지역 공고를 볼까요?",
-    hint: "고른 시도의 공고만 후보로 봅니다. 여러 곳을 골라도 됩니다. 나와 배우자가 사는 시도는 뒤에서 사는 곳을 넣을 때 저절로 더해집니다.",
-    input: ({ d, set }) => (
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-y-2">
-        {AREA_NAMES.map((a) => (
-          <Checkbox
-            key={a}
-            checked={d.areas.includes(a)}
-            onCheckedChange={(on) =>
-              set({
-                ...d,
-                areas: on ? [...d.areas, a] : d.areas.filter((x) => x !== a),
-              })
-            }
-          >
-            {a}
-          </Checkbox>
-        ))}
-      </div>
-    ),
-    answer: (s) => s.areas.join(", ") || "없음",
-    check: (s) => (s.areas.length ? undefined : "하나 이상 고르세요"),
-  },
   {
     id: "household",
     group: "가구",

@@ -1,4 +1,5 @@
 import { addDays, fmtDate, todayYmd } from "@shared/dates.ts";
+import { regionsOf } from "@shared/rules.ts";
 import { applyEnd, isLive } from "@shared/site.ts";
 import type { Notice, Settings } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
@@ -85,8 +86,11 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           </>
         ) : (
           <>
-            <a href="/settings">개인화</a>({s.areas.join("·") || "시도 없음"})에
-            맞춰 넣을 수 있는 공고를 골랐습니다.
+            사는 곳 기준으로 넣을 수 있는{" "}
+            {regionsOf(s.people.map((p) => p.sido).filter(Boolean))
+              .map((r) => r.label)
+              .join("·") || "전국"}{" "}
+            공고를 <a href="/settings">개인화</a>에 맞춰 골랐습니다.
           </>
         )}
       </p>
@@ -151,7 +155,7 @@ function summary(n: Notice, v: Verdict, scope: Scope): string {
     scope !== "rejected"
       ? ""
       : v.region === "out"
-        ? "고른 시도 밖"
+        ? "사는 곳의 권역 밖"
         : v.assetBlocked
           ? `자산 기준 초과(${v.assetBlocked})`
           : "";

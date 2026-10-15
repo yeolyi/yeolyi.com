@@ -65,7 +65,6 @@ export type Person = {
 
 /** 사람마다 다른 값은 전부 여기. 로그인하면 house.profiles 에, 아니면 브라우저에 남는다. */
 export type Settings = {
-  areas: string[]; // 청약홈 시도 이름. 이 안의 공고만 후보
   people: Person[]; // 한두 명. 특공은 그중 한 명만 넣는다
   marriedAt: string; // 혼인신고일. 비면 미혼. 민영 신혼 특공은 신고 필수, 공공은 예비신혼도 됨. 무주택기간·가점 부양가족도 여기서
   children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
@@ -87,7 +86,6 @@ export const emptyPerson = (name: string): Person => ({
 });
 
 export const DEFAULT_SETTINGS: Settings = {
-  areas: ["서울", "경기"],
   people: [emptyPerson("나")],
   marriedAt: "",
   children: 0,

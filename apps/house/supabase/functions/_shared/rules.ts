@@ -168,3 +168,20 @@ export function incomeBaseMan(householdSize: number): number {
       : (`${Math.min(8, householdSize)}인` as keyof typeof INCOME_BASE_2026);
   return INCOME_BASE_2026[key] / 10000;
 }
+
+/** 사는 곳으로 넣을 수 있는 권역(규칙 제4조 ③). 같은 권역 안의 다른 시·군 공고에도 넣는다(해당지역 다음 순서).
+ *  제주는 목록에 없어 혼자. 행복도시 예정지역·혁신도시·기업도시·산업단지 등은 사는 곳과 상관없이 넣지만(① 3호) 공고 데이터로 가를 수 없다. */
+export const REGIONS: { label: string; sidos: readonly string[] }[] = [
+  { label: "수도권", sidos: ["서울", "인천", "경기"] },
+  { label: "대전·세종·충남", sidos: ["대전", "세종", "충남"] },
+  { label: "충북", sidos: ["충북"] },
+  { label: "광주·전남", sidos: ["광주", "전남"] },
+  { label: "전북", sidos: ["전북"] },
+  { label: "대구·경북", sidos: ["대구", "경북"] },
+  { label: "부산·울산·경남", sidos: ["부산", "울산", "경남"] },
+  { label: "강원", sidos: ["강원"] },
+  { label: "제주", sidos: ["제주"] },
+];
+/** 사는 시도들이 속한 권역. */
+export const regionsOf = (sidos: string[]) =>
+  REGIONS.filter((r) => sidos.some((s) => r.sidos.includes(s)));
