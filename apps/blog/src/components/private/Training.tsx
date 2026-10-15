@@ -53,7 +53,7 @@ export default function Training() {
   const cardio = cardioToday();
 
   return (
-    <div className="my-[1lh] flex flex-col gap-[1lh] font-mono">
+    <div className="my-[1rlh] flex flex-col gap-[1rlh] font-mono">
       <p>
         <strong className="font-bold">{DAY_THEME[day]}</strong>
         {sbd != null && (
@@ -126,7 +126,7 @@ function TodayForm({
 
   return (
     <>
-      <div className="flex flex-col gap-[1lh]">
+      <div className="flex flex-col gap-[1rlh]">
         <TierBlock
           row={t1}
           done={t1ok}
@@ -167,7 +167,7 @@ function TierBlock({
   const [sets, setSets] = useState(0);
 
   return (
-    <div className="flex flex-col gap-[0.5lh]">
+    <div className="flex flex-col gap-[0.5rlh]">
       <div className="flex items-baseline justify-between gap-[1ch]">
         <span>
           <span className="text-muted-foreground">{row.tier}</span>{" "}

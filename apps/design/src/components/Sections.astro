@@ -1,27 +1,51 @@
 ---
 // 홈의 둘러보기: 블로그 홈 작업 목록과 같은 꼴(가로로 긴 배너 + 이름·한 줄 설명). 배너는 그 섹션의 견본이다.
 // 배너는 실제 부품이라 눌러 볼 수 있고 링크가 아니다. 이동은 이름 링크로.
-import { ComponentsBanner, PatternsBanner, StylesBanner } from "./SectionBanners";
+import ColorStrips from "@yeolyi/ui/ColorStrips";
+import { ComponentsBanner, PatternsBanner } from "./SectionBanners";
 
 const SECTIONS = [
-  { key: "styles", name: "스타일", summary: "색, 글자, 간격, 선, 링크와 초점, 아이콘, 움직임, 문구", href: "/styles" },
-  { key: "components", name: "컴포넌트", summary: "버튼, 입력, 체크박스, 라디오, 셀렉트, 서비스 헤더 같은 부품", href: "/components" },
-  { key: "patterns", name: "패턴", summary: "헤더, 한 페이지에 질문 하나, 답 요약, 목록", href: "/patterns" },
+  {
+    key: "styles",
+    name: "스타일",
+    summary: "색, 글자, 간격, 선, 링크와 초점, 아이콘, 움직임, 문구",
+    href: "/styles",
+  },
+  {
+    key: "components",
+    name: "컴포넌트",
+    summary: "버튼, 입력, 체크박스, 라디오, 셀렉트, 서비스 헤더",
+    href: "/components",
+  },
+  {
+    key: "patterns",
+    name: "패턴",
+    summary: "헤더, 한 페이지에 질문 하나, 답 요약, 목록",
+    href: "/patterns",
+  },
 ];
 ---
 
-<ul class="plain flex flex-col gap-[1.5lh]">
+<ul class="plain flex flex-col gap-[1.5rlh]">
   {
     SECTIONS.map((s) => (
       <li>
-        <div class="border-border relative h-[4lh] w-full overflow-hidden border select-none sm:h-[5lh]">
-          {s.key === "styles" && <StylesBanner client:visible />}
+        <div class="border-border relative h-[4rlh] w-full overflow-hidden border select-none sm:h-[5rlh]">
+          {s.key === "styles" && <ColorStrips client:visible />}
           {s.key === "components" && <ComponentsBanner client:visible />}
           {s.key === "patterns" && <PatternsBanner client:visible />}
         </div>
-        <p class="mt-[0.25lh]">
-          <a class="py-1.5" href={s.href}>{s.name}</a>
-          <span class="text-muted-foreground"> {s.summary}</span>
+        {/* 설명까지 한 링크. 반전은 이름에만 걸리게 링크의 호버 반전은 끄고 group 으로 이름 span 에 준다 */}
+        <p class="mt-[0.25rlh]">
+          <a
+            class="group hover:text-foreground py-1.5 no-underline hover:bg-transparent"
+            href={s.href}
+          >
+            <span class="group-hover:bg-foreground group-hover:text-background underline decoration-1 underline-offset-[0.2em]">
+              {s.name}
+            </span>
+            <span class="text-muted-foreground"> {s.summary}</span>
+          </a>
         </p>
       </li>
     ))

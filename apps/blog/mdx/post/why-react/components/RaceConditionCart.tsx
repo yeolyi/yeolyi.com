@@ -48,11 +48,11 @@ export default function RaceConditionCart() {
   const filteredProductIds = new Set(filteredProducts.map((p) => p.id));
 
   return (
-    <div className="prose py-[1lh]">
-      <div className="grid gap-[1lh] sm:grid-cols-2 sm:gap-0">
+    <div className="prose py-[1rlh]">
+      <div className="grid gap-[1rlh] sm:grid-cols-2 sm:gap-0">
         <div className="border-border sm:border-r sm:pe-6">
           <h3 className="mt-0">상품 필터</h3>
-          <div className="mt-[0.5lh]">
+          <div className="mt-[0.5rlh]">
             <RadioGroup
               orientation="vertical"
               defaultValue="none"
@@ -71,7 +71,7 @@ export default function RaceConditionCart() {
         </div>
         <div className="sm:ps-6">
           <h3 className="mt-0">상품 목록 {isLoading && "(로딩 중...)"}</h3>
-          <ul className="mt-[0.5lh]">
+          <ul className="mt-[0.5rlh]">
             {ALL_PRODUCTS.map((p) => (
               <li
                 key={p.id}

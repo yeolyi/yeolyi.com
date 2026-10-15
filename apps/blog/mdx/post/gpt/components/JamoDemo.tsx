@@ -34,7 +34,7 @@ export default function JamoDemo() {
   const jamo = useMemo(() => [...decompose(text)], [text]);
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}

@@ -52,11 +52,11 @@ export default function ComplexCart() {
   const total = sumBy(cart, (item) => item.price * item.quantity);
 
   return (
-    <div className="prose py-[1lh]">
-      <div className="grid gap-[1lh] sm:grid-cols-2 sm:gap-0">
+    <div className="prose py-[1rlh]">
+      <div className="grid gap-[1rlh] sm:grid-cols-2 sm:gap-0">
         <div className="border-border sm:border-r sm:pe-6">
           <h3 className="mt-0">상품 목록</h3>
-          <ul className="mt-[0.5lh]">
+          <ul className="mt-[0.5rlh]">
             {PRODUCTS.map((product) => (
               <li key={product.id} className="flex items-center gap-[1ch]">
                 {product.name}
@@ -71,12 +71,12 @@ export default function ComplexCart() {
         <div className="sm:ps-6">
           <h3 className="mt-0">장바구니</h3>
           {cart.length === 0 ? (
-            <p className="text-muted-foreground mt-[0.5lh]">
+            <p className="text-muted-foreground mt-[0.5rlh]">
               장바구니가 비어있습니다.
             </p>
           ) : (
             <>
-              <ul className="mt-[0.5lh]">
+              <ul className="mt-[0.5rlh]">
                 {cart.map((item) => (
                   <li key={item.id} className="flex items-center gap-[1ch]">
                     <span>
@@ -96,7 +96,7 @@ export default function ComplexCart() {
                   </li>
                 ))}
               </ul>
-              <p className="border-border mt-[0.5lh] flex items-center border-t pt-[0.5lh]">
+              <p className="border-border mt-[0.5rlh] flex items-center border-t pt-[0.5rlh]">
                 합계
                 <span className="ms-auto">{won(total)}</span>
               </p>

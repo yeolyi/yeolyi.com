@@ -31,17 +31,17 @@ const href = (p: CollectionEntry<"post">) => `/post/${postSlug(p.id)}`;
 >
   {
     /* 사이트 헤더(Masthead)는 모든 페이지 공통으로 BaseLayout 이 렌더한다. 글은 그
-     아래 한 칸(mt-1lh) 띄워 문서 헤더(제목·메타·추천)부터 시작한다. 디바이더, 본문,
-     아래=추천 순. 상·하단 추천은 스토어로 동기화. 간격은 DS 리듬(1lh·2lh). */
+     아래 한 칸(mt-1rlh) 띄워 문서 헤더(제목·메타·추천)부터 시작한다. 디바이더, 본문,
+     아래=추천 순. 상·하단 추천은 스토어로 동기화. 간격은 DS 리듬(1rlh·2rlh). */
   }
-  <div class="measure-col mt-[2lh] pb-[5lh] [&_astro-island]:block">
+  <div class="measure-col mt-[2rlh] pb-[5rlh] [&_astro-island]:block">
     {
       /* 글 머리: 제목, 0.5줄 아래 날짜·조회(왼쪽)와 추천(오른쪽 끝) 한 줄, 1px 가는 선으로 본문과 나눈다.
        추천 아이콘의 안쪽 여백은 -mr-2 로 상쇄해 오른쪽 선을 맞춘다. */
     }
-    <header class="border-border border-b pb-[0.5lh]">
+    <header class="border-border border-b pb-[0.5rlh]">
       <h1>{page.data.title}</h1>
-      <div class="mt-[0.25lh] flex items-center justify-between gap-4">
+      <div class="mt-[0.25rlh] flex items-center justify-between gap-4">
         <PostMeta date={meta} site="blog" client:idle />
         {
           /* 추천은 누를 자리(44px)는 지키되 줄 높이엔 끼어들지 않게 위아래를 겹쳐 둔다. */
@@ -52,7 +52,7 @@ const href = (p: CollectionEntry<"post">) => `/post/${postSlug(p.id)}`;
       </div>
     </header>
 
-    <div class="prose mt-[1.5lh]">
+    <div class="prose mt-[1.5rlh]">
       <Content components={mdxComponents} />
     </div>
 
@@ -61,7 +61,7 @@ const href = (p: CollectionEntry<"post">) => `/post/${postSlug(p.id)}`;
          이전·다음은 표시와 제목을 한 줄에 두고, 표시 칸 폭을 맞춰 제목의 시작선을 가지런히 한다.
          추천 아이콘의 안쪽 여백은 -ml-2 로 상쇄해 왼쪽 선을 맞춘다. */
     }
-    <footer class="border-border mt-[2lh] border-t pt-[0.5lh]">
+    <footer class="border-border mt-[2rlh] border-t pt-[0.5rlh]">
       <div class="-my-2 -ml-2 w-fit">
         <HeartButton postId={slug} client:idle />
       </div>
@@ -69,7 +69,7 @@ const href = (p: CollectionEntry<"post">) => `/post/${postSlug(p.id)}`;
         (prev || next) && (
           <nav
             aria-label="이전·다음 글"
-            class="mt-[0.5lh] grid grid-cols-[auto_1fr] items-baseline gap-x-4"
+            class="mt-[0.5rlh] grid grid-cols-[auto_1fr] items-baseline gap-x-4"
           >
             {prev && (
               <>

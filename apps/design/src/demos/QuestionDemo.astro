@@ -1,0 +1,33 @@
+---
+// 패턴 "한 페이지에 질문 하나" 견본: 진행 막대 → 질문(제목) → 도움말 → 답 → 주황 버튼 하나.
+import Button from "@yeolyi/ui/Button";
+import RadioGroup from "@yeolyi/ui/RadioGroup";
+---
+
+<div class="demo">
+  <div
+    role="progressbar"
+    aria-label="진행"
+    aria-valuemin="1"
+    aria-valuemax="15"
+    aria-valuenow="2"
+    class="bg-muted h-1 w-full"
+  >
+    <div class="bg-foreground h-full" style="width: 13.3%"></div>
+  </div>
+  <h2 class="mt-[1rlh]!">누구와 함께 신청하나요?</h2>
+  <p class="text-muted-foreground">
+    배우자나 결혼할 사람이 있으면 두 사람 모두 따져 봅니다.
+  </p>
+  <div class="mt-[1rlh]">
+    <RadioGroup
+      client:visible
+      orientation="vertical"
+      options={["혼자", "배우자 또는 결혼할 사람과 함께"]}
+      aria-label="함께 신청하는 사람"
+    />
+  </div>
+  <div class="mt-[1.5rlh]">
+    <Button variant="primary">저장 후 계속</Button>
+  </div>
+</div>

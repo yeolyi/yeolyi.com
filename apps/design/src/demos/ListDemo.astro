@@ -1,0 +1,29 @@
+---
+// 패턴 "목록" 견본: 고정폭 날짜 + 제목 링크, 아래 보조 색 요약 한 줄.
+const items = [
+  {
+    date: "10/12(월)",
+    title: "쌍용 더 플래티넘 한강",
+    summary: "경기 · 민영 · 본청약 · 7.5억",
+  },
+  {
+    date: "10/13(화)",
+    title: "수원역 아너스빌 타임원(2차)",
+    summary: "경기 · 민영 · 임의공급 · 분양가 미상",
+  },
+];
+---
+
+<div class="demo">
+  <ul class="plain">
+    {
+      items.map((it, i) => (
+        <li class={i ? "mt-[0.5rlh]" : ""}>
+          <span class="text-muted-foreground font-mono">{it.date} </span>
+          <a href="#">{it.title}</a>
+          <p class="text-muted-foreground mt-0! text-base">{it.summary}</p>
+        </li>
+      ))
+    }
+  </ul>
+</div>

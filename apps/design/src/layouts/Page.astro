@@ -29,10 +29,24 @@ const isHome = path === "/";
     <meta charset="UTF-8" />
     <script is:inline set:html={THEME_INIT} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{isHome ? "디자인 시스템 · yeolyi.com" : `${title} · 디자인 시스템`}</title>
+    <title>
+      {isHome ? "디자인 시스템 · yeolyi.com" : `${title} · 디자인 시스템`}
+    </title>
     {description && <meta name="description" content={description} />}
-    <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/MonoplexKR-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/PretendardVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/MonoplexKR-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="canonical" href={new URL(path, Astro.site)} />
@@ -41,20 +55,28 @@ const isHome = path === "/";
     <ServiceHeader
       client:load
       name="디자인 시스템"
-      className="measure-col pt-[1.5lh]"
+      className="measure-col pt-[1.5rlh]"
       nav={SECTIONS.map((s) => ({ ...s, current: s === section }))}
     />
-    <main class="measure-col mt-[2lh] pb-[5lh] [&_astro-island]:block">
-      <header class="border-border border-b pb-[0.5lh]">
-        {section && !isHome && path !== section.href && (
-          <p class="text-muted-foreground font-mono text-base">
-            <a href={section.href} class="text-muted-foreground">{section.label}</a>
-          </p>
-        )}
+    <main class="measure-col mt-[2rlh] pb-[5rlh] [&_astro-island]:block">
+      <header class="border-border border-b pb-[0.5rlh]">
+        {
+          section && !isHome && path !== section.href && (
+            <p class="text-muted-foreground font-mono text-base">
+              <a href={section.href} class="text-muted-foreground">
+                {section.label}
+              </a>
+            </p>
+          )
+        }
         <h1>{title}</h1>
-        {description && <p class="text-muted-foreground mt-[0.25lh]">{description}</p>}
+        {
+          description && (
+            <p class="text-muted-foreground mt-[0.25rlh]">{description}</p>
+          )
+        }
       </header>
-      <div class="prose mt-[1.5lh]">
+      <div class="prose mt-[1.5rlh]">
         <slot />
       </div>
     </main>

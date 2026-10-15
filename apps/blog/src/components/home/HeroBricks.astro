@@ -2,14 +2,14 @@
 import { Image } from "astro:assets";
 import me from "@/assets/main-me.avif";
 
-// 홈 사진. 링크 한 줄 크기(높이 1lh, 너비 약 4em) 칸으로 사진을 나누고, 마우스(또는
+// 홈 사진. 링크 한 줄 크기(높이 1rlh, 너비 약 4em) 칸으로 사진을 나누고, 마우스(또는
 // 손가락)가 지나는 칸을 그 영역의 평균색으로 채운다. 떠난 칸은 0.15초에 걸쳐 사진으로
 // 돌아온다(움직임 줄이기면 바로). 높이는 줄 높이의 배수라 칸이 세로로 딱 떨어지고,
 // 가로 칸 수는 폭에 맞춰 정해 칸 너비가 남지 않게 나눈다. 칸은 반듯한 격자로 나란히 놓는다.
 ---
 
 <div
-  class="relative h-[4lh] w-full touch-pan-y overflow-hidden select-none sm:h-[7lh]"
+  class="relative h-[4rlh] w-full touch-pan-y overflow-hidden select-none sm:h-[7rlh]"
   data-hero-bricks
 >
   <Image

@@ -70,7 +70,7 @@ export default function AttentionMap() {
   }, [result, head]);
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <div className="flex flex-wrap items-center gap-[2ch]">
         <Input
           value={prompt}

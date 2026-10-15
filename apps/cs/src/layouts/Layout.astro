@@ -27,8 +27,20 @@ const ogImage = new URL(og.src, Astro.site);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline set:html={THEME_INIT} />
-    <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/MonoplexKR-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/PretendardVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/MonoplexKR-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -53,7 +65,11 @@ const ogImage = new URL(og.src, Astro.site);
     <title>{fullTitle}</title>
   </head>
   <body>
-    <ServiceHeader client:load name={NAME} className="measure-col pt-[1.5lh]" />
+    <ServiceHeader
+      client:load
+      name={NAME}
+      className="measure-col pt-[1.5rlh]"
+    />
     <slot />
     <script>
       import { startTracking } from "@yeolyi/track";

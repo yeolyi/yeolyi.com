@@ -12,7 +12,7 @@ const { parts } = Astro.props;
 ---
 
 <Layout>
-  <div class="measure-col prose mt-[2lh] pb-[5lh]">
+  <div class="measure-col prose mt-[2rlh] pb-[5rlh]">
     <ImageCompare />
 
     <p>
@@ -25,9 +25,9 @@ const { parts } = Astro.props;
     {
       parts.map(({ title, posts: partPosts }) => (
         <>
-          <h2 class="mt-[2lh]">{title}</h2>
+          <h2 class="mt-[2rlh]">{title}</h2>
           {partPosts.length > 0 ? (
-            <ol class="mt-[0.5lh]">
+            <ol class="mt-[0.5rlh]">
               {partPosts.map((p) => (
                 <li>
                   <a class="py-1.5" href={`/${postSlug(p.id)}`}>
@@ -37,7 +37,7 @@ const { parts } = Astro.props;
               ))}
             </ol>
           ) : (
-            <p class="text-muted-foreground mt-[0.5lh]">준비 중</p>
+            <p class="text-muted-foreground mt-[0.5rlh]">준비 중</p>
           )}
         </>
       ))

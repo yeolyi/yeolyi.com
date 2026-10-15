@@ -46,7 +46,7 @@ const HOME_WORKS = [
     banner: "cse" as const,
     ext: external,
   },
-  ...WORKS.map((w) => ({
+  ...WORKS.filter((w) => !w.hidden).map((w) => ({
     name: w.name,
     summary: w.summary,
     href: workHref(w),
@@ -58,26 +58,26 @@ const HOME_WORKS = [
 
 <BaseLayout>
   <!-- 순서: 전역 헤더(Masthead) → 히어로 이미지 → 본문. 이미지는 Masthead 바로 아래,
-       pt-[2lh] 로 띄운다(머리띠 아래 콘텐츠 시작은 어느 페이지나 2lh). -->
-  <div class="measure-col pt-[2lh]">
+       pt-[2rlh] 로 띄운다(머리띠 아래 콘텐츠 시작은 어느 페이지나 2rlh). -->
+  <div class="measure-col pt-[2rlh]">
     <HeroBricks />
   </div>
 
-  <!-- 홈은 prose 리듬을 그대로 쓴다: 섹션 제목 앞 2lh(목록 페이지), 제목↔목록 0.5lh(간격 단계는 글 "디자인 시스템"). -->
-  <div class="measure-col prose mt-[1lh] pb-[5lh]">
+  <!-- 홈은 prose 리듬을 그대로 쓴다: 섹션 제목 앞 2rlh(목록 페이지), 제목↔목록 0.5rlh(간격 단계는 글 "디자인 시스템"). -->
+  <div class="measure-col prose mt-[1rlh] pb-[5rlh]">
     <p>
       가치 있고 쓰기 좋은 무언가를 만듭니다. <a
         href="https://instagram.com/yeol.dev">인스타그램 계정</a
       >에서 개발 이야기를 합니다. <a href="/resume">이력서</a>
     </p>
 
-    <h2 class="mt-[2lh]">글</h2>
+    <h2 class="mt-[2rlh]">글</h2>
     {
       /* 글 목록 — 불릿 * 한 줄에 날짜(muted mono) + 제목 링크. li 직후·앵커 안에
        개행(공백 텍스트 노드)이 들어가면 제목이 마커 슬롯에서 한 칸 밀리고 밑줄이
        공백까지 덮는다 — 공백 없이 조판한다(날짜↔제목 사이만 한 칸). */
     }
-    <ul class="plain mt-[0.5lh]">
+    <ul class="plain mt-[0.5rlh]">
       {
         posts.map((p) => (
           <li>
@@ -92,22 +92,22 @@ const HOME_WORKS = [
       }
     </ul>
 
-    <h2 class="mt-[2lh]">작업</h2>
+    <h2 class="mt-[2rlh]">작업</h2>
     {
       /* 직접 만든 것 전부: 높이 5줄(모바일 4줄)의 가로로 긴 화면 하나(포인터에 반응하는 작은 조각) + 이름·한 줄 소개. 이미지가 항목을 나누니 목록 머리(*)는 없다.
        이미지는 만져 보는 곳이라 링크가 아니다(만지다 눌려 다른 사이트로 넘어가지 않게). 이동은 이름 링크 하나로. */
     }
-    <ul class="plain mt-[0.5lh] flex flex-col gap-[1.5lh]">
+    <ul class="plain mt-[0.5rlh] flex flex-col gap-[1.5rlh]">
       {
         HOME_WORKS.map((w) => (
           <li>
             <div
               aria-hidden="true"
-              class="border-border relative h-[4lh] w-full touch-pan-y overflow-hidden border select-none sm:h-[5lh]"
+              class="border-border relative h-[4rlh] w-full touch-pan-y overflow-hidden border select-none sm:h-[5rlh]"
             >
               <Banner id={w.banner} />
             </div>
-            <p class="mt-[0.25lh]">
+            <p class="mt-[0.25rlh]">
               <a class="py-1.5" href={w.href} {...w.ext}>
                 {w.name}
               </a>

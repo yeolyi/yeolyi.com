@@ -26,7 +26,7 @@
 }
 
 :where(.prose) > * + * {
-  @apply mt-[1lh];
+  @apply mt-[1rlh];
 }
 
 :where(.prose) > :first-child {
@@ -41,19 +41,19 @@
 
   /* 코드 블록 — 옅은 바탕 + 왼쪽 2px 굵은 선, 긴 줄은 줄바꿈. 색은 shiki 인라인(여기선 구조만). */
   .astro-code {
-    @apply bg-muted! border-foreground block border-l-2 px-[2ch] py-[0.5lh] font-mono text-base leading-normal wrap-break-word whitespace-pre-wrap;
+    @apply bg-muted! border-foreground block border-l-2 px-[2ch] py-[0.5rlh] font-mono text-base leading-normal wrap-break-word whitespace-pre-wrap;
   }
 
-  /* 헤딩 — 크기·굵기는 global.css. 위 여백은 h2 3lh·h3 1lh(섹션 경계). */
+  /* 헤딩 — 크기·굵기는 global.css. 위 여백은 h2 3rlh·h3 1rlh(섹션 경계). */
   h2,
   h3 {
     @apply scroll-mt-24;
   }
   h2 {
-    @apply mt-[3lh];
+    @apply mt-[3rlh];
   }
   h3 {
-    @apply mt-[1lh];
+    @apply mt-[1rlh];
   }
 
   /* 링크 — 모양은 global.css(늘 밑줄, 색은 글자색). 인용 안 링크도 글자색을 따른다. */
@@ -63,7 +63,7 @@
     @apply border-foreground text-muted-foreground border-l-2 pl-5;
 
     * + * {
-      @apply mt-[1lh];
+      @apply mt-[1rlh];
     }
   }
 

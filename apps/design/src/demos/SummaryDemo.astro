@@ -1,0 +1,25 @@
+---
+// 패턴 "답 요약" 견본: 줄마다 이름 · 답 · 바꾸기.
+const rows = [
+  { name: "함께 신청하는 사람", answer: "혼자" },
+  { name: "혼인신고일", answer: "" },
+];
+---
+
+<div class="demo">
+  <dl class="border-border border-t">
+    {
+      rows.map((r) => (
+        <div class="border-border flex flex-wrap items-baseline gap-x-4 border-b py-[0.25rlh]">
+          <dt class="w-40 font-bold">{r.name}</dt>
+          <dd class={r.answer ? "flex-1" : "text-muted-foreground flex-1"}>
+            {r.answer || "비어 있음"}
+          </dd>
+          <dd>
+            <a href="#">바꾸기</a>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>

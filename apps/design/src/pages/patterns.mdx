@@ -1,69 +1,47 @@
 ---
 layout: ../layouts/Page.astro
 title: "패턴"
-description: "부품을 엮어 자주 하는 일을 푸는 방법입니다."
+description: "컴포넌트를 엮어 자주 하는 일을 푸는 방법입니다."
 ---
 
-import Button from "@yeolyi/ui/Button";
-import RadioGroup from "@yeolyi/ui/RadioGroup";
-
-[헤더](#헤더) · [한 페이지에 질문 하나](#한-페이지에-질문-하나) · [답 요약](#답-요약) · [목록](#목록) · [흔들리지 않게](#흔들리지-않게)
+import QuestionDemo from "../demos/QuestionDemo.astro";
+import SummaryDemo from "../demos/SummaryDemo.astro";
+import ListDemo from "../demos/ListDemo.astro";
 
 ## 헤더
 
-블로그는 이름과 바깥 링크(GitHub, Instagram, 테마)를 둔 공통 헤더, 그 아래 서비스는 [서비스 헤더](/components#서비스-헤더) 한 줄입니다. 서비스에는 바깥 링크를 두지 않습니다. 돌아갈 길은 경로의 yeolyi.com 하나면 됩니다. 테마 버튼은 어디에나 둡니다.
-
-두 헤더는 같은 자리에 놓여 사이트를 오가도 이름과 본문이 움직이지 않습니다. 화면 전체를 쓰는 도구(편집기)만 서비스 헤더를 화면 폭에 두고 아래에 가는 선을 긋습니다.
+블로그는 이름과 바깥 링크를 둔 공통 헤더, 그 아래 서비스는
+[서비스 헤더](/components#서비스-헤더) 한 줄입니다. 둘은 같은 자리에 놓여
+사이트를 오가도 이름과 본문이 움직이지 않습니다. 서비스에는 바깥 링크를 두지
+않고, 테마 버튼은 어디에나 둡니다. 화면 전체를 쓰는 도구(편집기)만 헤더를 화면
+폭에 두고 아래에 가는 선을 긋습니다.
 
 ## 한 페이지에 질문 하나
 
-여러 가지를 물어야 하면 한 페이지에 질문 하나씩 묻습니다.
+여러 가지를 물어야 하면 한 페이지에 질문 하나씩 묻습니다. 제목이 곧 질문이고
+라벨, 도움말은 그 아래 보조 색 한두 문장, 진행은 숫자 대신 얇은 막대 하나,
+버튼은 주황 "저장 후 계속" 하나입니다. 오류는 제목 아래 굵게 한 문장으로 무엇을
+하라는지 씁니다. 차례로 넘기며 읽는 글도 같은 머리를 씁니다.
 
-<div class="demo">
-  <div role="progressbar" aria-label="진행" aria-valuemin="1" aria-valuemax="15" aria-valuenow="2" class="bg-muted h-1 w-full"><div class="bg-foreground h-full" style="width: 13.3%"></div></div>
-  <h2 class="mt-[1lh]!">누구와 함께 신청하나요?</h2>
-  <p class="text-muted-foreground">배우자나 결혼할 사람이 있으면 두 사람 모두 따져 봅니다.</p>
-  <div class="mt-[1lh]"><RadioGroup client:visible orientation="vertical" options={["혼자", "배우자 또는 결혼할 사람과 함께"]} aria-label="함께 신청하는 사람" /></div>
-  <div class="mt-[1.5lh]"><Button variant="primary">저장 후 계속</Button></div>
-</div>
-
-- 제목이 곧 질문이고 입력 칸의 라벨입니다.
-- 도움말은 제목 아래 보조 색 한두 문장.
-- 몇 번째인지는 숫자 대신 글 폭만큼 늘어나는 얇은 진행 막대 하나로 보입니다. 위에는 "뒤로" 링크를 둡니다.
-- 차례로 넘기며 읽는 글(청약 알리미의 가이드)도 같은 머리를 씁니다. 위에 "목록" 링크, 그 아래 진행 막대, 그다음 제목.
-- 버튼은 주황 "저장 후 계속" 하나, 마지막 질문은 "저장". 오류는 제목 아래 굵게 한 문장으로, 무엇을 하라는지 씁니다.
+<QuestionDemo />
 
 ## 답 요약
 
-받은 답은 한 페이지에 모읍니다. 줄마다 짧은 이름, 답, "바꾸기" 링크. 바꾸기로 들어간 질문은 저장하면 요약으로 돌아옵니다.
+받은 답은 한 페이지에 모읍니다. 줄마다 짧은 이름, 답, "바꾸기" 링크. 바꾸기로
+들어간 질문은 저장하면 요약으로 돌아옵니다.
 
-<div class="demo">
-  <dl class="border-border border-t">
-    <div class="border-border flex flex-wrap items-baseline gap-x-4 border-b py-[0.25lh]"><dt class="w-40 font-bold">함께 신청하는 사람</dt><dd class="flex-1">혼자</dd><dd><a href="#">바꾸기</a></dd></div>
-    <div class="border-border flex flex-wrap items-baseline gap-x-4 border-b py-[0.25lh]"><dt class="w-40 font-bold">혼인신고일</dt><dd class="flex-1 text-muted-foreground">비어 있음</dd><dd><a href="#">바꾸기</a></dd></div>
-  </dl>
-</div>
+<SummaryDemo />
 
 ## 목록
 
-블로그 글 목록처럼 한 줄에 고정폭 날짜와 제목 링크, 필요하면 아래에 보조 색 요약 한 줄. 카드나 상자로 두르지 않습니다.
+한 줄에 고정폭 날짜와 제목 링크, 필요하면 아래에 보조 색 요약 한 줄. 카드나
+상자로 두르지 않습니다.
 
-<div class="demo">
-  <ul class="plain">
-    <li><span class="text-muted-foreground font-mono">10/12(월) </span><a href="#">쌍용 더 플래티넘 한강</a><p class="text-muted-foreground mt-0! text-base">경기 · 민영 · 본청약 · 7.5억</p></li>
-    <li class="mt-[0.5lh]"><span class="text-muted-foreground font-mono">10/13(화) </span><a href="#">수원역 아너스빌 타임원(2차)</a><p class="text-muted-foreground mt-0! text-base">경기 · 민영 · 임의공급 · 분양가 미상</p></li>
-  </ul>
-</div>
+<ListDemo />
 
 ## 흔들리지 않게
 
-읽는 중에 글이 밀리지 않게 합니다(Cumulative Layout Shift). 사람이 누르거나 쳐서 바뀌는 건 괜찮고, 늦게 도착한 것이 자리를 바꾸는 걸 막습니다.
-
-- **이미지에는 늘 가로·세로 크기를 줍니다.** `width`·`height` 속성을 주고 CSS 로 `height: auto`. 폭을 줄여도 비율로 자리를 미리 잡습니다.
-- **나중에 오는 데이터는 다 온 뒤와 같은 크기로 먼저 그립니다.** 불러오는 동안에도 같은 상자, 같은 줄 수. 모자란 줄은 빈 줄로 채우고, 줄 수가 들쭉날쭉하면 가장 긴 경우만큼 `min-height`(`lh` 단위)를 줍니다.
-- **"불러오는 중", "못 불러옴"을 줄로 끼우지 않습니다.** 한 줄이 생겼다 사라지며 밀리니, 상자는 그대로 두고 화면 읽기 프로그램에만 알립니다(`aria-busy`, `role="status"`).
-- **실패하거나 비어도 상자를 없애지 않습니다.** 빈 상자로 남기거나 같은 높이의 안내 한 줄을 둡니다.
-- **위쪽에 늦게 끼우지 않습니다.** 알림·배너는 처음부터 자리를 두거나 본문 위에 겹쳐 띄웁니다.
-- 글꼴은 각 사이트의 `/fonts/` 에서 미리 불러옵니다(preload). 대체 글꼴로 그렸다 바뀌는 흔들림을 줄입니다.
-
-확인은 느린 네트워크를 흉내 내고 `PerformanceObserver` 의 `layout-shift` 값을 더해 봅니다. 사람이 누른 직후(`hadRecentInput`)는 빼고, 0 을 목표로 합니다.
+늦게 도착한 것이 글을 밀지 않게 합니다. 사람이 눌러서 바뀌는 건 괜찮습니다.
+이미지에는 늘 가로·세로 크기를 주고, 나중에 오는 데이터는 다 온 뒤와 같은 크기의
+상자로 먼저 그립니다. "불러오는 중" 같은 문구를 줄로 끼우지 않고 화면 읽기
+프로그램에만 알리며, 알림·배너는 처음부터 자리를 두거나 본문 위에 겹쳐 띄웁니다.

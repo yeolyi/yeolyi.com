@@ -30,6 +30,17 @@
   /* 버튼·입력 칸·세그먼트 높이 하나(44px, 누를 자리 최소 크기) */
   --spacing-control: 2.75rem;
 
+  /* 본문 컬럼 폭. 글 사이트와 서비스의 문서형 화면(설정·도구 페이지)이 같이 쓴다 */
+  --measure: 45rem;
+}
+
+/* 본문 컬럼 — measure 폭으로 중앙 정렬 + 좌우 여백. 콘텐츠 폭이 정확히
+   min(뷰포트-3rem, measure)가 되도록 패딩은 content-box 바깥에 얹는다. */
+@utility measure-col {
+  box-sizing: content-box;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
 }
 
 /* 데모의 지금 상태(현재 칸·적중 등) 표시: 반전(잉크 바탕 + 바탕색 글자). 문장 안 강조는 굵게. */
@@ -63,7 +74,6 @@
     padding-top: 2px;
   }
 }
-
 
 /* 테마: 기본은 OS 설정, 고른 값은 <html data-theme> (themeStore.ts 가 쿠키로 기억하고 페인트 전에 붙인다). */
 :root {

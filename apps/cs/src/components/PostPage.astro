@@ -22,15 +22,19 @@ const next = index >= 0 ? order[index + 1] : undefined;
 const href = (p: CollectionEntry<"post">) => `/${postSlug(p.id)}`;
 ---
 
-<Layout title={page.data.title} description={page.data.description} ogType="article">
+<Layout
+  title={page.data.title}
+  description={page.data.description}
+  ogType="article"
+>
   {
     /* 글 머리(제목, 조회·추천, 가는 선) → 본문 → 글 끝(추천, 이전·다음 글). 블로그 글과 같은 틀.
        추천 아이콘의 안쪽 여백은 -mr-2·-ml-2 로 상쇄해 선을 맞춘다. 상·하단 추천은 스토어로 동기화. */
   }
-  <div class="measure-col mt-[2lh] pb-[5lh] [&_astro-island]:block">
-    <header class="border-border border-b pb-[0.5lh]">
+  <div class="measure-col mt-[2rlh] pb-[5rlh] [&_astro-island]:block">
+    <header class="border-border border-b pb-[0.5rlh]">
       <h1>{page.data.title}</h1>
-      <div class="mt-[0.25lh] flex items-center justify-between gap-4">
+      <div class="mt-[0.25rlh] flex items-center justify-between gap-4">
         <PostMeta site="cs" client:idle />
         <div class="-my-2 -mr-2">
           <HeartButton postId={slug} client:idle />
@@ -38,11 +42,11 @@ const href = (p: CollectionEntry<"post">) => `/${postSlug(p.id)}`;
       </div>
     </header>
 
-    <div class="prose mt-[1.5lh]">
+    <div class="prose mt-[1.5rlh]">
       <Content components={mdxComponents} />
     </div>
 
-    <footer class="border-border mt-[2lh] border-t pt-[0.5lh]">
+    <footer class="border-border mt-[2rlh] border-t pt-[0.5rlh]">
       <div class="-my-2 -ml-2 w-fit">
         <HeartButton postId={slug} client:idle />
       </div>
@@ -50,7 +54,7 @@ const href = (p: CollectionEntry<"post">) => `/${postSlug(p.id)}`;
         (prev || next) && (
           <nav
             aria-label="이전·다음 글"
-            class="mt-[0.5lh] grid grid-cols-[auto_1fr] items-baseline gap-x-4"
+            class="mt-[0.5rlh] grid grid-cols-[auto_1fr] items-baseline gap-x-4"
           >
             {prev && (
               <>

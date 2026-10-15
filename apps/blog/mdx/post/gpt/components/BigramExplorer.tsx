@@ -46,7 +46,7 @@ export default function BigramExplorer() {
     );
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <p className="text-muted-foreground m-0">
         집계 완료: {built.ms.toFixed(0)}ms, 고유 글자{" "}
         {built.vocab.toLocaleString()}종

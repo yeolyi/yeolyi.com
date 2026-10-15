@@ -15,7 +15,7 @@ const AmdahlLawExample = () => {
   const maxSpeedup = p === 1 ? Infinity : 1 / (1 - p);
 
   return (
-    <div className="prose py-[1lh]">
+    <div className="prose py-[1rlh]">
       <p>
         전체의 <Num>{proportion}%</Num> 부분의 성능이{" "}
         <Num>{speedup.toFixed(1)}배</Num>로 향상되었을 때, 전체 성능은{" "}
@@ -26,7 +26,7 @@ const AmdahlLawExample = () => {
         </Num>
         를 넘지 못합니다.
       </p>
-      <div className="flex flex-wrap gap-x-8 gap-y-[0.5lh]">
+      <div className="flex flex-wrap gap-x-8 gap-y-[0.5rlh]">
         <div className="w-3xs">
           <span id="proportion-label" className="text-muted-foreground">
             개선할 부분의 비율

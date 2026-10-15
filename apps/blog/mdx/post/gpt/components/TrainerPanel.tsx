@@ -28,7 +28,7 @@ export default function TrainerPanel({ custom = false }: { custom?: boolean }) {
   const samples = state.samples;
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <div className="flex flex-wrap items-center gap-[1ch]">
         {custom ? (
           <>
@@ -92,7 +92,7 @@ export default function TrainerPanel({ custom = false }: { custom?: boolean }) {
       )}
 
       {samples.length > 0 && (
-        <div className="flex flex-col gap-[0.5lh]">
+        <div className="flex flex-col gap-[0.5rlh]">
           {samples.map((s) => (
             <div key={s.iter}>
               <p className="text-muted-foreground m-0">

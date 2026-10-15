@@ -1,40 +1,8 @@
 import Button from "@yeolyi/ui/Button";
 import Checkbox from "@yeolyi/ui/Checkbox";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
-import { clsx } from "clsx";
-import { useState } from "react";
 
-// 홈 둘러보기 배너(Sections.astro)의 내용. 그림이 아니라 실제 부품이라 누르고 골라 볼 수 있다.
-
-const SWATCHES = [
-  { name: "바탕", bg: "bg-background", fg: "text-foreground" },
-  { name: "옅은 바탕", bg: "bg-muted", fg: "text-foreground" },
-  { name: "가는 선", bg: "bg-border", fg: "text-foreground" },
-  { name: "보조", bg: "bg-muted-foreground", fg: "text-background" },
-  { name: "기본", bg: "bg-foreground", fg: "text-background" },
-  { name: "주황", bg: "bg-accent", fg: "text-on-accent" },
-];
-
-// 스타일: 색 띠를 누르면 그 띠가 넓어지고 이름이 보인다. 전환 없이 딱 바뀐다.
-export function StylesBanner() {
-  const [cur, setCur] = useState<number | null>(null);
-  return (
-    <div className="absolute inset-0 flex">
-      {SWATCHES.map((s, i) => (
-        <button
-          key={s.name}
-          type="button"
-          aria-pressed={cur === i}
-          onClick={() => setCur(cur === i ? null : i)}
-          className={clsx(s.bg, s.fg, "focus-fill flex cursor-pointer items-end overflow-hidden p-3 text-left")}
-          style={{ flexGrow: cur === i ? 3 : 1, flexBasis: 0 }}
-        >
-          <span className={clsx("font-mono text-base whitespace-nowrap", cur === i ? "visible" : "sr-only")}>{s.name}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
+// 홈 둘러보기 배너(Sections.astro)의 내용. 그림이 아니라 실제 부품이라 누르고 골라 볼 수 있다. 스타일 배너는 @yeolyi/ui/ColorStrips.
 
 export function ComponentsBanner() {
   return (
@@ -55,9 +23,15 @@ export function PatternsBanner() {
         <span className="text-muted-foreground hidden text-base sm:block">
           yeolyi.com / <b className="text-foreground">서비스</b>
         </span>
-        <span className="block text-[1.5rem] leading-tight font-bold sm:mt-1">누구와 함께 신청하나요?</span>
+        <span className="block text-[1.5rem] leading-tight font-bold sm:mt-1">
+          누구와 함께 신청하나요?
+        </span>
       </div>
-      <RadioGroup orientation="vertical" options={["혼자", "배우자와"]} aria-label="누구와 함께 신청하나요?" />
+      <RadioGroup
+        orientation="vertical"
+        options={["혼자", "배우자와"]}
+        aria-label="누구와 함께 신청하나요?"
+      />
     </div>
   );
 }

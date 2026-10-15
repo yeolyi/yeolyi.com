@@ -1,4 +1,4 @@
-/* yeolyi.com 사이트 묶음의 기본 꼴: 글꼴, 글 폭(measure-col), 본문 크기·행간, 링크·초점·제목. 정본은 design.yeolyi.com.
+/* yeolyi.com 사이트 묶음의 기본 꼴: 글꼴, 본문 크기·행간, 링크·초점·제목. 글 폭(measure-col)은 @yeolyi/ui/theme.css. 정본은 design.yeolyi.com.
    쓰는 쪽 CSS 에서 tailwindcss·@yeolyi/ui/theme.css 다음에 @import 한다. 글꼴 파일은 각 사이트의 /fonts/ 에 둔다(블로그가 preload 하는 주소와 같게). */
 
 @font-face {
@@ -24,22 +24,14 @@
     "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", sans-serif;
   --font-mono: "MonoplexKR", ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  --measure: 45rem;
-}
-
-/* 본문 컬럼 — measure 폭으로 중앙 정렬 + 좌우 여백. 콘텐츠 폭이 정확히
-   min(뷰포트-3rem, measure)가 되도록 패딩은 content-box 바깥에 얹는다. */
-@utility measure-col {
-  box-sizing: content-box;
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding-inline: 1.5rem;
 }
 
 @layer base {
+  /* 간격 단위는 rlh(루트 줄 높이). 본문 줄 높이(18px × 1.7)를 html 에 길이로 둬서 작은 글씨 요소에 걸어도 같은 값이다.
+     lh 를 쓰면 그 요소 자신의 줄 높이라 보조 글씨(16px)에서 짧아진다. */
   html {
     scrollbar-gutter: stable;
+    line-height: calc(1.125rem * 1.7);
   }
 
   /* 본문 18px(모바일 17px), 행간 1.7. 한국 읽기 사이트 범위(16~18px, 1.6~1.75) 안에서 큰 쪽.
@@ -52,6 +44,9 @@
     font-family: var(--font-sans);
   }
   @media (max-width: 40rem) {
+    html {
+      line-height: calc(1.0625rem * 1.7);
+    }
     body {
       font-size: 1.0625rem;
     }
@@ -116,7 +111,12 @@
   /* 다른 사이트로 가는 링크는 끝에 화살표(lucide arrow-up-right). yeolyi.com 과 그 아래 서비스(*.yeolyi.com, 개발 중엔 localhost)는
      다른 사이트가 아니다. 이미지·아이콘을 감싼 링크와 화면 읽기에서 숨긴 링크(배너)는 뺀다.
      글자 ↗ 는 Pretendard 에 없어 다른 글꼴로 대신 그려져 높이가 어긋났다. 마스크라 글자색(호버 반전 포함)을 그대로 따른다. */
-  a[href^="http"]:not([href*="//yeolyi.com"], [href*=".yeolyi.com"], [href^="http://localhost"], [aria-hidden="true"]):not(:has(img, svg))::after {
+  a[href^="http"]:not(
+      [href*="//yeolyi.com"],
+      [href*=".yeolyi.com"],
+      [href^="http://localhost"],
+      [aria-hidden="true"]
+    ):not(:has(img, svg))::after {
     content: "";
     display: inline-block;
     width: 0.8em;

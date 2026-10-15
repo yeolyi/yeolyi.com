@@ -49,7 +49,7 @@ export default function Playground() {
       </Checkbox>
       <p
         aria-live="polite"
-        className="min-h-[1lh] text-[1.5rem] leading-snug font-bold"
+        className="min-h-[1rlh] text-[1.5rem] leading-snug font-bold"
       >
         {convert ? (
           convert(text, { numbers })

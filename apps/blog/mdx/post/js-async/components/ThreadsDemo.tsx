@@ -90,8 +90,8 @@ export default function ThreadsDemo() {
   }
 
   return (
-    <div className="py-[1lh] font-mono">
-      <div className="mx-auto flex w-fit flex-col gap-[1lh]">
+    <div className="py-[1rlh] font-mono">
+      <div className="mx-auto flex w-fit flex-col gap-[1rlh]">
         <section>
           <p className="text-muted-foreground">싱글 스레드</p>
           <div className="grid w-fit grid-cols-[auto_auto] gap-x-[2ch]">

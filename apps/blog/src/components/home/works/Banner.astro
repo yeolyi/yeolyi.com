@@ -1,5 +1,6 @@
 ---
 import { getImage } from "astro:assets";
+import ColorStrips from "@yeolyi/ui/ColorStrips";
 import type { Work } from "@/components/work/works";
 import appleTree from "./assets/apple-tree.png";
 import chadBg from "./assets/chad-bg.png";
@@ -9,7 +10,6 @@ import CarouselBanner from "./CarouselBanner";
 import ChadBanner from "./ChadBanner";
 import CsBanner from "./CsBanner";
 import CseBanner from "./CseBanner";
-import DesignBanner from "./DesignBanner";
 import HouseBanner from "./HouseBanner";
 import JeongeumBanner from "./JeongeumBanner";
 import LogicBanner from "./LogicBanner";
@@ -40,7 +40,7 @@ const trees =
 
 {trees && <CsBanner client:visible {...trees} />}
 {id === "cse" && <CseBanner client:visible />}
-{id === "design" && <DesignBanner client:visible />}
+{id === "design" && <ColorStrips client:visible />}
 {id === "carousel" && <CarouselBanner client:visible />}
 {id === "jeongeum" && <JeongeumBanner client:visible />}
 {chadImg && <ChadBanner client:visible {...chadImg} />}

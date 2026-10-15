@@ -18,6 +18,8 @@ export interface Work {
   // site 는 yeolyi.com 아래 앱(개발 중엔 로컬로), href 는 바깥 주소.
   site?: SiteName;
   href?: string;
+  // 아직 작업 중이라 홈 목록에 안 보인다(사이트 자체는 떠 있다).
+  hidden?: boolean;
 }
 
 export const WORKS: Work[] = [
@@ -27,6 +29,7 @@ export const WORKS: Work[] = [
     banner: "house",
     name: "청약 알리미",
     summary: "청약 공고를 내 상황에 맞춰 걸러 보는 알리미",
+    hidden: true,
   },
   {
     slug: "carousel",

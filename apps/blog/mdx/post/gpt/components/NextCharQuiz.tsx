@@ -56,7 +56,7 @@ export default function NextCharQuiz() {
     );
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <p className="m-0">
         {problem.prefix}
         <span className="bg-muted px-[0.4ch]">

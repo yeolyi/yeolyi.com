@@ -5,636 +5,661 @@
 
 /* 고정폭은 블로그와 같은 MonoplexKR. 본문 글꼴은 슬라이드용으로 이미 넣은 Pretendard Regular·Bold(main.tsx)를 같이 쓴다. */
 @font-face {
-	font-family: "MonoplexKR";
-	src: url("/fonts/MonoplexKR-Regular.woff2") format("woff2");
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
+  font-family: "MonoplexKR";
+  src: url("/fonts/MonoplexKR-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @theme {
-	--font-sans:
-		Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
-		"Noto Sans KR", "Malgun Gothic", sans-serif;
-	--font-mono: "MonoplexKR", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans:
+    Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR",
+    "Malgun Gothic", sans-serif;
+  --font-mono: "MonoplexKR", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-	color-scheme: light dark;
-	/* 캔버스 위 편집 표시(선택 상자·손잡이·스냅선). 슬라이드는 늘 흰 종이라 테마와 상관없이 짙은 잉크로 그린다. */
-	--canvas-ink: var(--color-stone-900);
+  color-scheme: light dark;
+  /* 캔버스 위 편집 표시(선택 상자·손잡이·스냅선). 슬라이드는 늘 흰 종이라 테마와 상관없이 짙은 잉크로 그린다. */
+  --canvas-ink: var(--color-stone-900);
 }
 
 @layer base {
-	html,
-	body,
-	#root {
-		height: 100%;
-	}
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
 
-	/* 본문 18px(모바일 17px), 고정폭 메타(text-base)는 16px(모바일 15px). 블로그와 같다. */
-	body {
-		@apply bg-background text-foreground;
-		font-family: var(--font-sans);
-		font-size: 1.125rem;
-		font-weight: 400;
-		line-height: 1.7;
-	}
-	@media (max-width: 40rem) {
-		body {
-			font-size: 1.0625rem;
-		}
-		:root {
-			--text-base: 0.9375rem;
-		}
-	}
+  /* 간격 단위 rlh 의 기준(@yeolyi/site/base.css 와 같다) */
+  html {
+    line-height: calc(1.125rem * 1.7);
+  }
+  /* 본문 18px(모바일 17px), 고정폭 메타(text-base)는 16px(모바일 15px). 블로그와 같다. */
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  @media (max-width: 40rem) {
+    html {
+      line-height: calc(1.0625rem * 1.7);
+    }
+    body {
+      font-size: 1.0625rem;
+    }
+    :root {
+      --text-base: 0.9375rem;
+    }
+  }
 
-	* {
-		@apply border-border break-keep;
-	}
+  * {
+    @apply border-border break-keep;
+  }
 
-	h1,
-	h2,
-	h3 {
-		font-weight: 700;
-		letter-spacing: -0.01em;
-	}
-	h1 {
-		font-size: 1.5rem;
-		line-height: 1.3;
-	}
-	h2,
-	h3 {
-		font-size: 1.1875rem;
-		line-height: 1.5;
-	}
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  h2,
+  h3 {
+    font-size: 1.1875rem;
+    line-height: 1.5;
+  }
 
-	::selection {
-		background-color: var(--color-accent);
-		color: var(--color-on-accent);
-	}
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
 
-	/* 링크: 늘 밑줄, 올리면 반전, 키보드 초점은 글자·밑줄만 주황. */
-	a {
-		text-decoration-line: underline;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 0.2em;
-	}
-	a:not(:has(img, svg, .thumb)):hover {
-		background-color: var(--color-foreground);
-		color: var(--color-background);
-	}
-	a:focus-visible {
-		outline: none;
-		color: var(--color-accent);
-		text-decoration-color: var(--color-accent);
-	}
+  /* 링크: 늘 밑줄, 올리면 반전, 키보드 초점은 글자·밑줄만 주황. */
+  a {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  a:not(:has(img, svg, .thumb)):hover {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+  a:focus-visible {
+    outline: none;
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
 
-	button:not([disabled]),
-	[role="button"]:not([disabled]) {
-		cursor: pointer;
-	}
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
 
-	/* 초점 기본값: 주황 고리. 테두리가 있는 컨트롤은 focus-border, 없는 것은 focus-fill 로 덮는다. */
-	:focus-visible {
-		outline: 3px solid var(--color-accent);
-		outline-offset: 2px;
-	}
+  /* 초점 기본값: 주황 고리. 테두리가 있는 컨트롤은 focus-border, 없는 것은 focus-fill 로 덮는다. */
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 
-	@media (prefers-reduced-motion: reduce) {
-		*,
-		*::before,
-		*::after {
-			transition: none !important;
-			animation: none !important;
-		}
-	}
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }
 
 @layer components {
-	/* ---- 공통 ---- */
-	.bar {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 8px;
-		padding: 8px 16px;
-		border-bottom-width: 1px;
-	}
-	.bar .spacer {
-		flex: 1;
-	}
-	/* 성격이 다른 버튼 묶음 사이 1px 세로선 */
-	.bar .sep {
-		width: 1px;
-		height: 1.5rem;
-		margin: 0 4px;
-		background: var(--color-border);
-	}
-	.error {
-		@apply mark;
-		width: 100%;
-		padding: 8px 16px;
-		text-align: left;
-	}
-	.fatal {
-		padding: 40px;
-		font-family: var(--font-mono);
-		font-size: var(--text-base);
-		color: var(--color-muted-foreground);
-	}
-	.meta {
-		font-family: var(--font-mono);
-		font-size: var(--text-base);
-		color: var(--color-muted-foreground);
-	}
+  /* ---- 공통 ---- */
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom-width: 1px;
+  }
+  .bar .spacer {
+    flex: 1;
+  }
+  /* 성격이 다른 버튼 묶음 사이 1px 세로선 */
+  .bar .sep {
+    width: 1px;
+    height: 1.5rem;
+    margin: 0 4px;
+    background: var(--color-border);
+  }
+  .error {
+    @apply mark;
+    width: 100%;
+    padding: 8px 16px;
+    text-align: left;
+  }
+  .fatal {
+    padding: 40px;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--color-muted-foreground);
+  }
+  .meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--color-muted-foreground);
+  }
 
-	/* 접기: 상자 없이 화살표와 글자만, 펼치면 90도 돈다(블로그 prose 와 같다). */
-	details > summary {
-		@apply hover:bg-foreground hover:text-background focus-fill flex w-fit cursor-pointer list-none items-center gap-1.5 transition-colors;
-		&:active {
-			padding-top: 1px;
-			margin-bottom: -1px;
-		}
-		&::-webkit-details-marker {
-			display: none;
-		}
-		&::before {
-			content: "";
-			width: 1.25em;
-			height: 1.25em;
-			flex: none;
-			background-color: currentColor;
-			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E")
-				center / contain no-repeat;
-			transition: transform 0.15s;
-		}
-	}
-	details[open] > summary::before {
-		transform: rotate(90deg);
-	}
+  /* ---- 로그인 ---- */
+  /* ---- 홈 ---- */
+  .home {
+    min-height: 100%;
+  }
+  .deck-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(216px, 1fr));
+    gap: 40px 32px;
+    padding: 24px 16px 48px;
+  }
+  .deck-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .deck-card .thumb {
+    border-width: 1px;
+  }
 
-	/* ---- 로그인 ---- */
-	/* ---- 홈 ---- */
-	.home {
-		min-height: 100%;
-	}
-	.deck-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(216px, 1fr));
-		gap: 40px 32px;
-		padding: 24px 16px 48px;
-	}
-	.deck-card {
-		display: flex;
-		flex-direction: column;
-		min-width: 0;
-	}
-	.deck-card .thumb {
-		border-width: 1px;
-	}
+  /* ---- 편집기 ---- */
+  .editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .editor .body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+  .left {
+    width: 248px;
+    flex: none;
+    overflow-y: auto;
+    padding: 8px 24px 32px 44px;
+    border-right-width: 1px;
+  }
 
-	/* ---- 편집기 ---- */
-	.editor {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-	}
-	.editor .body {
-		flex: 1;
-		display: flex;
-		min-height: 0;
-	}
-	.left {
-		width: 248px;
-		flex: none;
-		overflow-y: auto;
-		padding: 8px 24px 32px 44px;
-		border-right-width: 1px;
-	}
+  /* 장 목록 */
+  .slide-item {
+    position: relative;
+    /* 썸네일 너비에 맞춰야 삭제 버튼이 썸네일 안쪽 모서리에 놓인다 */
+    width: max-content;
+    cursor: pointer;
+  }
+  .slide-item .thumb {
+    border-width: 1px;
+  }
+  /* 지금 장: 굵은 잉크 선 */
+  .slide-item.on .thumb {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+  .slide-item .no {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 0;
+    padding: 0 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    color: var(--color-muted-foreground);
+  }
+  .slide-item.on .no {
+    @apply mark;
+  }
+  .slide-item.drop-before::before,
+  .slide-item.drop-after::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--color-foreground);
+  }
+  .slide-item.drop-before::before {
+    top: -9px;
+  }
+  .slide-item.drop-after::after {
+    bottom: -9px;
+  }
+  /* 장 삭제: 지금 장과 올린 장에만 */
+  .slide-delete {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    visibility: hidden;
+  }
+  .slide-item:hover .slide-delete,
+  .slide-item.on .slide-delete,
+  .slide-delete:focus-visible {
+    visibility: visible;
+  }
+  /* 장 사이 새 장 넣기: 평소엔 틈만, 올리면 + 막대가 보인다 */
+  .slide-gap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 20px;
+    font-size: 1rem;
+    color: transparent;
+  }
+  .slide-gap:hover {
+    background: var(--color-foreground);
+    color: var(--color-background);
+  }
+  @media (pointer: coarse) {
+    .slide-gap {
+      color: var(--color-muted-foreground);
+    }
+  }
+  /* 인스타 캡션: 장 썸네일과 같은 크기 */
+  .caption-item {
+    width: 180px;
+    margin-top: 24px;
+  }
+  .caption-item textarea {
+    height: 225px;
+    resize: none;
+    font-size: var(--text-base);
+  }
 
-	/* 장 목록 */
-	.slide-item {
-		position: relative;
-		/* 썸네일 너비에 맞춰야 삭제 버튼이 썸네일 안쪽 모서리에 놓인다 */
-		width: max-content;
-		cursor: pointer;
-	}
-	.slide-item .thumb {
-		border-width: 1px;
-	}
-	/* 지금 장: 굵은 잉크 선 */
-	.slide-item.on .thumb {
-		outline: 2px solid var(--color-foreground);
-		outline-offset: 2px;
-	}
-	.slide-item .no {
-		position: absolute;
-		right: calc(100% + 8px);
-		top: 0;
-		padding: 0 3px;
-		font-family: var(--font-mono);
-		font-size: var(--text-base);
-		line-height: 1.5;
-		color: var(--color-muted-foreground);
-	}
-	.slide-item.on .no {
-		@apply mark;
-	}
-	.slide-item.drop-before::before,
-	.slide-item.drop-after::after {
-		content: "";
-		position: absolute;
-		left: 0;
-		right: 0;
-		height: 4px;
-		background: var(--color-foreground);
-	}
-	.slide-item.drop-before::before {
-		top: -9px;
-	}
-	.slide-item.drop-after::after {
-		bottom: -9px;
-	}
-	/* 장 삭제: 지금 장과 올린 장에만 */
-	.slide-delete {
-		position: absolute;
-		top: 1px;
-		right: 1px;
-		visibility: hidden;
-	}
-	.slide-item:hover .slide-delete,
-	.slide-item.on .slide-delete,
-	.slide-delete:focus-visible {
-		visibility: visible;
-	}
-	/* 장 사이 새 장 넣기: 평소엔 틈만, 올리면 + 막대가 보인다 */
-	.slide-gap {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 180px;
-		height: 20px;
-		font-size: 1rem;
-		color: transparent;
-	}
-	.slide-gap:hover {
-		background: var(--color-foreground);
-		color: var(--color-background);
-	}
-	@media (pointer: coarse) {
-		.slide-gap {
-			color: var(--color-muted-foreground);
-		}
-	}
-	/* 인스타 캡션: 장 썸네일과 같은 크기 */
-	.caption-item {
-		width: 180px;
-		margin-top: 24px;
-	}
-	.caption-item textarea {
-		height: 225px;
-		resize: none;
-		font-size: var(--text-base);
-	}
+  /* 캔버스 */
+  .stage {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    background-color: var(--color-muted);
+    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+    background-size: 16px 16px;
+    /* 캔버스에서 끄는 동작이 스크롤·확대로 새지 않게 */
+    touch-action: none;
+  }
+  .world {
+    position: absolute;
+    transform-origin: 0 0;
+  }
+  .world .slide {
+    overflow: visible;
+  }
+  .mask {
+    position: absolute;
+    background: color-mix(in srgb, var(--color-muted) 85%, transparent);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .world .layer {
+    cursor: move;
+  }
+  .world .layer:hover {
+    outline: calc(1.5px / var(--s)) dashed var(--canvas-ink);
+  }
+  .world .layer.editing {
+    cursor: text;
+    outline: calc(2px / var(--s)) solid var(--canvas-ink);
+    caret-color: var(--canvas-ink);
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .frame {
+    position: absolute;
+    outline: 1px solid var(--color-border);
+  }
+  .guide {
+    position: absolute;
+    background: var(--canvas-ink);
+  }
+  .guide.v {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+  }
+  .guide.h {
+    left: 0;
+    right: 0;
+    height: 1px;
+  }
+  /* 선택 상자는 흰 테를 둘러 사진 위에서도 보이게 한다 */
+  .selbox,
+  .cropbox {
+    position: absolute;
+    outline: 2px solid var(--canvas-ink);
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.6);
+  }
+  .cropbox {
+    pointer-events: auto;
+    cursor: grab;
+    outline-style: dashed;
+  }
+  .crop-ghost {
+    position: absolute;
+    max-width: none;
+    opacity: 0.35;
+    outline: 1px dashed var(--canvas-ink);
+  }
+  .handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    background: #fff;
+    border: 2px solid var(--canvas-ink);
+    pointer-events: auto;
+  }
+  .h-nw {
+    left: 0;
+    top: 0;
+    cursor: nwse-resize;
+  }
+  .h-ne {
+    left: 100%;
+    top: 0;
+    cursor: nesw-resize;
+  }
+  .h-sw {
+    left: 0;
+    top: 100%;
+    cursor: nesw-resize;
+  }
+  .h-se {
+    left: 100%;
+    top: 100%;
+    cursor: nwse-resize;
+  }
+  .h-n {
+    left: 50%;
+    top: 0;
+    cursor: ns-resize;
+  }
+  .h-s {
+    left: 50%;
+    top: 100%;
+    cursor: ns-resize;
+  }
+  .h-w {
+    left: 0;
+    top: 50%;
+    cursor: ew-resize;
+    height: 24px;
+    margin-top: -12px;
+  }
+  .h-e {
+    left: 100%;
+    top: 50%;
+    cursor: ew-resize;
+    height: 24px;
+    margin-top: -12px;
+  }
+  @media (pointer: coarse) {
+    .handle {
+      width: 22px;
+      height: 22px;
+      margin: -11px 0 0 -11px;
+    }
+    .h-w,
+    .h-e {
+      height: 36px;
+      margin-top: -18px;
+    }
+  }
+  /* 코드 레이어는 늘 조작되고, 옮기기는 왼쪽 위 바깥의 손잡이로 한다(올리거나 선택하면 보인다) */
+  .world .layer.code {
+    cursor: auto;
+  }
+  .move-handle {
+    position: absolute;
+    right: 100%;
+    bottom: 100%;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    transform: scale(calc(1 / var(--s)));
+    transform-origin: 100% 100%;
+    background: var(--canvas-ink);
+    color: #fff;
+    cursor: move;
+    opacity: 0;
+    touch-action: none;
+  }
+  .world .layer.code:hover .move-handle,
+  .world .layer.code.selected .move-handle {
+    opacity: 1;
+  }
+  /* 편집 중 블러(취소선 태그로 들고 다님): 결과와 같은 모양으로 보여 준다 */
+  .layer.txt.editing s,
+  .layer.txt.editing strike {
+    text-decoration: none;
+    color: transparent;
+    text-shadow: 0 0 0.2em #000;
+  }
 
-	/* 캔버스 */
-	.stage {
-		position: relative;
-		flex: 1;
-		min-width: 0;
-		overflow: hidden;
-		background-color: var(--color-muted);
-		background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
-		background-size: 16px 16px;
-		/* 캔버스에서 끄는 동작이 스크롤·확대로 새지 않게 */
-		touch-action: none;
-	}
-	.world {
-		position: absolute;
-		transform-origin: 0 0;
-	}
-	.world .slide {
-		overflow: visible;
-	}
-	.mask {
-		position: absolute;
-		background: color-mix(in srgb, var(--color-muted) 85%, transparent);
-		pointer-events: none;
-		z-index: 10;
-	}
-	.world .layer {
-		cursor: move;
-	}
-	.world .layer:hover {
-		outline: calc(1.5px / var(--s)) dashed var(--canvas-ink);
-	}
-	.world .layer.editing {
-		cursor: text;
-		outline: calc(2px / var(--s)) solid var(--canvas-ink);
-		caret-color: var(--canvas-ink);
-	}
-	.overlay {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		z-index: 20;
-	}
-	.frame {
-		position: absolute;
-		outline: 1px solid var(--color-border);
-	}
-	.guide {
-		position: absolute;
-		background: var(--canvas-ink);
-	}
-	.guide.v {
-		top: 0;
-		bottom: 0;
-		width: 1px;
-	}
-	.guide.h {
-		left: 0;
-		right: 0;
-		height: 1px;
-	}
-	/* 선택 상자는 흰 테를 둘러 사진 위에서도 보이게 한다 */
-	.selbox,
-	.cropbox {
-		position: absolute;
-		outline: 2px solid var(--canvas-ink);
-		box-shadow: 0 0 0 4px rgb(255 255 255 / 0.6);
-	}
-	.cropbox {
-		pointer-events: auto;
-		cursor: grab;
-		outline-style: dashed;
-	}
-	.crop-ghost {
-		position: absolute;
-		max-width: none;
-		opacity: 0.35;
-		outline: 1px dashed var(--canvas-ink);
-	}
-	.handle {
-		position: absolute;
-		width: 12px;
-		height: 12px;
-		margin: -6px 0 0 -6px;
-		background: #fff;
-		border: 2px solid var(--canvas-ink);
-		pointer-events: auto;
-	}
-	.h-nw { left: 0; top: 0; cursor: nwse-resize; }
-	.h-ne { left: 100%; top: 0; cursor: nesw-resize; }
-	.h-sw { left: 0; top: 100%; cursor: nesw-resize; }
-	.h-se { left: 100%; top: 100%; cursor: nwse-resize; }
-	.h-n { left: 50%; top: 0; cursor: ns-resize; }
-	.h-s { left: 50%; top: 100%; cursor: ns-resize; }
-	.h-w { left: 0; top: 50%; cursor: ew-resize; height: 24px; margin-top: -12px; }
-	.h-e { left: 100%; top: 50%; cursor: ew-resize; height: 24px; margin-top: -12px; }
-	@media (pointer: coarse) {
-		.handle {
-			width: 22px;
-			height: 22px;
-			margin: -11px 0 0 -11px;
-		}
-		.h-w,
-		.h-e {
-			height: 36px;
-			margin-top: -18px;
-		}
-	}
-	/* 코드 레이어는 늘 조작되고, 옮기기는 왼쪽 위 바깥의 손잡이로 한다(올리거나 선택하면 보인다) */
-	.world .layer.code {
-		cursor: auto;
-	}
-	.move-handle {
-		position: absolute;
-		right: 100%;
-		bottom: 100%;
-		display: grid;
-		place-items: center;
-		width: 22px;
-		height: 22px;
-		transform: scale(calc(1 / var(--s)));
-		transform-origin: 100% 100%;
-		background: var(--canvas-ink);
-		color: #fff;
-		cursor: move;
-		opacity: 0;
-		touch-action: none;
-	}
-	.world .layer.code:hover .move-handle,
-	.world .layer.code.selected .move-handle {
-		opacity: 1;
-	}
-	/* 편집 중 블러(취소선 태그로 들고 다님): 결과와 같은 모양으로 보여 준다 */
-	.layer.txt.editing s,
-	.layer.txt.editing strike {
-		text-decoration: none;
-		color: transparent;
-		text-shadow: 0 0 0.2em #000;
-	}
+  /* 속성 패널 */
+  .panel {
+    width: 352px;
+    flex: none;
+    overflow-y: auto;
+    border-left-width: 1px;
+  }
+  .panel section {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border-bottom-width: 1px;
+  }
+  .panel .field {
+    display: grid;
+    gap: 4px;
+  }
+  .layers {
+    display: grid;
+    /* 기본 1fr 은 내용 너비 아래로 안 줄어 긴 이름이 패널 밖으로 나간다 */
+    grid-template-columns: minmax(0, 1fr);
+    border-top-width: 1px;
+  }
+  .layers li {
+    display: flex;
+    border-bottom-width: 1px;
+  }
 
-	/* 속성 패널 */
-	.panel {
-		width: 352px;
-		flex: none;
-		overflow-y: auto;
-		border-left-width: 1px;
-	}
-	.panel section {
-		display: grid;
-		gap: 12px;
-		padding: 16px;
-		border-bottom-width: 1px;
-	}
-	.panel .field {
-		display: grid;
-		gap: 4px;
-	}
-	.layers {
-		display: grid;
-		/* 기본 1fr 은 내용 너비 아래로 안 줄어 긴 이름이 패널 밖으로 나간다 */
-		grid-template-columns: minmax(0, 1fr);
-		border-top-width: 1px;
-	}
-	.layers li {
-		display: flex;
-		border-bottom-width: 1px;
-	}
+  /* ---- 모바일 편집기: 위 바 · 장 띠 · 캔버스 · 아래 시트 ---- */
+  .editor.mobile {
+    height: 100dvh;
+  }
+  .editor.mobile .bar {
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0 4px;
+  }
+  .editor.mobile .bar .spacer {
+    display: none;
+  }
+  /* iOS 는 16px 보다 작은 입력칸에 초점이 가면 화면을 확대한다 */
+  .editor.mobile input,
+  .editor.mobile textarea {
+    font-size: 16px;
+  }
+  .slides.horizontal {
+    flex: none;
+    display: flex;
+    /* 장 번호(썸네일 왼쪽 바깥)가 들어갈 자리 */
+    gap: 28px;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 10px 8px 10px 28px;
+    border-bottom-width: 1px;
+  }
+  .slides.horizontal .slide-item {
+    flex: none;
+  }
+  .slides.horizontal .slide-delete {
+    visibility: visible;
+  }
+  .slides.horizontal .slide-gap {
+    width: 20px;
+    height: 70px;
+    flex: none;
+    margin: 0 -6px;
+  }
+  .editor.mobile .stage {
+    flex: 1;
+    min-height: 0;
+  }
+  .sheet {
+    flex: none;
+    max-height: 42dvh;
+    display: flex;
+    flex-direction: column;
+    border-top-width: 1px;
+  }
+  .sheet-tabs {
+    display: flex;
+    border-bottom-width: 1px;
+  }
+  .sheet-body {
+    overflow-y: auto;
+  }
+  .sheet .panel {
+    width: auto;
+    border-left-width: 0;
+    overflow: visible;
+  }
+  .caption-item.wide {
+    width: auto;
+    margin: 16px;
+  }
+  .caption-item.wide textarea {
+    height: 30dvh;
+  }
+  .toast {
+    @apply mark;
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    z-index: 100;
+  }
+  .share-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    display: grid;
+    gap: 8px;
+    padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+    border-top-width: 1px;
+    background: var(--color-background);
+  }
 
-	/* ---- 모바일 편집기: 위 바 · 장 띠 · 캔버스 · 아래 시트 ---- */
-	.editor.mobile {
-		height: 100dvh;
-	}
-	.editor.mobile .bar {
-		flex-wrap: nowrap;
-		gap: 0;
-		padding: 0 4px;
-	}
-	.editor.mobile .bar .spacer {
-		display: none;
-	}
-	/* iOS 는 16px 보다 작은 입력칸에 초점이 가면 화면을 확대한다 */
-	.editor.mobile input,
-	.editor.mobile textarea {
-		font-size: 16px;
-	}
-	.slides.horizontal {
-		flex: none;
-		display: flex;
-		/* 장 번호(썸네일 왼쪽 바깥)가 들어갈 자리 */
-		gap: 28px;
-		align-items: flex-start;
-		overflow-x: auto;
-		padding: 10px 8px 10px 28px;
-		border-bottom-width: 1px;
-	}
-	.slides.horizontal .slide-item {
-		flex: none;
-	}
-	.slides.horizontal .slide-delete {
-		visibility: visible;
-	}
-	.slides.horizontal .slide-gap {
-		width: 20px;
-		height: 70px;
-		flex: none;
-		margin: 0 -6px;
-	}
-	.editor.mobile .stage {
-		flex: 1;
-		min-height: 0;
-	}
-	.sheet {
-		flex: none;
-		max-height: 42dvh;
-		display: flex;
-		flex-direction: column;
-		border-top-width: 1px;
-	}
-	.sheet-tabs {
-		display: flex;
-		border-bottom-width: 1px;
-	}
-	.sheet-body {
-		overflow-y: auto;
-	}
-	.sheet .panel {
-		width: auto;
-		border-left-width: 0;
-		overflow: visible;
-	}
-	.caption-item.wide {
-		width: auto;
-		margin: 16px;
-	}
-	.caption-item.wide textarea {
-		height: 30dvh;
-	}
-	.toast {
-		@apply mark;
-		position: fixed;
-		left: 50%;
-		bottom: 24px;
-		transform: translateX(-50%);
-		padding: 8px 16px;
-		font-family: var(--font-mono);
-		font-size: var(--text-base);
-		z-index: 100;
-	}
-	.share-sheet {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 100;
-		display: grid;
-		gap: 8px;
-		padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
-		border-top-width: 1px;
-		background: var(--color-background);
-	}
-
-	/* ---- 슬라이드 본체 (편집·썸네일·내보내기 공통) ----
+  /* ---- 슬라이드 본체 (편집·썸네일·내보내기 공통) ----
 	   편집기 UI 의 글꼴 크기·줄 높이·색·테마가 슬라이드로 상속되지 않게 예전 값을 여기서 고정한다
 	   (코드 레이어의 Shadow DOM 도 상속받는다). 결과물 픽셀이 바뀌면 안 된다. */
-	.slide {
-		position: relative;
-		overflow: hidden;
-		background: #fff;
-		color: #000;
-		color-scheme: light;
-		font-family: Pretendard, sans-serif;
-		font-size: 14px;
-		font-weight: 400;
-		line-height: normal;
-		letter-spacing: normal;
-		tab-size: 8;
-		font-feature-settings: normal;
-		font-variation-settings: normal;
-		-webkit-font-smoothing: antialiased;
-		word-break: keep-all;
-		overflow-wrap: break-word;
-		text-align: start;
-		font-synthesis: none;
-	}
-	.render {
-		width: 1080px;
-	}
-	.layer {
-		position: absolute;
-	}
-	.layer.img {
-		overflow: hidden;
-	}
-	.layer.code > div:first-child {
-		/* 그려진 내용에 맞춰 상자 크기가 정해지게 */
-		width: max-content;
-	}
-	/* 썸네일에서는 코드 레이어를 누를 수 없게 */
-	.thumb .layer.code > div:first-child {
-		pointer-events: none;
-	}
-	.code-error {
-		max-width: 900px;
-		padding: 12px 16px;
-		border: 4px solid #ee220c;
-		color: #ee220c;
-		font: 24px/1.4 ui-monospace, monospace;
-		white-space: pre-wrap;
-		background: #fff;
-	}
-	.layer.txt {
-		white-space: pre-wrap;
-		word-break: keep-all;
-		overflow-wrap: break-word;
-		text-wrap-style: balance;
-		letter-spacing: 0;
-		outline: none;
-	}
-	.watermark {
-		position: absolute;
-		left: 0;
-		right: 0;
-		text-align: center;
-		line-height: 1;
-		z-index: 1;
-		pointer-events: none;
-	}
-	.thumb {
-		overflow: hidden;
-		flex: none;
-		background: #fff;
-	}
-	.thumb .layer {
-		cursor: inherit;
-	}
+  .slide {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    color: #000;
+    color-scheme: light;
+    font-family: Pretendard, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: normal;
+    tab-size: 8;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    text-align: start;
+    font-synthesis: none;
+  }
+  .render {
+    width: 1080px;
+  }
+  .layer {
+    position: absolute;
+  }
+  .layer.img {
+    overflow: hidden;
+  }
+  .layer.code > div:first-child {
+    /* 그려진 내용에 맞춰 상자 크기가 정해지게 */
+    width: max-content;
+  }
+  /* 썸네일에서는 코드 레이어를 누를 수 없게 */
+  .thumb .layer.code > div:first-child {
+    pointer-events: none;
+  }
+  .code-error {
+    max-width: 900px;
+    padding: 12px 16px;
+    border: 4px solid #ee220c;
+    color: #ee220c;
+    font:
+      24px/1.4 ui-monospace,
+      monospace;
+    white-space: pre-wrap;
+    background: #fff;
+  }
+  .layer.txt {
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    text-wrap-style: balance;
+    letter-spacing: 0;
+    outline: none;
+  }
+  .watermark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    line-height: 1;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .thumb {
+    overflow: hidden;
+    flex: none;
+    background: #fff;
+  }
+  .thumb .layer {
+    cursor: inherit;
+  }
 }
 
 /* 투명 PNG 미리보기 바탕(체크무늬) */
 .frame-checker {
-	background: repeating-conic-gradient(var(--color-muted, #e5e5e5) 0 25%, transparent 0 50%) 0 0 / 16px 16px;
+  background: repeating-conic-gradient(
+      var(--color-muted, #e5e5e5) 0 25%,
+      transparent 0 50%
+    )
+    0 0 / 16px 16px;
 }

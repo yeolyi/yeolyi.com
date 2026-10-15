@@ -15,7 +15,7 @@ export default function Playground() {
   const [temp, setTemp] = useState(0.8);
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <RadioGroup
         options={MODEL_OPTIONS}
         value={source}

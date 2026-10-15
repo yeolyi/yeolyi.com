@@ -52,7 +52,7 @@ export default function NgramExplorer() {
     );
 
   return (
-    <div className="flex flex-col gap-[1lh] font-mono">
+    <div className="flex flex-col gap-[1rlh] font-mono">
       <div className="flex items-center gap-[2ch]">
         <span>문맥 {k}글자</span>
         <Slider
