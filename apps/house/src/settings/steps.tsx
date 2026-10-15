@@ -13,6 +13,7 @@ import Input from "@yeolyi/ui/Input";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import { Select } from "@yeolyi/ui/Select";
 import type { ReactNode } from "react";
+import { SIGUNGU } from "./sigungu.ts";
 
 // 설정을 질문 하나씩으로 쪼갠 것(GOV.UK "한 페이지에 한 가지"). 요약 페이지와 질문 페이지가 이 목록 하나를 같이 본다.
 // 질문 하나 = id · 묻는 말(페이지 제목) · 요약 줄 라벨 · 입력 · 요약에 보일 답. 입력은 초안(Settings)을 바꾸고, 저장은 페이지가 "계속"에서 한다.
@@ -37,6 +38,7 @@ export type Step = {
 };
 
 const PERSON_LABEL = ["나", "배우자"] as const;
+const NOT_YET = "아직 안 넣음";
 const won = (man: number) =>
   man >= 10000 ? `${man / 10000}억` : `${man.toLocaleString()}만 원`;
 const dateText = (ymd: string) =>
@@ -66,18 +68,28 @@ function numberStep(
           step="any"
           min={min}
           max={max}
-          value={Number.isNaN(d[key]) ? "" : d[key]}
-          onChange={(e) => set({ ...d, [key]: e.target.valueAsNumber })}
+          value={d[key] === null || Number.isNaN(d[key]) ? "" : d[key]}
+          onChange={(e) => {
+            const v = e.target.valueAsNumber;
+            set({ ...d, [key]: Number.isNaN(v) ? null : v });
+          }}
           className="min-w-[10ch]"
         />
         {o.unit}
       </span>
     ),
-    answer: (s) => (o.fmt ? o.fmt(s[key]) : `${s[key]}${o.unit}`),
-    check: (s) =>
-      Number.isNaN(s[key]) || s[key] < min || s[key] > max
+    // 비워 둘 수 있다(모르면 그 값으로 거르지 않는다). 넣었다면 범위 안이어야 한다.
+    answer: (s) => {
+      const v = s[key];
+      if (v === null) return NOT_YET;
+      return o.fmt ? o.fmt(v) : `${v}${o.unit}`;
+    },
+    check: (s) => {
+      const v = s[key];
+      return v !== null && (Number.isNaN(v) || v < min || v > max)
         ? `${min}에서 ${max} 사이로 넣으세요`
-        : undefined,
+        : undefined;
+    },
   };
 }
 
@@ -116,26 +128,43 @@ function personSteps(i: 0 | 1): Step[] {
       label: "사는 곳",
       question: i === 0 ? "어디에 사나요?" : "배우자는 어디에 사나요?",
       hint: "주민등록상 주소입니다. 공고가 난 시·군에 살면 그 지역 사람이 먼저 뽑힙니다.",
-      input: ({ d, set, inputId }) => (
+      input: ({ d, set }) => (
         <div className="flex flex-wrap items-center gap-2">
           <Select
             aria-label="시도"
             value={p(d).sido || undefined}
             placeholder="시도"
-            onValueChange={(v) => set({ ...d, people: setP(d, { sido: v }) })}
+            // 시도를 바꾸면 그 안에 없는 시군구는 지운다.
+            onValueChange={(v) =>
+              set({
+                ...d,
+                people: setP(d, {
+                  sido: v,
+                  sigungu: SIGUNGU[v]?.includes(p(d).sigungu)
+                    ? p(d).sigungu
+                    : "",
+                }),
+              })
+            }
             options={AREA_NAMES.map((a) => ({ value: a, label: a }))}
           />
-          <Input
-            id={inputId}
+          <Select
             aria-label="시군구"
-            placeholder="성남시"
-            value={p(d).sigungu}
-            onChange={(e) =>
-              set({ ...d, people: setP(d, { sigungu: e.target.value.trim() }) })
+            value={p(d).sigungu || undefined}
+            placeholder="시군구"
+            disabled={!p(d).sido}
+            onValueChange={(v) =>
+              set({ ...d, people: setP(d, { sigungu: v }) })
             }
+            options={(SIGUNGU[p(d).sido] ?? []).map((g) => ({
+              value: g,
+              label: g,
+            }))}
           />
         </div>
       ),
+      check: (s) =>
+        p(s).sido && !p(s).sigungu ? "시군구를 고르세요" : undefined,
       answer: (s) => [p(s).sido, p(s).sigungu].filter(Boolean).join(" "),
     },
     {
@@ -358,7 +387,7 @@ const STEPS_AFTER_PEOPLE: Step[] = [
     group: "소득과 자산",
     label: "총자산",
     question: "가구의 총자산은 얼마인가요?",
-    hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다.",
+    hint: "부동산 + 자동차 + 금융자산 + 전세보증금 − 부채. 공공 나눔형·선택형·토지임대부·신혼희망타운은 3.62억 이하만 넣을 수 있습니다. 모르면 비워 두세요.",
     unit: "억",
   }),
   numberStep("incomeMan", {
@@ -366,7 +395,7 @@ const STEPS_AFTER_PEOPLE: Step[] = [
     group: "소득과 자산",
     label: "월소득",
     question: "가구의 한 달 소득은 세전으로 얼마인가요?",
-    hint: "함께 신청하는 사람 모두의 건강보험 보수월액을 더한 것. 특별공급은 이 소득으로 구간을 나눕니다.",
+    hint: "함께 신청하는 사람 모두의 건강보험 보수월액을 더한 것. 특별공급은 이 소득으로 구간을 나눕니다. 모르면 비워 두세요.",
     unit: "만 원",
     fmt: (v) => won(v),
   }),
@@ -392,7 +421,7 @@ const DUAL_INCOME_STEP: Step = {
   input: ({ d, set }) => (
     <RadioGroup
       aria-label="맞벌이"
-      value={d.dualIncome ? "y" : "n"}
+      value={d.dualIncome === null ? "" : d.dualIncome ? "y" : "n"}
       onValueChange={(v) => set({ ...d, dualIncome: v === "y" })}
       options={[
         { value: "y", label: "예, 맞벌이" },
@@ -400,7 +429,8 @@ const DUAL_INCOME_STEP: Step = {
       ]}
     />
   ),
-  answer: (s) => (s.dualIncome ? "맞벌이" : "외벌이"),
+  answer: (s) =>
+    s.dualIncome === null ? NOT_YET : s.dualIncome ? "맞벌이" : "외벌이",
 };
 
 /** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문과 맞벌이 질문이 빠진다. */

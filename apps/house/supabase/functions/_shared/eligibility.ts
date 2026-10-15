@@ -33,7 +33,8 @@ export type Residency = {
 };
 export function residency(p: Person, n: Notice, today: string): Residency {
   const inSido = p.sido === n.sido;
-  const inCity = !!(p.sigungu && n.address?.includes(p.sigungu));
+  // 시군구 이름은 시도마다 겹친다(동구·서구 등). 같은 시도일 때만 본다.
+  const inCity = inSido && !!(p.sigungu && n.address?.includes(p.sigungu));
   const cityYears =
     inCity && p.movedInAt ? yearsBetween(p.movedInAt, today) : 0;
   const localOk =
@@ -132,18 +133,28 @@ export type IncomeTier = {
   sharePct: number;
   ok: boolean;
 };
-/** 맞벌이는 두 사람이 함께 신청하고 둘 다 소득이 있을 때만. 혼자면 외벌이. */
+/** 맞벌이는 두 사람이 함께 신청하고 둘 다 소득이 있을 때만. 혼자면 외벌이.
+ *  둘인데 아직 답하지 않았으면 경계가 넓은 맞벌이로 본다(모르는 값으로 거르지 않는다). */
 export const earners = (s: Settings): Earners =>
-  s.dualIncome && s.people.length > 1 ? "맞벌이" : "외벌이";
+  s.people.length > 1 && s.dualIncome !== false ? "맞벌이" : "외벌이";
+
+/** 소득 %. 월소득을 안 넣었으면 undefined 이고, 그때는 구간을 정하지 않는다. */
+export const incomePct = (s: Settings) =>
+  s.incomeMan === null
+    ? undefined
+    : Math.round((s.incomeMan / s.incomeBaseMan) * 100);
 
 export function incomeTiers(
   n: Notice,
   s: Settings,
-): { pct: number; tiers: IncomeTier[] } {
-  const pct = Math.round((s.incomeMan / s.incomeBaseMan) * 100);
+): { pct: number | undefined; tiers: IncomeTier[] } {
+  const pct = incomePct(s);
   const tiers = NEWLYWED_TIERS[n.publicHousing ? "public" : "private"][
     earners(s)
-  ].map((t) => ({ ...t, ok: t.capPct === undefined || pct <= t.capPct }));
+  ].map((t) => ({
+    ...t,
+    ok: pct !== undefined && (t.capPct === undefined || pct <= t.capPct),
+  }));
   return { pct, tiers };
 }
 
@@ -200,16 +211,19 @@ export function ladders(
     out.push({
       title: `예비신혼 특공 (${n.publicHousing ? "공공" : "민영"})`,
       supply: `신혼 ${v.tickets.newlywed}세대`,
-      income: {
-        pct,
-        incomeMan: s.incomeMan,
-        baseMan: s.incomeBaseMan,
-        tiers: tiers.map(({ label, capPct, sharePct }) => ({
-          label,
-          capPct,
-          sharePct,
-        })),
-      },
+      income:
+        pct === undefined || s.incomeMan === null
+          ? undefined
+          : {
+              pct,
+              incomeMan: s.incomeMan,
+              baseMan: s.incomeBaseMan,
+              tiers: tiers.map(({ label, capPct, sharePct }) => ({
+                label,
+                capPct,
+                sharePct,
+              })),
+            },
       prerequisites: [
         {
           ok: a.special,
@@ -230,11 +244,14 @@ export function ladders(
         label: `${t.label} ${t.sharePct}%`,
         on: t === landing,
       })),
-      tierNote: landing
-        ? `소득 ${pct}%(${earners(s)}), ${failed.length ? `${failed.join("·")} 넘음, ` : ""}${landing.capPct ? `${landing.label} ${landing.capPct}% 안` : "소득 무관 구간"}`
-        : `소득 ${pct}%(${earners(s)}), 모든 구간 초과`,
+      tierNote:
+        pct === undefined
+          ? "월소득을 넣으면 어느 구간인지 나옵니다"
+          : landing
+            ? `소득 ${pct}%(${earners(s)}), ${failed.length ? `${failed.join("·")} 넘음, ` : ""}${landing.capPct ? `${landing.label} ${landing.capPct}% 안` : "소득 무관 구간"}`
+            : `소득 ${pct}%(${earners(s)}), 모든 구간 초과`,
       within:
-        landing && landing.label !== "추첨"
+        pct === undefined || (landing && landing.label !== "추첨")
           ? [
               {
                 ok: s.children > 0,
@@ -287,10 +304,13 @@ export function ladders(
       start.date <= today ? yearsBetween(start.date, today) : 0;
     const e = earners(s);
     const firstTier = homelessYears >= PUBLIC_RANK1_HOMELESS_YEARS;
-    const pct = Math.round((s.incomeMan / s.incomeBaseMan) * 100);
+    const pct = incomePct(s);
     const small = (n.units ?? []).some((u) => u.area > 0 && u.area <= 60 * 1.3);
-    const incomeOk = !small || pct <= PUBLIC_GENERAL.smallAreaCapPct[e];
-    const inOrdered = pct <= PUBLIC_GENERAL.orderedCapPct[e];
+    // 월소득을 안 넣었으면 소득으로 거르지 않는다.
+    const incomeOk =
+      !small || pct === undefined || pct <= PUBLIC_GENERAL.smallAreaCapPct[e];
+    const inOrdered =
+      pct === undefined || pct <= PUBLIC_GENERAL.orderedCapPct[e];
     out.push({
       title: "일반공급 (공공)",
       supply: generalSupply(n),
@@ -309,9 +329,10 @@ export function ladders(
         ...(small
           ? [
               {
-                ok: incomeOk,
+                ok: pct === undefined ? null : incomeOk,
                 label: `소득: 60㎡ 이하는 ${e} ${PUBLIC_GENERAL.smallAreaCapPct[e]}% 이하`,
-                detail: `소득 ${pct}%`,
+                detail:
+                  pct === undefined ? "월소득을 넣으면 확인" : `소득 ${pct}%`,
               },
             ]
           : []),

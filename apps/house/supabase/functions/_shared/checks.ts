@@ -38,8 +38,11 @@ export function checks(n: Notice, v: Verdict, s: Settings): Check[] {
     out.push({
       key: "asset",
       label: "자산 자격",
-      value: `총자산 ${s.totalAssetsEok}억`,
-      ok: !v.assetBlocked,
+      value:
+        s.totalAssetsEok === null
+          ? "총자산 모름"
+          : `총자산 ${s.totalAssetsEok}억`,
+      ok: s.totalAssetsEok === null ? undefined : !v.assetBlocked,
       detail: `${v.assetBlocked ? ">" : "≤"} ${PUBLIC_ASSET_CAP_EOK}억`,
     });
   }

@@ -103,7 +103,13 @@ export function useLastRun() {
 
 const readLocal = (): Partial<Settings> | null => {
   try {
-    return JSON.parse(localStorage.getItem(LOCAL_KEY) ?? "null");
+    const saved: Partial<Settings> | null = JSON.parse(
+      localStorage.getItem(LOCAL_KEY) ?? "null",
+    );
+    // 예전엔 총자산 3억·월소득 600만이 기본값으로 채워져 저장됐다. 둘 다 그 값 그대로면 넣은 적 없는 것으로 보고 비운다.
+    if (saved?.totalAssetsEok === 3 && saved.incomeMan === 600)
+      return { ...saved, totalAssetsEok: null, incomeMan: null };
+    return saved;
   } catch {
     return null;
   }

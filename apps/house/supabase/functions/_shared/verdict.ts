@@ -58,7 +58,9 @@ export function judge(n: Notice, s: Settings): Verdict {
   const minPriceEok = prices.length ? manToEok(Math.min(...prices)) : undefined;
   const maxPriceEok = prices.length ? manToEok(Math.max(...prices)) : undefined;
   const assetBlocked =
-    assetGated(n) && s.totalAssetsEok > PUBLIC_ASSET_CAP_EOK
+    assetGated(n) &&
+    s.totalAssetsEok !== null &&
+    s.totalAssetsEok > PUBLIC_ASSET_CAP_EOK
       ? `총자산 ${s.totalAssetsEok}억 > ${PUBLIC_ASSET_CAP_EOK}억`
       : undefined;
 

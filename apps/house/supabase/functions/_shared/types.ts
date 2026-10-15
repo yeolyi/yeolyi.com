@@ -69,9 +69,9 @@ export type Settings = {
   people: Person[]; // 한두 명. 특공은 그중 한 명만 넣는다
   marriedAt: string; // 혼인신고일. 비면 미혼. 민영 신혼 특공은 신고 필수, 공공은 예비신혼도 됨. 무주택기간·가점 부양가족도 여기서
   children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
-  totalAssetsEok: number; // 공공주택 총자산(전세보증금 포함, 부채 차감)
-  incomeMan: number; // 가구 세전 월소득 합산
-  dualIncome: boolean; // 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
+  totalAssetsEok: number | null; // 안 넣었으면 null(자산으로 거르지 않음). 공공주택 총자산(전세보증금 포함, 부채 차감)
+  incomeMan: number | null; // 안 넣었으면 null(소득 구간을 모름). 가구 세전 월소득 합산
+  dualIncome: boolean | null; // 안 넣었으면 null. 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
   incomeBaseMan: number; // 도시근로자 가구당 월평균소득 100%. 3인 이하 가구는 '3인 이하' 칸(가구당 평균), 4인 이상만 가구원수별 — 별표6·규칙41조
 };
 
@@ -92,9 +92,9 @@ export const DEFAULT_SETTINGS: Settings = {
   people: [emptyPerson("나")],
   marriedAt: "",
   children: 0,
-  totalAssetsEok: 3,
-  incomeMan: 600,
-  dualIncome: false,
+  totalAssetsEok: null,
+  incomeMan: null,
+  dualIncome: null,
   incomeBaseMan: 753.4, // 2026-08 LH 공고문(성남복정2)의 '3인 이하 100%' 7,533,763 (가구당 평균). 가구원수별 표의 '3인'(8,168,429)과 다른 칸이다
 };
 

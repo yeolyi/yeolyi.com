@@ -300,3 +300,16 @@ test("소득 구간 외벌이: 민영 100/140, 공공 100/130. 공공 외벌이�
   const alone = settings({ dualIncome: true, people: [settings().people[0]!] });
   assert.equal(incomeTiers(성남민영, alone).tiers[0]!.capPct, 100);
 });
+
+test("월소득을 안 넣으면 소득 구간을 정하지 않고, 총자산을 안 넣으면 자산으로 거르지 않는다", () => {
+  const blank = settings({ incomeMan: null, totalAssetsEok: null });
+  const { pct, tiers } = incomeTiers(성남민영, blank);
+  assert.equal(pct, undefined);
+  assert.ok(tiers.every((t) => !t.ok));
+  const sh = notice({
+    kind: "신혼희망타운",
+    publicHousing: true,
+    units: [unit(79000, { special: 145 })],
+  });
+  assert.equal(judge(sh, blank).assetBlocked, undefined);
+});
