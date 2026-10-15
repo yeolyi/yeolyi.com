@@ -95,6 +95,10 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
     (x) => x.live && supplyOf(x.n) === "모름",
   ).length;
 
+  const region = regionsOf(s.people.map((p) => p.sido).filter(Boolean))
+    .map((r) => r.label)
+    .join("·");
+
   return (
     <>
       <h1>공고</h1>
@@ -113,13 +117,7 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           </>
         ) : (
           <>
-            <a href="/settings">개인화</a>에 맞춰 골랐습니다. 본청약은 사는 곳의
-            권역(
-            {regionsOf(s.people.map((p) => p.sido).filter(Boolean))
-              .map((r) => r.label)
-              .join("·") || "전국"}
-            ) 공고만, 무순위·임의공급·LH 잔여세대는 사는 곳을 따지지 않아 전국
-            공고를 보여 드립니다.
+            <a href="/settings">개인화</a>에 맞춰 골랐습니다.
           </>
         )}
       </p>
@@ -166,7 +164,13 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
         {scope === "candidate" || scope === "live" ? (
           (
             [
-              ["본청약", rows.filter((x) => isMainRound(x.n)), ""],
+              [
+                "본청약",
+                rows.filter((x) => isMainRound(x.n)),
+                scope === "candidate" && region
+                  ? `사는 곳의 권역(${region}) 공고입니다.`
+                  : "",
+              ],
               [
                 "무순위·임의공급",
                 rows.filter((x) => !isMainRound(x.n)),
