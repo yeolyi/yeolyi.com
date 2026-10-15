@@ -333,8 +333,17 @@ export function specialsOf(
       title: "청년 특별공급",
       law,
       units: t.young,
-      how: "뽑는 방법과 소득·자산 기준은 공고문에 있습니다(이 서비스는 아직 계산하지 않음). 한 사람이 한 번, 1인 1주택 기준이라 세대원도 각자 넣습니다.",
+      how: "60㎡ 이하만 공급합니다. 물량의 30%는 소득세를 5년 이상 낸 청년에게 점수(본인 소득·시·도 거주 기간·납입 횟수) 순으로 먼저 주고, 나머지도 점수 순, 같으면 추첨입니다. 1인 1주택 기준이라 세대원도 각자 넣습니다.",
       checks: [
+        {
+          id: "small",
+          label: "전용 60㎡ 이하 주택형",
+          law: "공공주택 특별법 시행규칙 별표 6의6 2.가",
+          ok: exclusiveAreas(n).some((a) => a <= 60),
+          mine: exclusiveAreas(n).some((a) => a <= 60)
+            ? "있음"
+            : "이 공고엔 없음",
+        },
         ...s.people.map((p, idx): Check => {
           const age = p.birth
             ? Math.floor(yearsBetween(p.birth, n.announcedAt))
@@ -372,9 +381,18 @@ export function specialsOf(
         },
         ...accountRows(s, n, today, "special"),
         {
+          // 가구가 아니라 본인 소득이라 개인화의 가구 월소득으로는 알 수 없다
           id: "young-income",
-          label: "소득·자산 기준",
-          law: "공공주택 특별법 시행규칙 별표 6의6",
+          label:
+            "본인 월소득이 1인 가구 기준 도시근로자 월평균소득의 140% 이하",
+          law: "공공주택 특별법 시행규칙 별표 6의6 2.가 1)다)",
+          ok: null,
+          mine: "본인 소득은 묻지 않음 · 공고문 기준표 확인",
+        },
+        {
+          id: "young-asset",
+          label: "자산 기준(제13조 ③)",
+          law: "공공주택 특별법 시행규칙 별표 6의6 2.가 1)가)",
           ok: null,
           mine: "공고문 확인",
         },

@@ -607,15 +607,20 @@ export function MyEligibility({
         </Item>
       );
     if (!n.publicHousing) {
+      // 혼인신고를 했으면 배우자 통장 기간의 절반을 점수로 더한다(별표 1 비고 2)
+      const spouse = people.find((q) => q !== p && q.accountOpenedAt);
       const b = bonusPoints({
         birth: p.birth,
         marriedAt: s.marriedAt,
         today,
         accountYears: a.years,
+        spouseAccountYears: spouse
+          ? yearsBetween(spouse.accountOpenedAt, today)
+          : undefined,
       });
       return (
         <Item key={p.name} ok={true} label={`${p.name}: 가점 ${b.total}점`}>
-          {`무주택 ${b.homeless} · 부양가족 ${b.dependents} · 통장 ${b.account}. 가점제에서 떨어지면 추첨제`}
+          {`무주택 ${b.homeless} · 부양가족 ${b.dependents} · 통장 ${b.account}${b.spouse ? `(배우자 통장 ${b.spouse} 포함)` : ""}. 가점제에서 떨어지면 추첨제`}
         </Item>
       );
     }
@@ -707,7 +712,12 @@ export function MyEligibility({
       )}
       {specials.map((sp) => {
         const rule = sp.rule;
-        if (!rule?.tiers.some((x) => x.capPct !== undefined)) return null;
+        // 소득 구간이 없거나 이미 자격이 안 되는 특공은 순위를 따지지 않는다
+        if (
+          !rule?.tiers.some((x) => x.capPct !== undefined) ||
+          allOk(sp.checks) === false
+        )
+          return null;
         const at = landingOf(rule, pct);
         const tier = rule.tiers[at];
         return (

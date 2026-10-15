@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   bonusPoints,
+  pointsOf,
   privatePointShare,
 } from "../../supabase/functions/_shared/rules.ts";
 
@@ -46,4 +47,33 @@ test("민영 가점 비율(제28조): 투기과열 40/70/80, 그 밖은 85㎡ �
 
 test("민영 가점 비율(제28조): 청약과열지역은 85㎡ 초과 50%", () => {
   assert.equal(privatePointShare(101, "청약과열"), 50);
+});
+
+test("가점: 배우자 통장은 가입 기간의 절반을 같은 표로 셈해 최대 3점, 통장 합계는 17점까지(별표 1 비고 2)", () => {
+  const base = { homelessYears: 0, dependents: 1 };
+  // 배우자 1년 → 6개월 → 2점
+  assert.equal(
+    pointsOf({ ...base, accountYears: 3, spouseAccountYears: 1 }).account,
+    5 + 2,
+  );
+  // 배우자 10년 → 5년 → 7점이지만 3점까지
+  assert.equal(
+    pointsOf({ ...base, accountYears: 3, spouseAccountYears: 10 }).spouse,
+    3,
+  );
+  // 본인 15년(17점)이면 더해도 17
+  assert.equal(
+    pointsOf({ ...base, accountYears: 15, spouseAccountYears: 10 }).account,
+    17,
+  );
+  // 혼인신고 전이면 더하지 않는다
+  assert.equal(
+    bonusPoints({
+      birth: "1999-10-13",
+      today: "2026-10-16",
+      accountYears: 3,
+      spouseAccountYears: 10,
+    }).spouse,
+    0,
+  );
 });

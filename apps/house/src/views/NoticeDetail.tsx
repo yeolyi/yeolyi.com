@@ -213,47 +213,12 @@ export const unitLabel = (type: string) => {
   return `${Number.isInteger(area) ? area : area.toFixed(2).replace(/0$/, "")}㎡${suffix ? ` ${suffix}` : ""}`;
 };
 
-/** 주택형 표. 값이 하나도 없는 칸(공급면적, 특공 종류, 분양가)은 그리지 않는다. */
-function Units({ n }: { n: Notice }) {
-  const units = n.units ?? [];
-  const zone = classify(n).zone;
-  const capped = zone !== "수도권외";
-  const all: { head: string; cell: (u: Unit) => string }[] = [
-    { head: "공급면적", cell: (u) => (u.area ? `${u.area.toFixed(1)}㎡` : "") },
-    { head: "세대", cell: (u) => (u.total ? String(u.total) : "") },
-    { head: "특공", cell: (u) => (u.special ? String(u.special) : "") },
-    {
-      head: "신혼",
-      cell: (u) =>
-        String((n.kind === "신혼희망타운" ? u.special : u.newlywed) || ""),
-    },
-    { head: "생애최초", cell: (u) => (u.firstHome ? String(u.firstHome) : "") },
-    { head: "신생아", cell: (u) => (u.newborn ? String(u.newborn) : "") },
-    { head: "다자녀", cell: (u) => (u.multiChild ? String(u.multiChild) : "") },
-    { head: "노부모", cell: (u) => (u.elderly ? String(u.elderly) : "") },
-    { head: "청년", cell: (u) => (u.young ? String(u.young) : "") },
-    {
-      head: "최고 분양가",
-      cell: (u) => (u.topPriceMan ? eok(u.topPriceMan) : ""),
-    },
-    {
-      head: "계약금",
-      cell: (u) =>
-        u.topPriceMan
-          ? MONEY_EXAMPLE.depositPct
-              .map((pct) => eok((u.topPriceMan ?? 0) * (pct / 100)))
-              .join("~")
-          : "",
-    },
-    {
-      head: "대출 뒤 내 돈",
-      cell: (u) =>
-        u.topPriceMan
-          ? eok(u.topPriceMan - loanExampleMan(u.topPriceMan, capped))
-          : "",
-    },
-  ];
+type Col = { head: string; cell: (u: Unit) => string };
+
+/** 주택형 표 하나. 값이 하나도 없는 칸은 그리지 않는다. */
+function UnitTable({ units, all }: { units: Unit[]; all: Col[] }) {
   const cols = all.filter((c) => units.some((u) => c.cell(u)));
+  if (!cols.length) return null;
   return (
     <div className="overflow-x-auto">
       <table className="table">
@@ -280,19 +245,73 @@ function Units({ n }: { n: Notice }) {
           ))}
         </tbody>
       </table>
-      {cols.some((c) => c.head === "계약금") && (
-        <p className="text-muted-foreground mt-[0.5rlh] text-base">
-          돈은 최고 분양가로 어림한 값이고 판정에는 쓰지 않습니다. 계약금은 흔한
-          비율(10~20%)이라 공고문의 비율로 확인하세요. 대출 뒤 내 돈은
-          분양가에서 대출 어림(LTV {MONEY_EXAMPLE.ltvPct}%
-          {capped
-            ? ", 수도권·규제지역 금액 상한 집값 15억 이하 6억·25억 이하 4억·그 위 2억 중 작은 쪽"
-            : ", 금액 상한 없음"}
-          , 2025년 10월 기준)을 뺀 값입니다. 실제 대출은 소득(DSR)과 그때의
-          규제로 정해집니다.
-        </p>
-      )}
     </div>
+  );
+}
+
+/** 주택형은 표 둘로 나눈다. 세대 수(특공 종류별)와 돈. 한 표에 다 넣으면 좁은 화면에서 옆으로 밀어야 한다. */
+function Units({ n }: { n: Notice }) {
+  const units = n.units ?? [];
+  const capped = classify(n).zone !== "수도권외";
+  const count = (v: number | undefined) => (v ? String(v) : "");
+  const seats: Col[] = [
+    { head: "공급면적", cell: (u) => (u.area ? `${u.area.toFixed(1)}㎡` : "") },
+    { head: "세대", cell: (u) => count(u.total) },
+    { head: "특공", cell: (u) => count(u.special) },
+    {
+      head: "신혼",
+      cell: (u) => count(n.kind === "신혼희망타운" ? u.special : u.newlywed),
+    },
+    { head: "생애최초", cell: (u) => count(u.firstHome) },
+    { head: "신생아", cell: (u) => count(u.newborn) },
+    { head: "다자녀", cell: (u) => count(u.multiChild) },
+    { head: "노부모", cell: (u) => count(u.elderly) },
+    { head: "청년", cell: (u) => count(u.young) },
+  ];
+  const money: Col[] = [
+    {
+      head: "최고 분양가",
+      cell: (u) => (u.topPriceMan ? eok(u.topPriceMan) : ""),
+    },
+    {
+      head: "계약금",
+      cell: (u) =>
+        u.topPriceMan
+          ? MONEY_EXAMPLE.depositPct
+              .map((pct) => eok((u.topPriceMan ?? 0) * (pct / 100)))
+              .join("~")
+          : "",
+    },
+    {
+      head: "대출 뒤 내 돈",
+      cell: (u) =>
+        u.topPriceMan
+          ? eok(u.topPriceMan - loanExampleMan(u.topPriceMan, capped))
+          : "",
+    },
+  ];
+  const priced = units.some((u) => u.topPriceMan);
+  return (
+    <>
+      <UnitTable units={units} all={seats} />
+      {priced && (
+        <>
+          <div className="mt-[1rlh]">
+            <UnitTable units={units} all={money} />
+          </div>
+          <p className="text-muted-foreground mt-[0.5rlh] text-base">
+            돈은 최고 분양가로 어림한 값이고 판정에는 쓰지 않습니다. 계약금은
+            흔한 비율(10~20%)이라 공고문의 비율로 확인하세요. 대출 뒤 내 돈은
+            분양가에서 대출 어림(LTV {MONEY_EXAMPLE.ltvPct}%
+            {capped
+              ? ", 수도권·규제지역 금액 상한 집값 15억 이하 6억·25억 이하 4억·그 위 2억 중 작은 쪽"
+              : ", 금액 상한 없음"}
+            , 2025년 10월 기준)을 뺀 값입니다. 실제 대출은 소득(DSR)과 그때의
+            규제로 정해집니다.
+          </p>
+        </>
+      )}
+    </>
   );
 }
 

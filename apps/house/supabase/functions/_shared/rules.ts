@@ -221,12 +221,19 @@ export function homelessStart(input: {
   } as const;
 }
 
-/** 민영 가점 표. 무주택기간(센 해가 없으면 0, 1년 미만 2, 해마다 2씩 최대 32) · 부양가족(0명 5, 한 명마다 5씩 최대 35) ·
- *  통장 기간(6개월 미만 1, 1년 미만 2, 해마다 1씩 최대 17). 가이드의 계산기도 이걸 쓴다. */
+/** 통장 기간 점수(별표 1 2.나 ③): 6개월 미만 1, 1년 미만 2, 해마다 1씩 최대 17. */
+const accountScore = (years: number) =>
+  years < 0.5 ? 1 : Math.min(17, 2 + Math.floor(years));
+
+/** 민영 가점 표(별표 1). 무주택기간(센 해가 없으면 0, 1년 미만 2, 해마다 2씩 최대 32) · 부양가족(0명 5, 한 명마다 5씩 최대 35) ·
+ *  통장 기간(최대 17). 배우자 통장이 있으면 그 가입 기간의 50%를 같은 표로 셈한 점수를 최대 3점까지 더한다(비고 2, 2024-03-25 개정.
+ *  노부모 부양 특공은 빼지만 이 함수는 일반공급만 쓴다). 더해도 통장 점수는 17점까지. 가이드의 계산기도 이걸 쓴다. */
 export function pointsOf(input: {
   homelessYears: number;
   dependents: number;
   accountYears: number;
+  /** 배우자 통장 가입 기간. 통장이 없거나 혼인신고 전이면 undefined */
+  spouseAccountYears?: number;
 }) {
   const homeless =
     input.homelessYears <= 0
@@ -236,15 +243,17 @@ export function pointsOf(input: {
     35,
     5 + 5 * Math.max(0, Math.floor(input.dependents)),
   );
-  const account =
-    input.accountYears < 0.5
-      ? 1
-      : Math.min(17, 2 + Math.floor(input.accountYears));
+  const spouse =
+    input.spouseAccountYears === undefined
+      ? 0
+      : Math.min(3, accountScore(input.spouseAccountYears / 2));
+  const account = Math.min(17, accountScore(input.accountYears) + spouse);
   return {
     total: homeless + dependents + account,
     homeless,
     dependents,
     account,
+    spouse,
   };
 }
 
@@ -254,6 +263,7 @@ export function bonusPoints(input: {
   marriedAt?: string;
   today: string;
   accountYears: number;
+  spouseAccountYears?: number;
 }) {
   const start = homelessStart(input);
   const homelessYears =
@@ -263,6 +273,9 @@ export function bonusPoints(input: {
       homelessYears,
       dependents: input.marriedAt ? 1 : 0,
       accountYears: input.accountYears,
+      spouseAccountYears: input.marriedAt
+        ? input.spouseAccountYears
+        : undefined,
     }),
     homelessYears,
     start,

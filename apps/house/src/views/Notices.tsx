@@ -1,3 +1,4 @@
+import { supplyOf } from "@shared/classify.ts";
 import { addDays, fmtDate, todayYmd } from "@shared/dates.ts";
 import { regionsOf } from "@shared/rules.ts";
 import { applyEnd, isLive } from "@shared/site.ts";
@@ -88,9 +89,20 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           : 1,
     );
 
+  // 처음 보는 공급 구분(청약홈 HOUSE_SECD)이 접수 중인 공고에 있으면 알린다. 분류 규칙(classify.ts)을 늘려야 한다는 신호다.
+  const unknown = judged.filter(
+    (x) => x.live && supplyOf(x.n) === "모름",
+  ).length;
+
   return (
     <>
       <h1>공고</h1>
+      {unknown > 0 && (
+        <p className="mark mt-[0.5rlh] w-fit px-1 text-base">
+          아직 분류하지 못한 공급 구분의 공고가 {unknown}건 있습니다. 이
+          공고들은 자격을 판정하지 않으니 공고문으로 확인하세요.
+        </p>
+      )}
       <p className="mt-[0.5rlh]">
         {fresh ? (
           <>
