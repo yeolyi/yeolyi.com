@@ -30,6 +30,7 @@ function cli(args: string[]) {
   });
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: 행의 모양은 SQL 마다 다르다
 function query(sql: string): any[] {
   const out = cli(["db", "query", sql]);
   return JSON.parse(out.slice(out.indexOf("{"))).rows;

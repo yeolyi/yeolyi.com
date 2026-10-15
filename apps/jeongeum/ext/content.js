@@ -88,7 +88,7 @@
     if (rootNode === document.documentElement || rootNode === document.body) {
       // <title> 은 TreeWalker 에도 잡히지만 SPA 가 document.title 로 바꾸는 경우를 위해 한 번 더
       const t = document.querySelector("title");
-      if (t && t.firstChild) processNode(t.firstChild, conv, opts);
+      if (t?.firstChild) processNode(t.firstChild, conv, opts);
     }
   }
 

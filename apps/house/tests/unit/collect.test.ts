@@ -13,7 +13,10 @@ function deps(fresh: Notice[], unitsBy: Record<string, Unit[]> = {}) {
     applyhome: {
       notices: async () =>
         fresh.filter((n) => n.source === "applyhome").map((n) => ({ ...n })),
-      units: async (n) => (asked.push(n.id), unitsBy[n.id] ?? []),
+      units: async (n) => {
+        asked.push(n.id);
+        return unitsBy[n.id] ?? [];
+      },
     },
     myhome: {
       leftovers: async () =>

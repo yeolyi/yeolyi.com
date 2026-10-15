@@ -69,7 +69,7 @@ export async function exportLocal(baseUrl: string, folder: string) {
       deviceScaleFactor: 1,
     });
     await page.goto(`${baseUrl}/render-local/${encodeURIComponent(folder)}`);
-    await page.waitForFunction(() => (window as any).__ready === true, null, {
+    await page.waitForFunction(() => window.__ready === true, null, {
       timeout: 30_000,
     });
     const files: string[] = [];
@@ -84,9 +84,7 @@ export async function exportLocal(baseUrl: string, folder: string) {
         .screenshot({ path: path.join(out, name), type: "jpeg", quality: 92 });
       files.push(name);
     }
-    const layout = (await page.evaluate(() =>
-      (window as any).__layout(),
-    )) as LayoutBox[][];
+    const layout = await page.evaluate(() => window.__layout?.() ?? []);
     await fs.writeFile(
       path.join(out, "layout.json"),
       `${JSON.stringify(

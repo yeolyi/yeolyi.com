@@ -6,7 +6,14 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!!**/dist", "!!**/.vercel", "!!**/.astro"]
+    // public 은 그대로 배포되는 정적 파일이라 소스가 아니다
+    "includes": [
+      "**",
+      "!!**/dist",
+      "!!**/.vercel",
+      "!!**/.astro",
+      "!!**/public"
+    ]
   },
   "formatter": {
     "enabled": false
@@ -14,7 +21,11 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        // `!` 는 타입이 못 좁히는 걸 사람이 아는 자리에 일부러 쓴다. `?.` 로 바꾸면 실패가 조용히 숨는다
+        "noNonNullAssertion": "off"
+      }
     }
   },
   "css": {

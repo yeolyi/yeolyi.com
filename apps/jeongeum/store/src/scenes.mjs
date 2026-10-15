@@ -1,6 +1,6 @@
 // 스토어 캡처화면용 장면. 실제 content script 를 돌려서 찍는다.
 // 사이트들은 데모용으로 직접 쓴 가상의 페이지다(실제 서비스 흉내 아님).
-import fs from "fs";
+import fs from "node:fs";
 
 const ICON = "file:///home/claude/monttang/ext/icons/32.png";
 const popupHtml = fs.readFileSync(
@@ -14,12 +14,12 @@ const popupStyle = popupHtml
   .replace(/\bbody\s*\{/, ".pp {")
   .replace(
     /(^|\})(\s*)([^{}@]+?)\s*\{/g,
-    (m, a, ws, sel) =>
+    (_m, a, ws, sel) =>
       a +
       ws +
       sel
         .split(",")
-        .map((x) => (x.trim().startsWith(".pp") ? x : ".pp " + x.trim()))
+        .map((x) => (x.trim().startsWith(".pp") ? x : `.pp ${x.trim()}`))
         .join(", ") +
       " {",
   );

@@ -7,6 +7,15 @@ import { AssetResolver, localResolve, type Resolve } from "./assets";
 import { type Deck, H, normalizeDeck, W } from "./model";
 import { codeLayersReady, SlideView } from "./SlideView";
 
+// server/export.ts 가 Playwright 로 기다리고 읽는 dev 훅.
+declare global {
+  interface Window {
+    __ready?: boolean;
+    __layout?: () => LayoutBox[][];
+    __capture?: (i: number) => Promise<string>;
+  }
+}
+
 export type LayoutBox = {
   id: string;
   type: "text" | "image" | "code" | "watermark";
@@ -69,7 +78,7 @@ function RenderDeck({
         [...document.images].map((img) => img.decode().catch(() => {})),
       );
       // 앱의 브라우저 내보내기(exportClient)와 같은 방식으로 찍어 보는 dev 훅. 헤드리스 크롬 결과와 비교용.
-      (window as any).__capture = (i: number) =>
+      window.__capture = (i: number) =>
         domToJpeg(
           document.querySelector(`[data-slide-index="${i}"]`) as HTMLElement,
           {
@@ -80,8 +89,8 @@ function RenderDeck({
             backgroundColor: "#fff",
           },
         );
-      (window as any).__layout = measure;
-      (window as any).__ready = true;
+      window.__layout = measure;
+      window.__ready = true;
     })();
   }, []);
   return (

@@ -4,6 +4,7 @@
 .prose {
   /* 인터랙티브 데모 프레이밍 — 코드블록과 같은 상하 보더. */
   astro-island {
+    /* biome-ignore lint/complexity/noImportantStyles: Astro 가 인라인 display: contents 를 준다 */
     display: block !important;
   }
 

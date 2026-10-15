@@ -1,13 +1,13 @@
+import fs from "node:fs";
+import { createRequire } from "node:module";
 import chromium from "@sparticuz/chromium";
-import fs from "fs";
-import { createRequire } from "module";
 import puppeteer from "puppeteer-core";
 import { page, scenes } from "./scenes.mjs";
 
 const require = createRequire(import.meta.url);
 const ext = "/home/claude/monttang/ext/";
-require(ext + "data.js");
-const E = require(ext + "engine.js");
+require(`${ext}data.js`);
+const E = require(`${ext}engine.js`);
 const D = globalThis.MONTTANG_DATA;
 const conv = E.createConverter({
   en: new Map(D.en.split("\n").map((l) => l.split("\t"))),
@@ -28,10 +28,10 @@ async function shot(name, { popup, converted }, file) {
   const s = scenes[name];
   const hanMode = s.lang === "zh" ? "zh" : s.lang === "ja" ? "ko" : undefined;
   s.titleKo = conv(s.title, { hanMode });
-  const html = out + `${name}.html`;
+  const html = `${out}${name}.html`;
   fs.writeFileSync(html, page(name, { popup, converted }));
   const p = await browser.newPage();
-  await p.goto("file://" + html, { waitUntil: "load" });
+  await p.goto(`file://${html}`, { waitUntil: "load" });
   await p.evaluate(() => document.fonts.ready);
   if (converted) {
     await p.evaluate(() => {

@@ -217,25 +217,34 @@ export function Editor({ slug }: { slug: string }) {
       return;
     }
     if (!selLayer) {
-      if (e.key === "ArrowDown" || e.key === "PageDown")
-        (e.preventDefault(), setSi(Math.min(slideCount - 1, cur + 1)));
-      if (e.key === "ArrowUp" || e.key === "PageUp")
-        (e.preventDefault(), setSi(Math.max(0, cur - 1)));
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        setSi(Math.min(slideCount - 1, cur + 1));
+      }
+      if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        setSi(Math.max(0, cur - 1));
+      }
       return;
     }
     const id = selLayer.id;
     if (e.key === "Escape") setSel(null);
-    else if (e.key === "Backspace" || e.key === "Delete")
-      (e.preventDefault(), remove(id));
-    else if (e.key === "Enter" && selLayer.type === "text")
-      (e.preventDefault(), setEditing({ id }));
-    else if (e.key === "Enter" && selLayer.type === "image")
-      (e.preventDefault(), setCropping(id));
-    else if (meta && e.code === "BracketRight")
-      (e.preventDefault(), zMove(id, e.shiftKey ? "front" : "forward"));
-    else if (meta && e.code === "BracketLeft")
-      (e.preventDefault(), zMove(id, e.shiftKey ? "back" : "backward"));
-    else if (e.key.startsWith("Arrow")) {
+    else if (e.key === "Backspace" || e.key === "Delete") {
+      e.preventDefault();
+      remove(id);
+    } else if (e.key === "Enter" && selLayer.type === "text") {
+      e.preventDefault();
+      setEditing({ id });
+    } else if (e.key === "Enter" && selLayer.type === "image") {
+      e.preventDefault();
+      setCropping(id);
+    } else if (meta && e.code === "BracketRight") {
+      e.preventDefault();
+      zMove(id, e.shiftKey ? "front" : "forward");
+    } else if (meta && e.code === "BracketLeft") {
+      e.preventDefault();
+      zMove(id, e.shiftKey ? "back" : "backward");
+    } else if (e.key.startsWith("Arrow")) {
       e.preventDefault();
       const n = e.shiftKey ? 10 : 1;
       const dx = e.key === "ArrowLeft" ? -n : e.key === "ArrowRight" ? n : 0;

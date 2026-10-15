@@ -1,14 +1,14 @@
 // 스토어 캡처화면: 1장 실제 팝업, 2~4장 언어별 변환 카드. 변환 결과는 전부 실제 엔진 출력.
 
+import fs from "node:fs";
+import { createRequire } from "node:module";
 import chromium from "@sparticuz/chromium";
-import fs from "fs";
-import { createRequire } from "module";
 import puppeteer from "puppeteer-core";
 
 const require = createRequire(import.meta.url);
 const ext = "/home/claude/monttang/ext/";
-require(ext + "data.js");
-const E = require(ext + "engine.js");
+require(`${ext}data.js`);
+const E = require(`${ext}engine.js`);
 const D = globalThis.MONTTANG_DATA;
 const conv = E.createConverter({
   en: new Map(D.en.split("\n").map((l) => l.split("\t"))),
@@ -21,7 +21,7 @@ const CREAM = "#fffaf0";
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 // 실제 팝업 마크업과 스타일(.pp 아래로 가둠)
-const popupHtml = fs.readFileSync(ext + "popup.html", "utf8");
+const popupHtml = fs.readFileSync(`${ext}popup.html`, "utf8");
 const popupStyle = popupHtml
   .match(/<style>([\s\S]*?)<\/style>/)[1]
   .replace(/@media \(prefers-color-scheme: dark\) \{[\s\S]*?\}\s*\}/, "")
@@ -29,12 +29,12 @@ const popupStyle = popupHtml
   .replace(/\bbody\s*\{/, ".pp {")
   .replace(
     /(^|\})(\s*)([^{}@]+?)\s*\{/g,
-    (m, a, ws, sel) =>
+    (_m, a, ws, sel) =>
       a +
       ws +
       sel
         .split(",")
-        .map((x) => (x.trim().startsWith(".pp") ? x : ".pp " + x.trim()))
+        .map((x) => (x.trim().startsWith(".pp") ? x : `.pp ${x.trim()}`))
         .join(", ") +
       " {",
   );

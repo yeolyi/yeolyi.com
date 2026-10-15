@@ -107,7 +107,10 @@ function Question({
       <div className="mt-[1rlh]">
         {step.input({
           d,
-          set: (nd) => (setD(nd), setError(undefined)),
+          set: (nd) => {
+            setD(nd);
+            setError(undefined);
+          },
           inputId,
         })}
       </div>

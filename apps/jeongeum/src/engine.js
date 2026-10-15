@@ -323,7 +323,7 @@
       const parts = VOWEL[b].slice();
       let v = parts[0];
       const stress = (vp.match(/\d/) || [""])[0];
-      const lv = lvs && lvs[vowelOrd];
+      const lv = lvs?.[vowelOrd];
       vowelOrd++;
       const sv = spelledVowel(b, stress, lv);
       let fromAAo = false;
@@ -573,7 +573,7 @@
     const plain = word.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/’/g, "'");
     const lower = plain.toLowerCase();
     if (/^[A-Z]{2,5}$/.test(plain)) {
-      const d = dict && dict.get(lower);
+      const d = dict?.get(lower);
       if (!(plain.length >= 4 && d && /[AEIOU]/.test(plain)))
         return spellLetters(plain);
       return d;
@@ -582,7 +582,7 @@
       return /^[Aa]$/.test(plain) && plain === "a"
         ? "어"
         : LETTER[plain.toUpperCase()];
-    const d = dict && dict.get(lower);
+    const d = dict?.get(lower);
     if (d) return d;
     // 소유격·축약
     const ap = lower.match(/^(.+)'(s|re|ll|ve|d|t|m)$/);
@@ -614,7 +614,7 @@
       ]) {
         if (lower.endsWith(suf) && lower.length > suf.length + 2) {
           const stem = lower.slice(0, -suf.length);
-          const sd = dict.get(stem) || dict.get(stem + "e");
+          const sd = dict.get(stem) || dict.get(`${stem}e`);
           if (sd) return sd + tail;
         }
       }
@@ -754,7 +754,7 @@
         k++;
       }
     }
-    if (frac) s += "점" + [...frac].map((c) => DIG[+c] || "영").join("");
+    if (frac) s += `점${[...frac].map((c) => DIG[+c] || "영").join("")}`;
     return s;
   }
 
@@ -774,7 +774,7 @@
       let s = "";
       for (const ch of run) {
         const idx = ch.codePointAt(0) - CJK_START;
-        const r = table && table[idx];
+        const r = table?.[idx];
         s += r && r !== "?" ? r : ch;
       }
       return s;

@@ -85,6 +85,7 @@ const num = (v: unknown, d: number) =>
 const round = (v: number) => Math.round(v * 100) / 100;
 
 // 사람(나 또는 Claude)이 손으로 쓴 JSON 을 받아 빠진 필드를 채운다. id·기본값·이미지 높이 등.
+// biome-ignore lint/suspicious/noExplicitAny: 손으로 쓴 JSON 은 모양을 믿을 수 없다
 export function normalizeDeck(raw: any): Deck {
   const slides: Slide[] = Array.isArray(raw?.slides)
     ? raw.slides.map(normalizeSlide)
@@ -99,6 +100,7 @@ export function normalizeDeck(raw: any): Deck {
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: 위와 같다
 function normalizeSlide(raw: any): Slide {
   return {
     id: typeof raw?.id === "string" ? raw.id : uid(),
@@ -109,6 +111,7 @@ function normalizeSlide(raw: any): Slide {
   };
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: 위와 같다
 function normalizeLayer(raw: any): Layer | null {
   const id = typeof raw?.id === "string" ? raw.id : uid();
   if (raw?.type === "text") {

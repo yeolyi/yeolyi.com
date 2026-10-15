@@ -15,7 +15,7 @@ const $ = (id) => document.getElementById(id);
     const res = await chrome.tabs.sendMessage(tab.id, {
       type: "monttang:status",
     });
-    host = res && res.host;
+    host = res?.host;
   } catch (_) {
     // chrome:// 페이지, 웹 스토어 등 확장이 들어갈 수 없는 탭
   }

@@ -28,6 +28,7 @@ export function readTheme(): Theme {
 }
 
 export function writeTheme(t: Theme) {
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API 는 Firefox 에 없다
   document.cookie =
     t === "auto"
       ? `theme=; path=/; max-age=0${domain()}`

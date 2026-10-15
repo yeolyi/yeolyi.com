@@ -113,7 +113,10 @@
     *,
     *::before,
     *::after {
+      /* 선택자 특이성과 상관없이 모든 움직임을 끄려면 !important 가 필요하다 */
+      /* biome-ignore lint/complexity/noImportantStyles: 위 주석 */
       transition: none !important;
+      /* biome-ignore lint/complexity/noImportantStyles: 위 주석 */
       animation: none !important;
     }
   }

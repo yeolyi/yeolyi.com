@@ -192,7 +192,7 @@ export function PrepayCalc() {
                 />
               )}
             </Row>
-            <Row label="한 번에 넣는 목돈" value={man(lump) + " 원"}>
+            <Row label="한 번에 넣는 목돈" value={`${man(lump)} 원`}>
               {(id) => (
                 <Slider
                   value={[lump]}

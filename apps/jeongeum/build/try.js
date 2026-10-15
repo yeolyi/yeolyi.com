@@ -21,5 +21,4 @@ const lines = process.argv.slice(2).length
       "API, HTML, CSS, NASA, USA, OK, iPhone 17 Pro",
       "Price: $1,299.99 on 2026-10-09",
     ];
-for (const l of lines)
-  console.log(l + "\n  → " + conv(l, { numbers: true }) + "\n");
+for (const l of lines) console.log(`${l}\n  → ${conv(l, { numbers: true })}\n`);

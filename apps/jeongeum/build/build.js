@@ -1,6 +1,6 @@
 // data/*.tsv → ext/data.js (확장 프로그램에 실리는 사전)
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const E = require("../src/engine.js");
 const { pinyinToHangul } = require("./pinyin.js");
 const OVERRIDES = require("./overrides.js");
