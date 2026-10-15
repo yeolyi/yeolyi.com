@@ -28,12 +28,24 @@ importers:
 
   .:
     devDependencies:
+      '@biomejs/biome':
+        specifier: 2.3.13
+        version: 2.3.13
       husky:
         specifier: ^9.1.7
         version: 9.1.7
       lint-staged:
         specifier: ^16.2.7
         version: 16.2.7
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
+      prettier-plugin-astro:
+        specifier: ^0.14.1
+        version: 0.14.1
+      prettier-plugin-tailwindcss:
+        specifier: ^0.7.2
+        version: 0.7.2(prettier-plugin-astro@0.14.1)(prettier@3.8.1)
 
   apps/blog:
     dependencies:
@@ -128,9 +140,6 @@ importers:
       '@astrojs/markdown-remark':
         specifier: ^7.2.1
         version: 7.2.1
-      '@biomejs/biome':
-        specifier: 2.3.13
-        version: 2.3.13
       '@types/hast':
         specifier: ^3.0.4
         version: 3.0.4
@@ -143,15 +152,6 @@ importers:
       knip:
         specifier: ^6.24.0
         version: 6.24.0
-      prettier:
-        specifier: ^3.8.1
-        version: 3.8.1
-      prettier-plugin-astro:
-        specifier: ^0.14.1
-        version: 0.14.1
-      prettier-plugin-tailwindcss:
-        specifier: ^0.7.2
-        version: 0.7.2(prettier-plugin-astro@0.14.1)(prettier@3.8.1)
       rollup-plugin-visualizer:
         specifier: ^6.0.5
         version: 6.0.5(rolldown@1.2.13)(rollup@4.57.0)

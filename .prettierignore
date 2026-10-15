@@ -1,0 +1,5 @@
+# 빌드 산출물과 잠금 파일은 포맷하지 않는다
+pnpm-lock.yaml
+**/dist
+**/.vercel
+**/.astro
