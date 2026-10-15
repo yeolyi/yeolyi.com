@@ -32,10 +32,13 @@ function monthsBetween(from: string, to: string) {
 export default function MonthCalendar({
   events,
   today,
+  fixedWeeks = true,
   className,
 }: {
   events: CalendarEvent[];
   today?: string;
+  /** 달마다 6주로 그려 높이를 같게(불러오기 전후로 흔들리면 안 되는 곳). 끄면 그 달의 주 수만큼. */
+  fixedWeeks?: boolean;
   className?: string;
 }) {
   const sorted = events.toSorted((a, b) => (a.start < b.start ? -1 : 1));
@@ -56,9 +59,21 @@ export default function MonthCalendar({
   const shown = paged ? months.slice(page * PAGE, page * PAGE + PAGE) : months;
   return (
     <div className={className}>
-      <div className="grid gap-x-6 gap-y-[1rlh] sm:grid-cols-2">
+      {/* 한 달뿐이면 글 폭을 다 쓴다(두 칸 틀에서 왼쪽 절반만 차면 아래 목록과 폭이 어긋난다). */}
+      <div
+        className={clsx(
+          "grid gap-x-6 gap-y-[1rlh]",
+          shown.length > 1 && "sm:grid-cols-2",
+        )}
+      >
         {shown.map((mo) => (
-          <Month key={mo} month={mo} events={sorted} today={today} />
+          <Month
+            key={mo}
+            month={mo}
+            events={sorted}
+            today={today}
+            fixedWeeks={fixedWeeks}
+          />
         ))}
       </div>
       {paged && (
@@ -82,10 +97,12 @@ function Month({
   month,
   events,
   today,
+  fixedWeeks,
 }: {
   month: string;
   events: CalendarEvent[];
   today?: string;
+  fixedWeeks: boolean;
 }) {
   const [y, m] = month.split("-").map(Number) as [number, number];
   const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
@@ -94,8 +111,9 @@ function Month({
     ...Array(first).fill(null),
     ...Array.from({ length: days }, (_, i) => i + 1),
   ];
-  // 달마다 주 수(4~6)가 달라 높이가 흔들리지 않게 늘 6주로 그린다.
-  while (cells.length < 42) cells.push(null);
+  // 달마다 주 수(4~6)가 달라, fixedWeeks 면 높이가 흔들리지 않게 늘 6주로 그린다.
+  while (cells.length % 7 || (fixedWeeks && cells.length < 42))
+    cells.push(null);
   const weeks = Array.from({ length: cells.length / 7 }, (_, w) =>
     cells.slice(w * 7, w * 7 + 7),
   );

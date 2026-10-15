@@ -65,7 +65,15 @@ const SHORT: Record<string, string> = {
 };
 
 /** 공고~계약은 월 달력으로, 입주(몇 년 뒤라 달력에 안 들어간다)와 용어 풀이는 아래 날짜 목록으로. */
-export function Schedule({ n, today }: { n: Notice; today: string }) {
+export function Schedule({
+  n,
+  today,
+  fixedWeeks = true,
+}: {
+  n: Notice;
+  today: string;
+  fixedWeeks?: boolean;
+}) {
   const ms = milestones(n);
   return (
     <>
@@ -78,6 +86,7 @@ export function Schedule({ n, today }: { n: Notice; today: string }) {
             label: SHORT[m.label] ?? m.label,
           }))}
         today={today}
+        fixedWeeks={fixedWeeks}
       />
       <ScheduleList ms={ms} today={today} />
     </>

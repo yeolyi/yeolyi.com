@@ -16,8 +16,8 @@ import { useNotice } from "../data.ts";
 import { ic } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
 
-// 한 단짜리 글처럼: 목록으로 → 제목·성격 → 기본 정보 → 내 판정 → 일정 → 누가, 어디쯤 → 주택형.
-// 아직 개인화하지 않았으면 판정과 "누가, 어디쯤"은 그리지 않는다(기본값은 임의의 가정이다).
+// 한 단짜리 글처럼: 목록으로 → 제목·성격 → 단지(기본 정보 + 주택형) → 넣을 수 있나(가구 판정 + 사람별 사다리) → 일정 → 관련 가이드.
+// 아직 개인화하지 않았으면 "넣을 수 있나"는 개인화로 잇는 한 줄뿐이다.
 export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
   const { notice: n, isPending } = useNotice(id);
   const today = todayYmd();
@@ -59,7 +59,15 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
     ],
     ["사업주체", n.builder],
     ["세대", n.totalUnits ? `${n.totalUnits.toLocaleString()}세대` : undefined],
-    ["분양가", price ? `${price}(주택형별 최고가)` : "공고문 참고"],
+    // 주택형 표가 분양가를 주택형별로 보여 주면 여기선 뺀다.
+    [
+      "분양가",
+      n.units?.some((u) => u.topPriceMan)
+        ? undefined
+        : price
+          ? `${price}(주택형별 최고가)`
+          : "공고문 참고",
+    ],
     [
       "공고문",
       n.url ? (
@@ -88,7 +96,13 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
           ))}
       </dl>
 
-      <Section title="내 판정">
+      {n.units && n.units.length > 0 && (
+        <div className="mt-[1rlh]">
+          <Units n={n} />
+        </div>
+      )}
+
+      <Section title="넣을 수 있나">
         {fresh ? (
           <p>
             <a href="/settings">개인화</a>하면 이 공고에 넣을 수 있는지, 넣으면
@@ -112,7 +126,10 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
                 </li>
               ))}
             </ul>
-            <p className="text-muted-foreground mt-[0.5rlh] text-base">
+            <div className="mt-[1rlh]">
+              <People n={n} v={v} s={s} today={today} />
+            </div>
+            <p className="text-muted-foreground mt-[1rlh] text-base">
               개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
               확인하세요.
             </p>
@@ -121,20 +138,8 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
       </Section>
 
       <Section title="일정">
-        <Schedule n={n} today={today} />
+        <Schedule n={n} today={today} fixedWeeks={false} />
       </Section>
-
-      {!fresh && (
-        <Section title="누가, 어디쯤">
-          <People n={n} v={v} s={s} today={today} />
-        </Section>
-      )}
-
-      {n.units && n.units.length > 0 && (
-        <Section title="주택형">
-          <Units n={n} />
-        </Section>
-      )}
 
       <Section title="관련 가이드">
         <NoticeGuides n={n} v={v} />

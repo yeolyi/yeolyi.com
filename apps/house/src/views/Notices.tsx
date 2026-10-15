@@ -139,12 +139,6 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           ))}
         </ul>
       </div>
-      {!fresh && (
-        <p className="text-muted-foreground mt-[2rlh] text-base">
-          판정은 개인화에 넣은 답으로 계산한 참고용입니다. 자격과 일정은
-          공고문으로 확인하세요.
-        </p>
-      )}
     </>
   );
 }
