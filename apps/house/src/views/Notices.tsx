@@ -31,11 +31,11 @@ const SCOPES: Record<Scope, { label: string; empty: string }> = {
 export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   const notices = useNotices();
   const fresh = isFresh(s);
-  const scopes: Scope[] = fresh
+  const scopes: [Scope, ...Scope[]] = fresh
     ? ["live", "closed"]
     : ["candidate", "rejected", "closed"];
   const asked = query.get("status") as Scope | null;
-  const scope: Scope = asked && scopes.includes(asked) ? asked : scopes[0]!;
+  const scope: Scope = asked && scopes.includes(asked) ? asked : scopes[0];
   const today = todayYmd();
 
   const judged = useMemo(

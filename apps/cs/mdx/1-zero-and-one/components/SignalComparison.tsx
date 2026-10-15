@@ -197,8 +197,7 @@ export default function SignalComparison() {
     generateWaveformData(DECIMAL_LEVELS, INITIAL_NOISE, mulberry32(123)),
   );
 
-  const handleNoiseChange = (value: number[]) => {
-    const noise = value[0];
+  const handleNoiseChange = (noise: number) => {
     setNoiseLevel(noise);
     setBinaryData(generateWaveformData(BINARY_LEVELS, noise));
     setDecimalData(generateWaveformData(DECIMAL_LEVELS, noise));
@@ -227,7 +226,7 @@ export default function SignalComparison() {
         <span className="text-muted-foreground shrink-0">노이즈</span>
         <Slider
           name="noise"
-          value={[noiseLevel]}
+          value={noiseLevel}
           onValueChange={handleNoiseChange}
           min={0.05}
           max={0.45}

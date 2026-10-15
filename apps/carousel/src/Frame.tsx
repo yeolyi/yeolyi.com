@@ -76,13 +76,19 @@ function pickKind(w: number, h: number): Kind {
 }
 
 // 기기: 화면 자리를 빈틈없이 채우게 캡처를 깔고(넘치면 위아래는 위 기준, 좌우는 가운데 기준으로 자름) 프레임을 덮는다. frame.py 와 같은 방식.
+function ctx2d(c: HTMLCanvasElement) {
+  const g = c.getContext("2d");
+  if (!g) throw new Error("캔버스를 쓸 수 없는 브라우저입니다");
+  return g;
+}
+
 async function deviceCanvas(shot: HTMLImageElement, d: DeviceFrame) {
   const frame = await loadImage(frameUrl(d));
   const [l, t, r, b] = d.screen;
   const c = document.createElement("canvas");
   c.width = frame.naturalWidth;
   c.height = frame.naturalHeight;
-  const g = c.getContext("2d")!;
+  const g = ctx2d(c);
   const w = r - l;
   const h = b - t;
   const scale = Math.max(w / shot.naturalWidth, h / shot.naturalHeight);
@@ -104,7 +110,7 @@ function browserCanvas(shot: HTMLImageElement, url: string) {
   const c = document.createElement("canvas");
   c.width = W + pad * 2;
   c.height = H + bar + pad * 2;
-  const g = c.getContext("2d")!;
+  const g = ctx2d(c);
   const win = () => {
     g.beginPath();
     g.roundRect(pad, pad, W, H + bar, radius);
@@ -155,8 +161,11 @@ async function render(shot: HTMLImageElement, kind: Kind, url: string) {
     kind === "browser"
       ? browserCanvas(shot, url)
       : await deviceCanvas(shot, DEVICES[kind]);
-  const png = await new Promise<Blob>((resolve) =>
-    c.toBlob((b) => resolve(b!), "image/png"),
+  const png = await new Promise<Blob>((resolve, reject) =>
+    c.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("PNG 로 만들지 못했습니다"))),
+      "image/png",
+    ),
   );
   return { png, preview: URL.createObjectURL(png) };
 }

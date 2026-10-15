@@ -52,13 +52,11 @@ export default function BasePicker({
             </span>
             <Slider
               aria-labelledby={`${id}-slider-${index}`}
-              value={[values[index] ?? slider.defaultValue]}
+              value={values[index] ?? slider.defaultValue}
               min={slider.min}
               max={slider.max}
               step={slider.step ?? 1}
-              onValueChange={(value) =>
-                handleChange(index, value[0] ?? slider.defaultValue)
-              }
+              onValueChange={(value) => handleChange(index, value)}
             />
             <p className="text-muted-foreground text-right font-mono">
               {values[index]}

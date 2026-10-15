@@ -150,9 +150,11 @@ export class Applyhome {
   /** 주택형별 세대수·분양가. 잔여세대·임의공급 조회엔 분양가와 특공 칸이 없다. */
   async units(n: Notice): Promise<Unit[]> {
     const [, houseManageNo, pblancNo] = n.id.split(":");
+    if (!houseManageNo || !pblancNo)
+      throw new Error(`청약홈 공고 id 가 아닙니다: ${n.id}`);
     const rows = await this.all(UNITS_OP[n.kind], {
-      "HOUSE_MANAGE_NO::EQ": houseManageNo!,
-      "PBLANC_NO::EQ": pblancNo!,
+      "HOUSE_MANAGE_NO::EQ": houseManageNo,
+      "PBLANC_NO::EQ": pblancNo,
     });
     return rows.map(toUnit);
   }

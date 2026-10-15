@@ -2,7 +2,7 @@
 // 운영에선 .yeolyi.com 도메인 쿠키라 한 번 고르면 모든 서비스에 같이 적용되고, 로컬에선 쿠키가 포트를 가리지 않아 앱끼리 같이 바뀐다.
 // "auto" 는 쿠키를 지워 OS 설정(color-scheme: light dark)에 맡긴다. 화면 쪽 CSS 는 theme.css 의 :root[data-theme].
 export type Theme = "auto" | "light" | "dark";
-export const THEMES: Theme[] = ["auto", "light", "dark"];
+export const THEMES: readonly Theme[] = ["auto", "light", "dark"];
 export const THEME_LABEL: Record<Theme, string> = {
   auto: "테마: 시스템 설정",
   light: "테마: 라이트",
@@ -57,7 +57,8 @@ export function cycleTheme(
   origin: HTMLElement,
   onApply: (t: Theme) => void,
 ): Theme {
-  const next = THEMES[(THEMES.indexOf(current) + 1) % THEMES.length]!;
+  const next: Theme =
+    THEMES[(THEMES.indexOf(current) + 1) % THEMES.length] ?? "auto";
   const commit = () => {
     applyTheme(next);
     writeTheme(next);

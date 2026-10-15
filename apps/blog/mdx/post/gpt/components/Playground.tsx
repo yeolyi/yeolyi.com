@@ -32,8 +32,8 @@ export default function Playground() {
         />
         <span>T {temp.toFixed(1)}</span>
         <Slider
-          value={[temp * 10]}
-          onValueChange={([v]) => setTemp(v / 10)}
+          value={temp * 10}
+          onValueChange={(v) => setTemp(v / 10)}
           min={1}
           max={20}
           step={1}

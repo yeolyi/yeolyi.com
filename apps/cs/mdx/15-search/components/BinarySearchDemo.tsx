@@ -38,17 +38,18 @@ function advanceLinear(s: State): State {
     if (idx >= ARR.length) return s;
     return { ...s, sub: 1, currentIdx: idx, currentVal: ARR[idx] };
   }
+  if (s.currentIdx === null) return s;
   if (s.currentVal === TARGET)
     return {
       ...s,
       sub: 0,
       found: true,
-      checked: [...s.checked, s.currentIdx!],
+      checked: [...s.checked, s.currentIdx],
     };
   return {
     ...s,
     sub: 0,
-    checked: [...s.checked, s.currentIdx!],
+    checked: [...s.checked, s.currentIdx],
     currentIdx: null,
     currentVal: null,
   };
@@ -62,21 +63,22 @@ function advanceBinary(s: State): State {
   }
 
   if (s.sub === 1) {
+    if (s.currentIdx === null || s.currentVal === null) return s;
     if (s.currentVal === TARGET)
       return {
         ...s,
         sub: 2,
         found: true,
-        checked: [...s.checked, s.currentIdx!],
+        checked: [...s.checked, s.currentIdx],
       };
-    const newLo = s.currentVal! < TARGET ? s.currentIdx! + 1 : s.lo;
-    const newHi = s.currentVal! > TARGET ? s.currentIdx! - 1 : s.hi;
+    const newLo = s.currentVal < TARGET ? s.currentIdx + 1 : s.lo;
+    const newHi = s.currentVal > TARGET ? s.currentIdx - 1 : s.hi;
     return {
       ...s,
       sub: 2,
       lo: newLo,
       hi: newHi,
-      checked: [...s.checked, s.currentIdx!],
+      checked: [...s.checked, s.currentIdx],
     };
   }
 

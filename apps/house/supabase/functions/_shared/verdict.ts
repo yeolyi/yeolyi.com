@@ -65,19 +65,22 @@ export function neededEquity(priceEok: number, s: Settings) {
   return { loanEok: round1(loan), neededEquityEok: round1(priceEok - loan) };
 }
 
-function pickReference(units: Unit[], s: Settings): Unit | undefined {
-  const priced = units.filter((u) => (u.topPriceMan ?? 0) > 0);
+type Priced = Unit & { topPriceMan: number };
+const isPriced = (u: Unit): u is Priced => (u.topPriceMan ?? 0) > 0;
+
+function pickReference(units: Unit[], s: Settings): Priced | undefined {
+  const priced = units.filter(isPriced);
   if (!priced.length) return undefined;
   const affordable = priced.filter(
     (u) =>
-      neededEquity(manToEok(u.topPriceMan!), s).neededEquityEok <= s.equityEok,
+      neededEquity(manToEok(u.topPriceMan), s).neededEquityEok <= s.equityEok,
   );
   const pool = affordable.length ? affordable : priced;
   return pool.reduce((a, b) =>
     (
       affordable.length
-        ? a.topPriceMan! >= b.topPriceMan!
-        : a.topPriceMan! <= b.topPriceMan!
+        ? a.topPriceMan >= b.topPriceMan
+        : a.topPriceMan <= b.topPriceMan
     )
       ? a
       : b,
@@ -92,7 +95,7 @@ export function judge(n: Notice, s: Settings): Verdict {
   const minPriceEok = prices.length ? manToEok(Math.min(...prices)) : undefined;
   const maxPriceEok = prices.length ? manToEok(Math.max(...prices)) : undefined;
   const ref = pickReference(n.units ?? [], s);
-  const refPriceEok = ref ? manToEok(ref.topPriceMan!) : undefined;
+  const refPriceEok = ref ? manToEok(ref.topPriceMan) : undefined;
   // "살 수 있는 주택형이 하나라도 있나" — 기준 주택형이 살 수 있는 것이면 통과(못 사면 가장 싼 것이 기준이 된다).
   const price =
     refPriceEok === undefined

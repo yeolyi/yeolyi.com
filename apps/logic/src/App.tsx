@@ -2,7 +2,11 @@ import Flow from "@yeolyi/logic";
 import Button from "@yeolyi/ui/Button";
 import ServiceHeader from "@yeolyi/ui/ServiceHeader";
 import { type ComponentType, lazy, Suspense, useEffect, useState } from "react";
-import { EXAMPLES, type ExampleSlug } from "./examples/examples.ts";
+import {
+  EXAMPLE_BY_SLUG,
+  EXAMPLES,
+  type ExampleSlug,
+} from "./examples/examples.ts";
 
 // 주소: / 시작 페이지(회로 하나 + 예제 목록) · /editor 편집기(반가산기에서 시작) · /examples/<slug> 예제 회로. /examples 는 시작 페이지를 보여 준다.
 // 편집기와 예제 회로는 화면 전체를 쓰는 도구라 폭 제한이 없다.
@@ -80,7 +84,7 @@ const flows = Object.fromEntries(
 ) as Record<ExampleSlug, ComponentType>;
 
 // 편집기는 빈 캔버스 대신 반가산기를 깔고 연다. 무엇을 할 수 있는지 바로 보이고, 지우고 새로 시작해도 된다.
-const halfAdder = EXAMPLES.find((e) => e.slug === "half-adder")!;
+const halfAdder = EXAMPLE_BY_SLUG["half-adder"];
 const EditorFlow = lazy(async () => {
   const { default: initialJSON } = await halfAdder.load();
   return {
@@ -153,7 +157,7 @@ export function App() {
 }
 
 // 시작 페이지의 회로: 7-세그먼트 디코더를 보기 전용으로(스위치만 눌리고 크기는 내용에 맞춤). 고치는 건 편집기에서.
-const featured = EXAMPLES.find((e) => e.slug === "seven-segment")!;
+const featured = EXAMPLE_BY_SLUG["seven-segment"];
 const Featured = lazy(async () => {
   const { default: initialJSON } = await featured.load();
   return {

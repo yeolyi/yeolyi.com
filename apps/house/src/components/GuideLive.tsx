@@ -104,9 +104,9 @@ export function SectorNow() {
 const SCHEDULE_ROWS = 7;
 const twoMonths = (n: Notice) => {
   const [y1, m1] = n.announcedAt.split("-").map(Number) as [number, number];
-  const [y2, m2] = (n.contractEnd ?? n.contractStart!)
-    .split("-")
-    .map(Number) as [number, number];
+  const end = n.contractEnd ?? n.contractStart;
+  if (!end) return false;
+  const [y2, m2] = end.split("-").map(Number) as [number, number];
   return (y2 - y1) * 12 + (m2 - m1) <= 1;
 };
 export function ScheduleExample() {

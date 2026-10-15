@@ -7,12 +7,13 @@ export function StatusBar() {
   const r = run.data;
   const stale =
     r && Date.now() - new Date(r.finishedAt).getTime() > 2 * 3600_000;
-  const bad = !!(run.error || r?.error || stale);
-  if (!bad) return null;
   const text = run.error
     ? `상태를 못 읽음: ${run.error.message}`
     : r?.error
       ? `${fmtClock(r.finishedAt)} 수집 실패: ${r.error}`
-      : `${fmtClock(r!.finishedAt)} 뒤로 수집이 멈춰 있습니다`;
+      : r && stale
+        ? `${fmtClock(r.finishedAt)} 뒤로 수집이 멈춰 있습니다`
+        : null;
+  if (!text) return null;
   return <p className="mark w-fit px-1 text-base">{text}</p>;
 }

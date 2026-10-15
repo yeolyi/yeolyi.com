@@ -39,19 +39,19 @@ export function FindMaxDemo() {
   const cur = !idle ? NUMBERS[s.numIdx] : null;
 
   const ctx2 =
-    s.sub < 1
+    s.sub < 1 || cur === null
       ? null
-      : s.numIdx === 0 && s.prevMax === null
-        ? `첫 번째 숫자, 최댓값 = ${cur!}`
-        : cur! > s.prevMax!
-          ? `${cur!} > ${s.prevMax!}, 최댓값 = ${cur!}`
-          : `${cur!} < ${s.prevMax!}, 유지`;
+      : s.prevMax === null
+        ? `첫 번째 숫자, 최댓값 = ${cur}`
+        : cur > s.prevMax
+          ? `${cur} > ${s.prevMax}, 최댓값 = ${cur}`
+          : `${cur} < ${s.prevMax}, 유지`;
 
   const ctx3 =
     s.sub < 2
       ? null
-      : done
-        ? `끝. 최댓값은 ${s.maxVal!}`
+      : done && s.maxVal !== null
+        ? `끝. 최댓값은 ${s.maxVal}`
         : `남은 숫자 ${NUMBERS.length - s.numIdx - 1}개`;
 
   return (
@@ -90,8 +90,8 @@ export function FindMaxDemo() {
           <span className={clsx(!idle && s.sub === 0 && "mark")}>
             숫자 하나를 본다.
           </span>
-          {!idle && (
-            <span className="text-muted-foreground font-normal"> ({cur!})</span>
+          {cur !== null && (
+            <span className="text-muted-foreground font-normal"> ({cur})</span>
           )}
         </li>
         <li>

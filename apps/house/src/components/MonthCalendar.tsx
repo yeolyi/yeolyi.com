@@ -39,13 +39,14 @@ export default function MonthCalendar({
   className?: string;
 }) {
   const sorted = [...events].sort((a, b) => (a.start < b.start ? -1 : 1));
-  const months = sorted.length
+  const first = sorted[0];
+  const months = first
     ? monthsBetween(
-        ym(sorted[0]!.start),
+        ym(first.start),
         ym(
           sorted.reduce(
             (a, e) => ((e.end ?? e.start) > a ? (e.end ?? e.start) : a),
-            sorted[0]!.start,
+            first.start,
           ),
         ),
       )

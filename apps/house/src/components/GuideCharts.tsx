@@ -9,7 +9,7 @@ const FILL = [
   "bg-muted-foreground text-background",
   "bg-muted text-foreground",
 ] as const;
-const swatch = (i: number) => FILL[i]!.split(" ")[0];
+const swatch = (i: number) => FILL[i]?.split(" ")[0];
 
 function Legend({ names }: { names: string[] }) {
   return (
@@ -37,7 +37,7 @@ export function StackBars({
   rows: { label: string; values: number[] }[];
   caption?: ReactNode;
 }) {
-  const labeled = rows.length > 1 || rows[0]!.label;
+  const labeled = rows.length > 1 || rows[0]?.label;
   return (
     <figure className="mt-[0.5rlh]">
       <Legend names={names} />

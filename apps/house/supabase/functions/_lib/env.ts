@@ -2,9 +2,14 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 // Edge Function 공통: service role 클라이언트와 예약 실행 확인. Deno 전용이라 Node 테스트는 이 파일을 부르지 않는다.
 export const env = (k: string) => Deno.env.get(k) || undefined;
+const must = (k: string) => {
+  const v = env(k);
+  if (!v) throw new Error(`환경 변수 ${k} 가 없습니다`);
+  return v;
+};
 
 export const admin = () =>
-  createClient(env("SUPABASE_URL")!, env("SUPABASE_SERVICE_ROLE_KEY")!, {
+  createClient(must("SUPABASE_URL"), must("SUPABASE_SERVICE_ROLE_KEY"), {
     db: { schema: "house" },
     auth: { persistSession: false },
   });

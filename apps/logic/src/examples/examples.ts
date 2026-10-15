@@ -49,3 +49,8 @@ export const EXAMPLES = [
 ] as const;
 
 export type ExampleSlug = (typeof EXAMPLES)[number]["slug"];
+export type Example = (typeof EXAMPLES)[number];
+
+export const EXAMPLE_BY_SLUG = Object.fromEntries(
+  EXAMPLES.map((e) => [e.slug, e]),
+) as Record<ExampleSlug, Example>;

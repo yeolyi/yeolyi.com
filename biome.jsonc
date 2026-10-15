@@ -21,11 +21,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "style": {
-        // `!` 는 타입이 못 좁히는 걸 사람이 아는 자리에 일부러 쓴다. `?.` 로 바꾸면 실패가 조용히 숨는다
-        "noNonNullAssertion": "off"
-      }
+      "recommended": true
     }
   },
   "css": {
@@ -47,6 +43,17 @@
   // to prevent false positive linting errors
   // caused by our partial support.
   "overrides": [
+    {
+      // 테스트는 결과를 풀어 바로 단언하니 `!` 가 틀려도 테스트가 터진다
+      "includes": ["**/tests/**", "**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.astro"],
       "linter": {

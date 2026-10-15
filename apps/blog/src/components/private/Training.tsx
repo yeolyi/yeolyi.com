@@ -197,8 +197,8 @@ function TierBlock({
       <Slider
         min={0}
         max={sched.sets}
-        value={[sets]}
-        onValueChange={([n]) => setSets(n)}
+        value={sets}
+        onValueChange={setSets}
         aria-label={`${row.tier} 완료 세트`}
       />
       <div className="flex items-center gap-[1.5ch]">

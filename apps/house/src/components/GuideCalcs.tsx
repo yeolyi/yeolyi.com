@@ -65,8 +65,8 @@ export function PointsCalc() {
       <Row label="무주택 기간" value={`${homelessLabel(h)} · ${p.homeless}점`}>
         {(id) => (
           <Slider
-            value={[h]}
-            onValueChange={([v]) => setH(v!)}
+            value={h}
+            onValueChange={setH}
             min={0}
             max={16}
             aria-labelledby={id}
@@ -79,8 +79,8 @@ export function PointsCalc() {
       >
         {(id) => (
           <Slider
-            value={[d]}
-            onValueChange={([v]) => setD(v!)}
+            value={d}
+            onValueChange={setD}
             min={0}
             max={6}
             aria-labelledby={id}
@@ -90,8 +90,8 @@ export function PointsCalc() {
       <Row label="통장 가입 기간" value={`${accountLabel(a)} · ${p.account}점`}>
         {(id) => (
           <Slider
-            value={[a]}
-            onValueChange={([v]) => setA(v!)}
+            value={a}
+            onValueChange={setA}
             min={0}
             max={16}
             aria-labelledby={id}
@@ -117,8 +117,8 @@ export function MoneyCalc() {
       <Row label="분양가" value={eok(price)}>
         {(id) => (
           <Slider
-            value={[price]}
-            onValueChange={([v]) => setPrice(v!)}
+            value={price}
+            onValueChange={setPrice}
             min={3}
             max={20}
             step={0.5}

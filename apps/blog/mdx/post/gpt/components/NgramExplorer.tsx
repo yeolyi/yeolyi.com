@@ -56,8 +56,8 @@ export default function NgramExplorer() {
       <div className="flex items-center gap-[2ch]">
         <span>문맥 {k}글자</span>
         <Slider
-          value={[kIdx]}
-          onValueChange={([v]) => setKIdx(v)}
+          value={kIdx}
+          onValueChange={setKIdx}
           min={0}
           max={KS.length - 1}
           step={1}

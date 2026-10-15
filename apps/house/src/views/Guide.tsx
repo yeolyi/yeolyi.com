@@ -1341,14 +1341,14 @@ const PAGES: Page[] = [
 
 // /guide 는 목차, /guide/<slug> 는 그 쪽. 없는 쪽이면 목차로. 쪽 맨 위의 "목록"(개인화 질문의 "뒤로"와 같은 자리)이 목차로 간다.
 export function Guide({ slug }: { slug?: string }) {
-  const page = PAGES.findIndex((p) => p.slug === slug);
-  return page < 0 ? <Contents /> : <GuidePage i={page} />;
+  const i = PAGES.findIndex((p) => p.slug === slug);
+  const page = PAGES[i];
+  return page ? <GuidePage page={page} i={i} /> : <Contents />;
 }
 
 // 쪽 위치: 한 칸이면 "민영 · 일반공급", 민영·공공 두 칸에 걸치면 "특별공급"처럼 열 이름만.
 
-function GuidePage({ i }: { i: number }) {
-  const page = PAGES[i]!;
+function GuidePage({ page, i }: { page: Page; i: number }) {
   const sources = collectSources(page.body);
   const prev = PAGES[i - 1];
   const next = PAGES[i + 1];

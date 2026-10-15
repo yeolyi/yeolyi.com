@@ -33,8 +33,8 @@ const AmdahlLawExample = () => {
           </span>
           <Slider
             aria-labelledby="proportion-label"
-            value={[proportion]}
-            onValueChange={(val) => setProportion(val[0] ?? proportion)}
+            value={proportion}
+            onValueChange={setProportion}
             max={100}
             step={1}
             className="mt-2"
@@ -46,8 +46,8 @@ const AmdahlLawExample = () => {
           </span>
           <Slider
             aria-labelledby="speedup-label"
-            value={[speedup]}
-            onValueChange={(val) => setSpeedup(val[0] ?? speedup)}
+            value={speedup}
+            onValueChange={setSpeedup}
             min={1}
             max={100}
             step={0.1}

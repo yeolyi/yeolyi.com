@@ -156,8 +156,9 @@ function verdictLine(v: Verdict): string {
 export const unitLabel = (type: string) => {
   const m = /^0*(\d+(?:\.\d+)?)(.*)$/.exec(type.trim());
   if (!m) return type;
-  const area = Number.parseFloat(m[1]!);
-  const suffix = m[2]!.trim();
+  const [, num = "", rest = ""] = m;
+  const area = Number.parseFloat(num);
+  const suffix = rest.trim();
   return `${Number.isInteger(area) ? area : area.toFixed(2).replace(/0$/, "")}㎡${suffix ? ` ${suffix}` : ""}`;
 };
 

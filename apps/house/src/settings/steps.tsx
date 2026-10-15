@@ -244,7 +244,7 @@ function personSteps(i: 0 | 1): Step[] {
   ];
 }
 
-const STEPS_BEFORE_PEOPLE: Step[] = [
+const STEPS_BEFORE_PEOPLE: [Step, ...Step[]] = [
   {
     id: "areas",
     group: "공고",
@@ -283,15 +283,11 @@ const STEPS_BEFORE_PEOPLE: Step[] = [
         aria-label="함께 신청하는 사람"
         orientation="vertical"
         value={d.people.length > 1 ? "two" : "one"}
-        onValueChange={(v) =>
-          set({
-            ...d,
-            people:
-              v === "two"
-                ? [d.people[0]!, d.people[1] ?? emptyPerson("배우자")]
-                : [d.people[0]!],
-          })
-        }
+        onValueChange={(v) => {
+          const [me = emptyPerson("나"), partner = emptyPerson("배우자")] =
+            d.people;
+          set({ ...d, people: v === "two" ? [me, partner] : [me] });
+        }}
         options={[
           { value: "one", label: "혼자" },
           { value: "two", label: "배우자 또는 결혼할 사람과 함께" },
@@ -431,7 +427,7 @@ const STEPS_AFTER_PEOPLE: Step[] = [
 ];
 
 /** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문이 빠진다. */
-export const stepsFor = (s: Settings): Step[] => [
+export const stepsFor = (s: Settings): [Step, ...Step[]] => [
   ...STEPS_BEFORE_PEOPLE,
   ...personSteps(0),
   ...(s.people.length > 1 ? personSteps(1) : []),

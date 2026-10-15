@@ -98,5 +98,5 @@ function borrowPrices(n: Notice, known: Map<string, Notice>) {
   );
   if (!priced) return;
   for (const u of n.units)
-    u.topPriceMan = priced.units!.find((p) => p.type === u.type)?.topPriceMan;
+    u.topPriceMan = priced.units?.find((p) => p.type === u.type)?.topPriceMan;
 }

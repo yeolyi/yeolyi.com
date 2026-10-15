@@ -243,7 +243,7 @@ function Bars({ series, bucket }: { series: Stats["series"]; bucket: string }) {
       return `${d.getFullYear() % 100}.${String(d.getMonth() + 1).padStart(2, "0")}`;
     return `${d.getMonth() + 1}.${d.getDate()}`;
   };
-  const ends = series.length ? [series[0]!, series[series.length - 1]!] : [];
+  const ends = series.length ? [series[0], series[series.length - 1]] : [];
   return (
     <figure>
       <svg

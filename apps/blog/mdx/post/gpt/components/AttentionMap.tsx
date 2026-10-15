@@ -86,8 +86,8 @@ export default function AttentionMap() {
       <div className="flex flex-wrap items-center gap-[2ch]">
         <span>layer {layer}</span>
         <Slider
-          value={[layer]}
-          onValueChange={([v]) => {
+          value={layer}
+          onValueChange={(v) => {
             setLayer(v);
             // head와 달리 layer는 워커 재계산이 필요하다
             if (result && ready && !busy) void run(v);
@@ -99,8 +99,8 @@ export default function AttentionMap() {
         />
         <span>head {head}</span>
         <Slider
-          value={[head]}
-          onValueChange={([v]) => setHead(v)}
+          value={head}
+          onValueChange={setHead}
           min={0}
           max={5}
           step={1}

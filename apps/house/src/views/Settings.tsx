@@ -66,9 +66,10 @@ function Question({
     );
   const i = walk.indexOf(step);
   const alone = fromSummary || step.assumption;
-  const prev = alone || i <= 0 ? "settings" : `settings/${walk[i - 1]!.id}`;
-  const next =
-    alone || i === walk.length - 1 ? "settings" : `settings/${walk[i + 1]!.id}`;
+  const prevStep = alone ? undefined : walk[i - 1];
+  const nextStep = alone ? undefined : walk[i + 1];
+  const prev = prevStep ? `settings/${prevStep.id}` : "settings";
+  const next = nextStep ? `settings/${nextStep.id}` : "settings";
 
   const submit = async () => {
     const problem = step.check?.(d);
@@ -148,7 +149,7 @@ function Summary({ settings }: { settings: Settings }) {
         <div className="mt-[1rlh]">
           <Button
             variant="primary"
-            onClick={() => go(`settings/${steps[0]!.id}`)}
+            onClick={() => go(`settings/${steps[0].id}`)}
           >
             시작하기
           </Button>
@@ -162,9 +163,7 @@ function Summary({ settings }: { settings: Settings }) {
       ) : (
         <>
           <p className="mt-[0.5rlh]">
-            <a href={`/settings/${steps[0]!.id}`}>
-              처음부터 차례로 다시 답하기
-            </a>
+            <a href={`/settings/${steps[0].id}`}>처음부터 차례로 다시 답하기</a>
           </p>
           {groups.map((g) => (
             <section key={g} className="mt-[2rlh]">

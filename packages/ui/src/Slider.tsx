@@ -7,13 +7,13 @@ import { useEffect, useRef, useState } from "react";
 // 키보드 초점은 손잡이에 주황 테두리, 끄는 동안 손잡이가 조금 굵어진다.
 // Base UI Slider 위에 얹었다: 막대 어디를 눌러도(터치 포함) 그 자리로 값이 옮겨지고, 키보드(←→·PageUp/Down·Home/End)와
 // 스크린리더는 안쪽의 숨은 range 입력이 맡는다. 네이티브 range 는 iOS 에서 손잡이를 잡아야만 움직여 손잡이 없는 모양과 맞지 않았다.
-// 값 표시는 쓰는 쪽이 옆에 고정폭으로. Radix 와 같은 배열 API(value·onValueChange)를 유지한다.
+// 값 표시는 쓰는 쪽이 옆에 고정폭으로. 값은 숫자 하나다(Base UI 와 같다. 배열이면 쓰는 쪽마다 [v] 를 풀어야 한다).
 // 값이 바뀌면 네이티브 range 처럼 버블링되는 input 이벤트를 낸다. Base UI 는 숨은 입력의 값을 코드로 바꿔
 // 이벤트가 나지 않아, React 밖에서 폼의 input 이벤트와 FormData(name)로 값을 읽는 데모가 멈췄었다.
 interface Props {
-  value?: number[];
-  defaultValue?: number[];
-  onValueChange?: (value: number[]) => void;
+  value?: number;
+  defaultValue?: number;
+  onValueChange?: (value: number) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -27,7 +27,7 @@ interface Props {
 
 export default function Slider({
   value,
-  defaultValue = [0],
+  defaultValue = 0,
   onValueChange,
   min = 0,
   max = 100,
@@ -48,10 +48,10 @@ export default function Slider({
   return (
     <Base.Root
       ref={rootRef}
-      value={value?.[0]}
-      defaultValue={value ? undefined : defaultValue[0]}
+      value={value}
+      defaultValue={value === undefined ? defaultValue : undefined}
       onValueChange={(v) => {
-        onValueChange?.([v as number]);
+        onValueChange?.(v as number);
         setChanges((n) => n + 1);
       }}
       min={min}

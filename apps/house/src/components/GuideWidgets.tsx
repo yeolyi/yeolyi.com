@@ -87,8 +87,8 @@ export function Rank1Check() {
         <Row label="통장 가입 기간" value={`${months}개월`}>
           {(id) => (
             <Slider
-              value={[months]}
-              onValueChange={([v]) => setMonths(v!)}
+              value={months}
+              onValueChange={setMonths}
               min={0}
               max={36}
               aria-labelledby={id}
@@ -99,8 +99,8 @@ export function Rank1Check() {
           <Row label="납입 횟수" value={`${count}회`}>
             {(id) => (
               <Slider
-                value={[count]}
-                onValueChange={([v]) => setCount(v!)}
+                value={count}
+                onValueChange={setCount}
                 min={0}
                 max={36}
                 aria-labelledby={id}
@@ -184,8 +184,8 @@ export function PrepayCalc() {
             <Row label="매달 내는 돈" value={`${monthly}만 원`}>
               {(id) => (
                 <Slider
-                  value={[monthly]}
-                  onValueChange={([v]) => setMonthly(v!)}
+                  value={monthly}
+                  onValueChange={setMonthly}
                   min={2}
                   max={25}
                   aria-labelledby={id}
@@ -195,8 +195,8 @@ export function PrepayCalc() {
             <Row label="한 번에 넣는 목돈" value={`${man(lump)} 원`}>
               {(id) => (
                 <Slider
-                  value={[lump]}
-                  onValueChange={([v]) => setLump(v!)}
+                  value={lump}
+                  onValueChange={setLump}
                   min={0}
                   max={1500}
                   step={10}
@@ -221,8 +221,8 @@ export function PrepayCalc() {
             <Row label="가입한 지" value={span(months * DAYS_PER_MONTH)}>
               {(id) => (
                 <Slider
-                  value={[months]}
-                  onValueChange={([v]) => setMonths(v!)}
+                  value={months}
+                  onValueChange={setMonths}
                   min={1}
                   max={180}
                   aria-labelledby={id}
@@ -232,8 +232,8 @@ export function PrepayCalc() {
             <Row label="그중 밀린 회차" value={`${miss}회`}>
               {(id) => (
                 <Slider
-                  value={[miss]}
-                  onValueChange={([v]) => setMissed(v!)}
+                  value={miss}
+                  onValueChange={setMissed}
                   min={0}
                   max={months}
                   aria-labelledby={id}
@@ -258,7 +258,7 @@ export function PrepayCalc() {
 
 /** 도시근로자 가구당 월평균소득(전년도) 100% 금액, 2026년 적용. LH 공공분양 안내(2026-09) 표 그대로(원).
  *  3인 이하는 한 칸(가구당 평균), 4인부터 가구원 수별. 비율은 이 가이드에 나오는 것만. */
-const INCOME_BASE_2026: Record<string, number> = {
+const INCOME_BASE_2026 = {
   "3인 이하": 7533763,
   "4인": 8802202,
   "5인": 9326985,
@@ -266,10 +266,11 @@ const INCOME_BASE_2026: Record<string, number> = {
   "7인": 10485541,
   "8인": 11064819,
 };
+type HouseholdSize = keyof typeof INCOME_BASE_2026;
 const INCOME_PCTS = [100, 120, 130, 140, 160, 200];
 export function IncomeTable() {
-  const [size, setSize] = useState("3인 이하");
-  const base = INCOME_BASE_2026[size]!;
+  const [size, setSize] = useState<HouseholdSize>("3인 이하");
+  const base = INCOME_BASE_2026[size];
   return (
     <Box>
       <p>가구원 수</p>
@@ -278,7 +279,7 @@ export function IncomeTable() {
           aria-label="가구원 수"
           options={Object.keys(INCOME_BASE_2026).slice(0, 4)}
           value={size}
-          onValueChange={setSize}
+          onValueChange={(v) => setSize(v as HouseholdSize)}
         />
       </div>
       <dl className="mt-[1rlh] grid grid-cols-[auto_1fr] gap-x-6 border-t pt-[0.5rlh]">
@@ -364,12 +365,12 @@ export function TierChart({
   return (
     <figure className="mt-[0.5rlh]">
       <ul className="text-muted-foreground flex gap-4 text-base" aria-hidden>
-        {rows[0]!.tiers.map((t, i) => (
+        {rows[0]?.tiers.map((t, i) => (
           <li key={t.label} className="flex items-center gap-1.5">
             <span
               className={clsx(
                 "inline-block size-3",
-                TIER_FILL[i]!.split(" ")[0],
+                TIER_FILL[i]?.split(" ")[0],
               )}
             />
             {t.label}
@@ -390,7 +391,7 @@ export function TierChart({
                 {r.tiers.map((t, i) => {
                   // 상한이 없는 줄은 축 끝까지 한 칸으로 칠하고, 오른쪽을 흐리게 사라지게 해 계속 이어짐을 보인다.
                   const open = t.capPct === undefined;
-                  const high = open ? AXIS_MAX : t.capPct!;
+                  const high = t.capPct ?? AXIS_MAX;
                   const seg = (
                     <div
                       key={t.label}
@@ -414,12 +415,14 @@ export function TierChart({
               <span />
               <div className="text-muted-foreground relative mb-1 h-5 font-mono text-sm">
                 {r.tiers
-                  .filter((t) => t.capPct !== undefined)
+                  .flatMap((t) =>
+                    t.capPct === undefined ? [] : [{ ...t, capPct: t.capPct }],
+                  )
                   .map((t) => (
                     <span
                       key={t.label}
                       className="absolute -translate-x-1/2"
-                      style={{ left: pct(t.capPct!) }}
+                      style={{ left: pct(t.capPct) }}
                     >
                       {t.capPct}
                     </span>
@@ -488,8 +491,8 @@ export function TierCascade() {
         >
           {(id) => (
             <Slider
-              value={[income]}
-              onValueChange={([v]) => setIncome(v!)}
+              value={income}
+              onValueChange={setIncome}
               min={50}
               max={250}
               step={5}
@@ -528,7 +531,7 @@ export function TierCascade() {
       </ol>
       <p className="mt-[0.5rlh] font-bold">
         {enter < 0
-          ? `${sector} 신혼부부 특별공급은 소득이 ${tiers.at(-1)!.capPct}%(맞벌이 기준)를 넘으면 넣을 수 없습니다.`
+          ? `${sector} 신혼부부 특별공급은 소득이 ${tiers.at(-1)?.capPct}%(맞벌이 기준)를 넘으면 넣을 수 없습니다.`
           : `기회는 ${tiers.length - enter}번입니다.`}
       </p>
     </Box>
@@ -565,6 +568,9 @@ const SCORE_ITEMS = [
   },
 ] as const;
 const SCORE_MAX = SCORE_ITEMS.reduce((a, it) => a + Math.max(...it.points), 0);
+// 고른 보기(인덱스)의 점수. 아직 안 골랐으면 첫 보기.
+const pointOf = (it: (typeof SCORE_ITEMS)[number], pick: number | undefined) =>
+  it.points[pick ?? 0] ?? 0;
 const SCORE_ROW =
   "grid grid-cols-[1fr_max-content] gap-x-4 sm:grid-cols-[13rem_1fr_7ch]";
 export function SameLineOrder() {
@@ -583,7 +589,7 @@ export function SameLineOrder() {
           "같으면 우선 구간은 점수 순, 일반 구간은 추첨",
           "점수까지 같으면 추첨",
         ];
-  const score = SCORE_ITEMS.reduce((a, it, i) => a + it.points[picks[i]!]!, 0);
+  const score = SCORE_ITEMS.reduce((a, it, i) => a + pointOf(it, picks[i]), 0);
   return (
     <Box>
       <RadioGroup
@@ -614,7 +620,7 @@ export function SameLineOrder() {
                   {it.label}
                 </span>
                 <span className="col-start-2 row-start-1 self-center text-right font-mono tabular-nums sm:col-start-3">
-                  {it.points[picks[i]!]}점
+                  {pointOf(it, picks[i])}점
                 </span>
                 <div className="col-span-2 col-start-1 row-start-2 mt-1 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:mt-0">
                   <RadioGroup

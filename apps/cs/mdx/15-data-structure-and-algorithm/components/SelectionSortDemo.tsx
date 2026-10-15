@@ -39,8 +39,9 @@ function advance(s: State): State {
   }
 
   if (s.sub === 0) {
+    if (s.minIdx === null) return s;
     const next = [...s.arr];
-    [next[s.sorted], next[s.minIdx!]] = [next[s.minIdx!], next[s.sorted]];
+    [next[s.sorted], next[s.minIdx]] = [next[s.minIdx], next[s.sorted]];
     return { ...s, arr: next, sub: 1 };
   }
 
