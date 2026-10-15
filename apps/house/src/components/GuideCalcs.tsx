@@ -108,6 +108,14 @@ export function PointsCalc() {
           {p.homeless}점
         </span>
       </div>
+      {/* 세 날짜 칸을 다 보고 정한 결과라 칸들 아래가 아니라 제목 줄 바로 밑에 둔다. */}
+      <p className="text-muted-foreground text-base">
+        {!start
+          ? "생년월일을 넣으면 계산합니다."
+          : start.date > today
+            ? `아직 세지 않습니다. ${start.date}(${start.from})부터 셉니다.`
+            : `${start.date}(${start.from})부터 셉니다.`}
+      </p>
       <DateField label="생년월일" value={birthV} onChange={setBirth} />
       <DateField
         label="혼인신고일"
@@ -121,13 +129,6 @@ export function PointsCalc() {
         value={since}
         onChange={setSince}
       />
-      <p className="text-muted-foreground mt-[1rlh] text-base">
-        {!start
-          ? "생년월일을 넣으면 계산합니다."
-          : start.date > today
-            ? `아직 세지 않습니다. ${start.date}(${start.from})부터 셉니다.`
-            : `${start.date}(${start.from})부터 셉니다.`}
-      </p>
       <div className="mt-[1rlh] border-t pt-[0.5rlh]" />
       <Row
         label="부양가족"
