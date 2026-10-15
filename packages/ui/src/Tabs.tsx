@@ -35,7 +35,7 @@ export default function Tabs({
       <Base.List
         activateOnFocus
         aria-label={ariaLabel}
-        className="flex flex-wrap gap-x-6 border-b"
+        className="flex flex-wrap gap-x-4 border-b sm:gap-x-6"
       >
         {items.map((it) => (
           <Base.Tab

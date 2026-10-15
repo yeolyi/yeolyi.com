@@ -11,7 +11,7 @@ export type PublicType = "나눔형" | "선택형" | "토지임대부" | "일반
 export type Unit = {
   type: string; // "084.9800A"
   area: number; // 공급면적 ㎡
-  total: number;
+  total: number; // 주택형 전체 세대(일반 + 특공)
   special: number; // 특별공급 세대수 합. 신혼희망타운은 이 값이 곧 신혼 물량
   topPriceMan?: number; // 최고 분양가(만원). 잔여세대·임의공급 조회엔 없어 같은 단지 본청약에서 빌린다
   young: number;

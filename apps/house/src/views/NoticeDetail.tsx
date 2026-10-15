@@ -13,10 +13,10 @@ import { useNotice } from "../data.ts";
 import { ic, setQuery } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
 
-// 목록으로 → 제목·성격 → 탭(공고 정보 | 내 자격 | 일정). 한 번에 한 덩어리만 보이게 탭으로 나눈다.
+// 목록으로 → 제목·공고문 링크 → 탭(공고 정보 | 뽑는 방식 | 내 자격 | 내 순위 | 일정). 한 번에 한 덩어리만 보이게 탭으로 나눈다.
 // 고른 탭은 ?tab= 에. 기본은 늘 "공고 정보".
 // 아직 개인화하지 않았으면 "내 자격"은 개인화로 잇는 한 줄뿐이다.
-const TABS = ["complex", "eligibility", "schedule"] as const;
+const TABS = ["complex", "explain", "eligibility", "rank", "schedule"] as const;
 type Tab = (typeof TABS)[number];
 
 export function NoticeDetail({
@@ -108,8 +108,9 @@ export function NoticeDetail({
             label: "공고 정보",
             content: (
               <>
-                {/* 이름-값 두 칸 표. 아래 주택형 표와 같은 꼴이라 "단지" 한 묶음으로 읽힌다. */}
-                <table className="table">
+                {/* 지도가 맨 위(어디인지가 먼저), 그 아래 이름-값 표와 주택형 표가 한 묶음. */}
+                {n.address && <KakaoMap address={n.address} />}
+                <table className="mt-[1rlh] table first:mt-0">
                   <tbody>
                     {info
                       .filter(([, val]) => val)
@@ -123,8 +124,6 @@ export function NoticeDetail({
                       ))}
                   </tbody>
                 </table>
-
-                {n.address && <KakaoMap address={n.address} />}
                 {n.units && n.units.length > 0 && (
                   <div className="mt-[1rlh]">
                     <Units n={n} />
@@ -134,16 +133,47 @@ export function NoticeDetail({
             ),
           },
           {
+            value: "explain",
+            label: "뽑는 방식",
+            content: (
+              <MyEligibility n={n} v={v} s={s} today={today} part="explain" />
+            ),
+          },
+          {
             value: "eligibility",
             label: "내 자격",
             content: fresh ? (
               <p>
-                <a href="/settings">개인화</a>하면 이 공고가 우리 가구에 어떤지,
-                어디서 어떻게 경쟁하는지 풀어 드립니다.
+                <a href="/settings">개인화</a>하면 이 공고에서 우리 가구가
+                어떤지 풀어 드립니다.
               </p>
             ) : (
               <>
-                <MyEligibility n={n} v={v} s={s} today={today} />
+                <MyEligibility
+                  n={n}
+                  v={v}
+                  s={s}
+                  today={today}
+                  part="eligibility"
+                />
+                <p className="text-muted-foreground mt-[2rlh] text-base">
+                  개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
+                  확인하세요.
+                </p>
+              </>
+            ),
+          },
+          {
+            value: "rank",
+            label: "내 순위",
+            content: fresh ? (
+              <p>
+                <a href="/settings">개인화</a>하면 이 공고에서 우리 가구가
+                어떤지 풀어 드립니다.
+              </p>
+            ) : (
+              <>
+                <MyEligibility n={n} v={v} s={s} today={today} part="rank" />
                 <p className="text-muted-foreground mt-[2rlh] text-base">
                   개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
                   확인하세요.

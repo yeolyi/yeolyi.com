@@ -102,10 +102,11 @@ test("주택형 행 → Unit", () => {
     LFE_FRST_HSHLDCO: 4,
     NWBB_HSHLDCO: 5,
   });
+  // SUPLY_HSHLDCO 는 일반공급만이라 전체는 일반 28 + 특공 24.
   assert.deepEqual(u, {
     type: "084.9800A",
     area: 112.3,
-    total: 28,
+    total: 52,
     special: 24,
     topPriceMan: 216300,
     young: 0,

@@ -43,11 +43,8 @@ type Ok = boolean | null; // null: 답이 비어 모름
 const P = ({ children }: { children: ReactNode }) => (
   <p className="mt-[1rlh] first:mt-0">{children}</p>
 );
-const H2 = ({ children }: { children: ReactNode }) => (
-  <h2 className="mt-[2rlh] first:mt-0">{children}</h2>
-);
 const H3 = ({ children }: { children: ReactNode }) => (
-  <h3 className="mt-[1.5rlh]">{children}</h3>
+  <h3 className="mt-[1.5rlh] first:mt-0">{children}</h3>
 );
 const won = (man: number) =>
   man >= 10000
@@ -91,18 +88,21 @@ const List = ({ children }: { children: ReactNode }) => (
   <ul className="mt-[0.5rlh] space-y-[0.25rlh]">{children}</ul>
 );
 
+/** part: 공고 상세의 탭 하나 — 뽑는 방식(explain) · 내 자격(eligibility) · 내 순위(rank). 재료는 같이 계산한다. */
 export function MyEligibility({
   n,
   v,
   s,
   today,
+  part,
 }: {
   n: Notice;
   v: Verdict;
   s: Settings;
   today: string;
+  part: "explain" | "eligibility" | "rank";
 }) {
-  const back = `${location.pathname}?tab=eligibility`;
+  const back = `${location.pathname}?tab=${part}`;
   const Fill = ({ step, children }: { step: string; children: ReactNode }) => (
     <a href={`/settings/${step}?back=${encodeURIComponent(back)}`}>
       {children}
@@ -174,7 +174,6 @@ export function MyEligibility({
   // ───────── 청약 설명 ─────────
   const explain = (
     <>
-      <H2>청약 설명</H2>
       {!main ? (
         <P>
           {kind}의 {n.kind === "임의공급" ? "임의공급" : "무순위(잔여세대)"}
@@ -271,7 +270,6 @@ export function MyEligibility({
 
   const eligibility = (
     <>
-      <H2>내 자격</H2>
       <List>
         <Item
           ok={sidos.length ? v.region === "in" : null}
@@ -433,7 +431,6 @@ export function MyEligibility({
   const local = applicant ? residency(applicant, n, today).localOk : false;
   const rank = !blocked && main && (
     <>
-      <H2>내 순위</H2>
       {hasNewlywed && newlywedAllowed(n, s) && (
         <>
           <H3>신혼부부 특별공급</H3>
@@ -517,20 +514,31 @@ export function MyEligibility({
     t.young > 0 && ["청년", t.young, "other-special"],
   ].filter(Boolean) as [string, number, string][];
 
+  if (part === "explain")
+    return (
+      <div>
+        {explain}
+        {main && others.length > 0 && (
+          <P>
+            {others.map(([label, k, slug], i) => (
+              <span key={label}>
+                {i > 0 && ", "}
+                <a href={`/guide/${slug}`}>{label}</a> {k}세대
+              </span>
+            ))}
+            도 있지만 아직 계산하지 않습니다. 공고문으로 확인하세요.
+          </P>
+        )}
+      </div>
+    );
+  if (part === "eligibility") return <div>{eligibility}</div>;
   return (
     <div>
-      {explain}
-      {eligibility}
-      {rank}
-      {main && others.length > 0 && (
+      {rank || (
         <P>
-          {others.map(([label, k, slug], i) => (
-            <span key={label}>
-              {i > 0 && ", "}
-              <a href={`/guide/${slug}`}>{label}</a> {k}세대
-            </span>
-          ))}
-          도 있지만 아직 계산하지 않습니다. 공고문으로 확인하세요.
+          {blocked
+            ? "넣을 수 없는 공고라 순위를 따지지 않습니다. 내 자격 탭을 보세요."
+            : "무순위·임의공급은 순위 없이 추첨합니다."}
         </P>
       )}
     </div>

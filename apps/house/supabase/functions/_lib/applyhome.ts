@@ -94,7 +94,8 @@ export function toUnit(r: Row): Unit {
   return {
     type: str(r, "HOUSE_TY") ?? "",
     area: Number(str(r, "SUPLY_AR")) || 0,
-    total: num(r, "SUPLY_HSHLDCO"),
+    // SUPLY_HSHLDCO 는 일반공급 세대 수다(공고 총세대 TOT_SUPLY_HSHLDCO = 주택형별 일반 + 특공 합과 맞는다).
+    total: num(r, "SUPLY_HSHLDCO") + num(r, "SPSPLY_HSHLDCO"),
     special: num(r, "SPSPLY_HSHLDCO"),
     topPriceMan: num(r, "LTTOT_TOP_AMOUNT") || undefined,
     young: num(r, "YGMN_HSHLDCO"),

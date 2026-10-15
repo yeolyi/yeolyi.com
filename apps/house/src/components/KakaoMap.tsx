@@ -89,7 +89,7 @@ export function KakaoMap({ address }: { address: string }) {
 
   if (state === "failed") return null;
   return (
-    <figure className="mt-[1rlh]">
+    <figure>
       <div
         ref={ref}
         role="img"
