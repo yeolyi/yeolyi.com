@@ -1169,8 +1169,15 @@ const PAGES: Page[] = [
     body: (
       <>
         <P>
-          청약 공고는 <strong>청약홈</strong>(applyhome.co.kr)에 올라오고 접수도
-          거기서 합니다.
+          청약 공고는{" "}
+          <a
+            href="https://www.applyhome.co.kr"
+            target="_blank"
+            rel="noreferrer"
+          >
+            청약홈
+          </a>
+          에 올라오고 접수도 거기서 합니다.
           <C s={APPLYHOME} />
           <C s={rule("제50조")} /> 무순위도 법이 정한 횟수까지는 청약홈으로
           받습니다.
@@ -1178,7 +1185,11 @@ const PAGES: Page[] = [
         </P>
         <P>
           LH 같은 공공기관은 남은 집을 직접 팔 수 있어서, LH가 직접 파는
-          잔여세대는 <strong>LH 청약플러스</strong>에 따로 올라옵니다.
+          잔여세대는{" "}
+          <a href="https://apply.lh.or.kr" target="_blank" rel="noreferrer">
+            LH 청약플러스
+          </a>
+          에 따로 올라옵니다.
           <C s={rule("제50조")} />
           <C s={LH_PLUS} />
         </P>
@@ -1189,8 +1200,11 @@ const PAGES: Page[] = [
           감을 잡는 용도입니다.
         </P>
         <P>
-          이 서비스는 청약홈의 공고와, LH 잔여세대를 싣는 마이홈(myhome.go.kr)의
-          공고를 매시간 모아 보여 줍니다.
+          이 서비스는 청약홈의 공고와, LH 잔여세대를 싣는{" "}
+          <a href="https://www.myhome.go.kr" target="_blank" rel="noreferrer">
+            마이홈
+          </a>
+          의 공고를 매시간 모아 보여 줍니다.
         </P>
       </>
     ),
