@@ -275,3 +275,28 @@ test("사다리: 공공 신혼은 20% 칸(126% ≤ 140, 예비신혼도). 공공
     true,
   );
 });
+
+test("소득 구간 외벌이: 민영 100/140, 공공 100/130. 공공 외벌이는 130%를 넘으면 추첨도 못 들어감", () => {
+  const single = settings({ dualIncome: false }); // 126%
+  assert.deepEqual(
+    incomeTiers(성남민영, single).tiers.map((t) => [t.label, t.capPct, t.ok]),
+    [
+      ["우선", 100, false],
+      ["일반", 140, true],
+      ["추첨", undefined, true],
+    ],
+  );
+  const pub = notice({ publicHousing: true });
+  assert.deepEqual(
+    incomeTiers(pub, single).tiers.map((t) => t.ok),
+    [false, true, true],
+  );
+  const over = settings({ dualIncome: false, incomeMan: 1000 }); // 133%
+  assert.deepEqual(
+    incomeTiers(pub, over).tiers.map((t) => t.ok),
+    [false, false, false],
+  );
+  // 혼자 신청하면 맞벌이라고 답했어도 외벌이로 본다
+  const alone = settings({ dualIncome: true, people: [settings().people[0]!] });
+  assert.equal(incomeTiers(성남민영, alone).tiers[0]!.capPct, 100);
+});

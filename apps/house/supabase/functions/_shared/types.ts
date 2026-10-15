@@ -71,6 +71,7 @@ export type Settings = {
   children: number; // 혼인기간 중 출산·임신·입양 자녀. 신혼 특공 1순위(자녀 있음)/2순위를 가른다
   totalAssetsEok: number; // 공공주택 총자산(전세보증금 포함, 부채 차감)
   incomeMan: number; // 가구 세전 월소득 합산
+  dualIncome: boolean; // 맞벌이(신청자·배우자 모두 소득). 소득 구간 경계가 다르다. 혼자면 외벌이
   incomeBaseMan: number; // 도시근로자 가구당 월평균소득 100%. 3인 이하 가구는 '3인 이하' 칸(가구당 평균), 4인 이상만 가구원수별 — 별표6·규칙41조
 };
 
@@ -93,6 +94,7 @@ export const DEFAULT_SETTINGS: Settings = {
   children: 0,
   totalAssetsEok: 3,
   incomeMan: 600,
+  dualIncome: false,
   incomeBaseMan: 753.4, // 2026-08 LH 공고문(성남복정2)의 '3인 이하 100%' 7,533,763 (가구당 평균). 가구원수별 표의 '3인'(8,168,429)과 다른 칸이다
 };
 

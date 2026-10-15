@@ -22,7 +22,7 @@ export function NoticeDetail({ id, s }: { id: string; s: Settings }) {
   const { notice: n, isPending } = useNotice(id);
   const today = todayYmd();
   const back = (
-    <a href="/notices" className="inline-flex items-center gap-1">
+    <a href="/" className="inline-flex items-center gap-1">
       <ArrowLeft {...ic} />
       공고 목록
     </a>

@@ -382,10 +382,33 @@ const STEPS_AFTER_PEOPLE: Step[] = [
   }),
 ];
 
-/** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문이 빠진다. */
+/** 둘이 함께 신청할 때만 묻는다. 혼자면 외벌이다. */
+const DUAL_INCOME_STEP: Step = {
+  id: "dualincome",
+  group: "소득과 자산",
+  label: "맞벌이",
+  question: "두 사람 모두 소득이 있나요?",
+  hint: "근로소득이나 사업소득이 둘 다 있으면 맞벌이입니다. 특별공급 소득 구간의 경계가 달라집니다.",
+  input: ({ d, set }) => (
+    <RadioGroup
+      aria-label="맞벌이"
+      value={d.dualIncome ? "y" : "n"}
+      onValueChange={(v) => set({ ...d, dualIncome: v === "y" })}
+      options={[
+        { value: "y", label: "예, 맞벌이" },
+        { value: "n", label: "아니요, 한 명만" },
+      ]}
+    />
+  ),
+  answer: (s) => (s.dualIncome ? "맞벌이" : "외벌이"),
+};
+
+/** 지금 설정에 맞는 질문 목록. 혼자면 배우자 질문과 맞벌이 질문이 빠진다. */
 export const stepsFor = (s: Settings): [Step, ...Step[]] => [
   ...STEPS_BEFORE_PEOPLE,
   ...personSteps(0),
   ...(s.people.length > 1 ? personSteps(1) : []),
-  ...STEPS_AFTER_PEOPLE,
+  ...STEPS_AFTER_PEOPLE.flatMap((st) =>
+    st.id === "income" && s.people.length > 1 ? [st, DUAL_INCOME_STEP] : [st],
+  ),
 ];

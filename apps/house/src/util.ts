@@ -9,7 +9,7 @@ export const fmtClock = (iso: string) =>
     hour12: false,
   });
 
-// 주소: /(소개) · /notices?status=rejected · /notices/<id> · /settings · /settings/<질문> · /guide/<쪽>. 모노레포 전체에서 # 라우팅은 쓰지 않는다.
+// 주소: /(공고 목록, ?status=rejected) · /notices/<id> · /settings · /settings/<질문> · /guide/<쪽>. 모노레포 전체에서 # 라우팅은 쓰지 않는다.
 // 탭 같은 화면 상태는 쿼리에 두어 새로고침·공유해도 그대로 열리게 한다(서버는 vercel.json 이 모두 index.html 로).
 // 같은 앱 안 링크(<a href="/…">)는 문서 단위로 가로채 history 로 옮긴다(다시 불러오지 않게).
 export type Route = { segs: string[]; query: URLSearchParams };

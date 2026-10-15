@@ -1,17 +1,17 @@
 import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import { useEffect } from "react";
 import { StatusBar } from "./components/StatusBar.tsx";
 import { useSettings } from "./data.ts";
 import { useRoute } from "./util.ts";
 import { Guide } from "./views/Guide.tsx";
-import { Home } from "./views/Home.tsx";
 import { NoticeDetail } from "./views/NoticeDetail.tsx";
 import { Notices } from "./views/Notices.tsx";
 import { SettingsView } from "./views/Settings.tsx";
 
 const NAV = [
-  { key: "notices", label: "공고" },
-  { key: "guide", label: "가이드" },
-  { key: "settings", label: "개인화" },
+  { key: "notices", label: "공고", href: "/" },
+  { key: "guide", label: "가이드", href: "/guide" },
+  { key: "settings", label: "개인화", href: "/settings" },
 ] as const;
 
 // 서비스 헤더(yeolyi.com / 청약 알리미) 아래 45rem 한 단. 수집 상태는 맨 아래 한 줄.
@@ -21,13 +21,12 @@ export function App() {
     query,
   } = useRoute();
   const settings = useSettings();
-  // / 는 소개(Home), 공고 목록은 /notices. 소개에서는 메뉴의 어느 칸도 고른 것으로 보이지 않는다.
-  const home = view === "" || view === undefined;
-  const tab = home
-    ? undefined
-    : view === "settings" || view === "guide"
-      ? view
-      : "notices";
+  // 공고 목록이 첫 화면(/). 예전 주소 /notices 는 / 로 옮긴다(공고 상세는 /notices/<id> 그대로).
+  const tab = view === "settings" || view === "guide" ? view : "notices";
+  useEffect(() => {
+    if (view === "notices" && !id)
+      history.replaceState(null, "", `/${location.search}`);
+  }, [view, id]);
   return (
     <>
       <ServiceHeader
@@ -36,14 +35,12 @@ export function App() {
         className="measure-col pt-[1.5rlh]"
         nav={NAV.map((n) => ({
           label: n.label,
-          href: `/${n.key}`,
+          href: n.href,
           current: tab === n.key,
         }))}
       />
       <main className="measure-col pt-[2rlh] pb-[3rlh]">
-        {home ? (
-          <Home settings={settings.data} />
-        ) : tab === "guide" ? (
+        {tab === "guide" ? (
           <Guide slug={id} />
         ) : !settings.data ? (
           <p className="meta">

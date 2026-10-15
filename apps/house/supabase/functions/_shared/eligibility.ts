@@ -1,11 +1,16 @@
 import { addYears, fmtYears, yearsBetween } from "./dates.ts";
 import {
   bonusPoints,
+  type Earners,
+  homelessStart,
   LOCAL_YEARS_REGULATED,
+  LOTTERY_HOMELESS_PCT,
+  lotteryHomelessFirst,
   NEWLYWED_TIERS,
   PRIVATE_NEWLYWED_REQUIRES_MARRIAGE,
   PUBLIC_GENERAL,
   PUBLIC_RANK1_HOMELESS_YEARS,
+  privatePointShare,
   RANK1_ACCOUNT,
   SPECIAL_ACCOUNT,
 } from "./rules.ts";
@@ -127,14 +132,18 @@ export type IncomeTier = {
   sharePct: number;
   ok: boolean;
 };
+/** 맞벌이는 두 사람이 함께 신청하고 둘 다 소득이 있을 때만. 혼자면 외벌이. */
+export const earners = (s: Settings): Earners =>
+  s.dualIncome && s.people.length > 1 ? "맞벌이" : "외벌이";
+
 export function incomeTiers(
   n: Notice,
   s: Settings,
 ): { pct: number; tiers: IncomeTier[] } {
   const pct = Math.round((s.incomeMan / s.incomeBaseMan) * 100);
-  const tiers = (
-    n.publicHousing ? NEWLYWED_TIERS.public : NEWLYWED_TIERS.private
-  ).map((t) => ({ ...t, ok: t.capPct === undefined || pct <= t.capPct }));
+  const tiers = NEWLYWED_TIERS[n.publicHousing ? "public" : "private"][
+    earners(s)
+  ].map((t) => ({ ...t, ok: t.capPct === undefined || pct <= t.capPct }));
   return { pct, tiers };
 }
 
@@ -222,8 +231,8 @@ export function ladders(
         on: t === landing,
       })),
       tierNote: landing
-        ? `소득 ${pct}%, ${failed.length ? `${failed.join("·")} 넘음, ` : ""}${landing.capPct ? `${landing.label} ${landing.capPct}% 안` : "소득 무관 구간"}`
-        : `소득 ${pct}%, 모든 구간 초과`,
+        ? `소득 ${pct}%(${earners(s)}), ${failed.length ? `${failed.join("·")} 넘음, ` : ""}${landing.capPct ? `${landing.label} ${landing.capPct}% 안` : "소득 무관 구간"}`
+        : `소득 ${pct}%(${earners(s)}), 모든 구간 초과`,
       within:
         landing && landing.label !== "추첨"
           ? [
@@ -273,16 +282,15 @@ export function ladders(
 
   if (n.publicHousing) {
     // 별표 6 1.: 자산요건(부동산·자동차)은 면적 불문, 소득 요건은 60㎡ 이하만. 선정은 자녀 우선 50% → 소득칸 30%(제27조 순차) → 추첨 20%.
-    const homelessYears = Math.max(
-      0,
-      yearsBetween(p.birth, today) - 30,
-      s.marriedAt ? yearsBetween(s.marriedAt, today) : 0,
-    );
+    const start = homelessStart({ birth: p.birth, marriedAt: s.marriedAt });
+    const homelessYears =
+      start.date <= today ? yearsBetween(start.date, today) : 0;
+    const e = earners(s);
     const firstTier = homelessYears >= PUBLIC_RANK1_HOMELESS_YEARS;
     const pct = Math.round((s.incomeMan / s.incomeBaseMan) * 100);
     const small = (n.units ?? []).some((u) => u.area > 0 && u.area <= 60 * 1.3);
-    const incomeOk = !small || pct <= PUBLIC_GENERAL.smallAreaCapPct;
-    const inOrdered = pct <= PUBLIC_GENERAL.orderedCapPct;
+    const incomeOk = !small || pct <= PUBLIC_GENERAL.smallAreaCapPct[e];
+    const inOrdered = pct <= PUBLIC_GENERAL.orderedCapPct[e];
     out.push({
       title: "일반공급 (공공)",
       supply: generalSupply(n),
@@ -302,7 +310,7 @@ export function ladders(
           ? [
               {
                 ok: incomeOk,
-                label: `소득: 60㎡ 이하는 맞벌이 ${PUBLIC_GENERAL.smallAreaCapPct}% 이하`,
+                label: `소득: 60㎡ 이하는 ${e} ${PUBLIC_GENERAL.smallAreaCapPct[e]}% 이하`,
                 detail: `소득 ${pct}%`,
               },
             ]
@@ -322,16 +330,19 @@ export function ladders(
           on: incomeOk && !(inOrdered && firstTier),
         },
       ],
-      tierNote: firstTier
-        ? `무주택 ${fmtYears(homelessYears)}, 순차 칸 1순차. 저축총액 ${p.accountPaidMan}만`
-        : `무주택 ${fmtYears(homelessYears)}, 순차 칸은 2순차라 사실상 불가(만 30세·혼인신고일부터 3년 뒤 1순차). 자녀 없음 → 추첨 ${PUBLIC_GENERAL.lotterySharePct}%가 실제 표`,
+      tierNote: !inOrdered
+        ? `소득 ${pct}%가 ${e} ${PUBLIC_GENERAL.orderedCapPct[e]}%를 넘어 자녀 우선·순차 칸은 못 들어감. 추첨 ${PUBLIC_GENERAL.lotterySharePct}%만`
+        : firstTier
+          ? `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸 1순차. 저축총액 ${p.accountPaidMan}만`
+          : `무주택 ${fmtYears(homelessYears)}(${start.from}부터), 순차 칸은 2순차라 사실상 불가(${addYears(start.date, PUBLIC_RANK1_HOMELESS_YEARS)}부터 1순차). 추첨 ${PUBLIC_GENERAL.lotterySharePct}%가 실제 표`,
       within: [localStep],
     });
   } else {
     const b = bonusPoints({
-      ageYears: yearsBetween(p.birth, today),
+      birth: p.birth,
+      marriedAt: s.marriedAt,
+      today,
       accountYears: a.years,
-      married: !!s.marriedAt,
     });
     out.push({
       title: "일반공급 (민영)",
@@ -355,11 +366,34 @@ export function ladders(
           on: true,
         },
       ],
-      tierNote: `가점 ${b.total}점 (무주택 ${b.homeless}${b.homelessYears <= 0 ? `, 만 30세부터 ${Math.ceil(-(yearsBetween(p.birth, today) - 30))}년 뒤` : ""} · 부양가족 ${b.dependents}, 혼인신고하면 +5 · 통장 ${b.account})`,
+      tierNote: `${privateGeneralNote(n)} 내 가점 ${b.total}점 (무주택 ${b.homeless}${b.start.date > today ? `, ${b.start.from}(${b.start.date})부터 셈` : ""} · 부양가족 ${b.dependents}${s.marriedAt ? "" : ", 혼인신고하면 +5"} · 통장 ${b.account})`,
       within: [localStep],
     });
   }
   return out;
+}
+
+/** 민영 일반공급의 가점·추첨 비율을 공고의 면적대마다 한 줄로. 전용면적은 주택형 이름("084.9800A")에서 읽는다. */
+function privateGeneralNote(n: Notice): string {
+  const bands = new Map<string, number | "공고">();
+  for (const u of n.units ?? []) {
+    const area = Number.parseFloat(u.type);
+    if (!area) continue;
+    const band =
+      area <= 60 ? "60㎡ 이하" : area <= 85 ? "85㎡ 이하" : "85㎡ 초과";
+    bands.set(band, privatePointShare(area, !!n.regulated));
+  }
+  const parts = [...bands].map(([band, share]) =>
+    share === "공고"
+      ? `${band} 가점 비율은 시군구 공고(40% 이하)`
+      : share === 0
+        ? `${band} 모두 추첨`
+        : `${band} 가점 ${share}%·추첨 ${100 - share}%`,
+  );
+  const homeless = lotteryHomelessFirst(n.sido, !!n.regulated)
+    ? ` 추첨 물량의 ${LOTTERY_HOMELESS_PCT}%는 무주택자 먼저.`
+    : "";
+  return parts.length ? `${parts.join(", ")}.${homeless}` : homeless.trim();
 }
 
 /** 일반공급 물량 = 전체 − 특공. 주택형 정보가 없으면 모른다. */

@@ -8,6 +8,7 @@ import {
 // 테스트 가구: 예비신혼 둘, 경기 성남 거주. 숫자는 각 테스트의 기대값과 맞물려 있어 바꾸면 테스트도 고친다.
 const HOUSEHOLD: Partial<Settings> = {
   areas: ["서울", "경기"],
+  dualIncome: true,
   people: [
     {
       name: "갑",

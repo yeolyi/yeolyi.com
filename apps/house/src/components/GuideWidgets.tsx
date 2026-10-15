@@ -1,4 +1,4 @@
-import { NEWLYWED_TIERS } from "@shared/rules.ts";
+import { type Earners, NEWLYWED_TIERS, type Tier } from "@shared/rules.ts";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Slider from "@yeolyi/ui/Slider";
 import { clsx } from "clsx";
@@ -175,29 +175,22 @@ const TIER_FILL = [
   "bg-muted-foreground text-background",
   "bg-muted text-foreground",
 ];
-type Tier = { label: string; capPct?: number; sharePct: number };
-type Earners = "맞벌이" | "외벌이";
 type TierRow = { label: string } & Record<Earners, readonly Tier[]>;
 // 숫자는 규칙 제35조의3·제41조·제43조(2026-06-15)와 별표 6(2026-06-22) 원문과 대조했다. 외벌이는 부부 중 한 명만 소득이 있는 가구(공공은 미혼 포함).
 // 공공 외벌이는 자격 상한이 일반 구간 상한과 같아 추첨 칸이 없다. 추첨 몫엔 앞 구간에서 떨어진 사람으로 들어간다(별표 6 2.나 2)다)).
 // 마지막 줄 물량은 100에서 앞 줄을 뺀 값.
+// 차트에는 바로 들어갈 수 있는 구간만 그린다(공공 외벌이 추첨은 상한이 일반과 같아 폭이 없다).
+const enterable = (tiers: readonly Tier[]) =>
+  tiers.filter(
+    (t, i) =>
+      i === 0 || t.capPct === undefined || t.capPct !== tiers[i - 1]?.capPct,
+  );
 const NEWLYWED_ROWS: TierRow[] = [
-  {
-    label: "민영",
-    맞벌이: NEWLYWED_TIERS.private,
-    외벌이: [
-      { label: "우선", capPct: 100, sharePct: 50 },
-      { label: "일반", capPct: 140, sharePct: 20 },
-      { label: "추첨", sharePct: 30 },
-    ],
-  },
+  { label: "민영", ...NEWLYWED_TIERS.private },
   {
     label: "공공",
-    맞벌이: NEWLYWED_TIERS.public,
-    외벌이: [
-      { label: "우선", capPct: 100, sharePct: 70 },
-      { label: "일반", capPct: 130, sharePct: 20 },
-    ],
+    맞벌이: NEWLYWED_TIERS.public.맞벌이,
+    외벌이: enterable(NEWLYWED_TIERS.public.외벌이),
   },
 ];
 /** 생애최초(규칙 제43조 ③, 별표 6 2.다)·신생아(규칙 제35조의3 ③, 별표 6 2.마). 민영은 맞벌이 구분이 없다. */
@@ -356,9 +349,12 @@ export function TierChart({ rows = NEWLYWED_ROWS }: { rows?: TierRow[] }) {
  *  소득이 낮을수록 기회가 여러 번이다. 공공은 마지막 줄 상한(맞벌이 200%)을 넘으면 넣을 수 없다. */
 export function TierCascade() {
   const [sector, setSector] = useState("민영");
+  const [earners, setEarners] = useState<string>("맞벌이");
   const [income, setIncome] = useState(130);
   const tiers =
-    sector === "민영" ? NEWLYWED_TIERS.private : NEWLYWED_TIERS.public;
+    NEWLYWED_TIERS[sector === "민영" ? "private" : "public"][
+      earners as Earners
+    ];
   const enter = tiers.findIndex(
     (t) => t.capPct === undefined || income <= t.capPct,
   );
@@ -371,10 +367,15 @@ export function TierCascade() {
         onValueChange={setSector}
       />
       <div className="mt-[0.5rlh]">
-        <Row
-          label="가구 소득(맞벌이 기준)"
-          value={`${income}%${income >= 250 ? "+" : ""}`}
-        >
+        <RadioGroup
+          aria-label="소득이 있는 사람"
+          options={["맞벌이", "외벌이"]}
+          value={earners}
+          onValueChange={setEarners}
+        />
+      </div>
+      <div className="mt-[0.5rlh]">
+        <Row label="가구 소득" value={`${income}%${income >= 250 ? "+" : ""}`}>
           {(id) => (
             <Slider
               value={income}
@@ -417,7 +418,7 @@ export function TierCascade() {
       </ol>
       <p className="mt-[0.5rlh] font-bold">
         {enter < 0
-          ? `${sector} 신혼부부 특별공급은 소득이 ${tiers.at(-1)?.capPct}%(맞벌이 기준)를 넘으면 넣을 수 없습니다.`
+          ? `${sector} 신혼부부 특별공급은 ${earners} 가구 소득이 ${tiers.at(-1)?.capPct}%를 넘으면 넣을 수 없습니다.`
           : `기회는 ${tiers.length - enter}번입니다.`}
       </p>
     </Box>

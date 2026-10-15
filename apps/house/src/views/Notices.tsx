@@ -94,9 +94,7 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
         <RadioGroup
           aria-label="공고 묶음"
           value={scope}
-          onValueChange={(v) =>
-            go("notices", v === scopes[0] ? {} : { status: v })
-          }
+          onValueChange={(v) => go("", v === scopes[0] ? {} : { status: v })}
           options={scopes.map((sc) => ({
             value: sc,
             label: `${SCOPES[sc].label} ${judged.filter((x) => inScope(x, sc)).length}`,
