@@ -223,7 +223,9 @@ function personSteps(i: 0 | 1): Step[] {
             type="number"
             inputMode="numeric"
             min={0}
-            value={p(d).accountCount}
+            // 0 은 빈칸으로 보인다(0 을 지우지 못하고 "0105" 처럼 앞에 붙던 문제). 비우면 0.
+            value={p(d).accountCount || ""}
+            placeholder="0"
             onChange={(e) =>
               set({
                 ...d,
@@ -253,7 +255,8 @@ function personSteps(i: 0 | 1): Step[] {
             type="number"
             inputMode="numeric"
             min={0}
-            value={p(d).accountPaidMan}
+            value={p(d).accountPaidMan || ""}
+            placeholder="0"
             onChange={(e) =>
               set({
                 ...d,
