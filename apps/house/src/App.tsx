@@ -72,16 +72,8 @@ export function App() {
           <Notices query={query} s={settings.data} />
         )}
       </main>
-      <footer className="measure-col text-muted-foreground space-y-[0.5rlh] pb-[2rlh] text-base">
+      <footer className="measure-col pb-[2rlh]">
         <StatusBar />
-        <p>
-          판정과 설명은 참고용입니다. 자격·일정·분양가는 입주자모집공고문이
-          기준이니, 넣기 전에 꼭 공고문으로 확인하세요.
-        </p>
-        <p>
-          공고 자료: 한국부동산원 청약홈(공공데이터포털), 마이홈. 이 서비스는
-          정부·공공기관이 운영하지 않습니다.
-        </p>
       </footer>
     </>
   );
