@@ -28,7 +28,7 @@ import { isMainRound } from "@shared/site.ts";
 import type { Notice, Person, Settings } from "@shared/types.ts";
 import { assetGated, type Verdict } from "@shared/verdict.ts";
 import { clsx } from "clsx";
-import { Check, CircleHelp, X } from "lucide-react";
+import { Check as Check2, CircleHelp, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { ic } from "../util.ts";
 import { StackBars } from "./GuideCharts.tsx";
@@ -64,7 +64,7 @@ function Item({
   label: ReactNode;
   children?: ReactNode;
 }) {
-  const Icon = ok === null ? CircleHelp : ok ? Check : X;
+  const Icon = ok === null ? CircleHelp : ok ? Check2 : X;
   return (
     <li className="flex gap-2">
       <Icon
@@ -82,6 +82,49 @@ function Item({
         {children && <span className="text-muted-foreground"> {children}</span>}
       </span>
     </li>
+  );
+}
+/** 내 자격 표: 요구 조건 | 우리 상태 | 결과. 결과는 아이콘 + 글자(색 없이도 읽히게). */
+const CheckTable = ({ children }: { children: ReactNode }) => (
+  <table className="mt-[0.5rlh] table first:mt-0">
+    <thead>
+      <tr>
+        <th>요구 조건</th>
+        <th>우리 상태</th>
+        <th className="w-[6.5rem]">결과</th>
+      </tr>
+    </thead>
+    <tbody>{children}</tbody>
+  </table>
+);
+function Check({
+  ok,
+  label,
+  children,
+}: {
+  ok: Ok;
+  label: ReactNode;
+  children?: ReactNode;
+}) {
+  const Icon = ok === null ? CircleHelp : ok ? Check2 : X;
+  return (
+    <tr>
+      <td className={clsx("whitespace-normal", ok === false && "font-bold")}>
+        {label}
+      </td>
+      <td className="text-muted-foreground whitespace-normal">{children}</td>
+      <td>
+        <span
+          className={clsx(
+            "inline-flex items-center gap-1.5",
+            ok === null ? "text-muted-foreground" : ok === false && "font-bold",
+          )}
+        >
+          <Icon {...ic} />
+          {ok === null ? "모름" : ok ? "충족" : "미충족"}
+        </span>
+      </td>
+    </tr>
   );
 }
 const List = ({ children }: { children: ReactNode }) => (
@@ -270,8 +313,8 @@ export function MyEligibility({
 
   const eligibility = (
     <>
-      <List>
-        <Item
+      <CheckTable>
+        <Check
           ok={sidos.length ? v.region === "in" : null}
           label={`지역: ${n.sido} 공고`}
         >
@@ -280,9 +323,9 @@ export function MyEligibility({
           ) : (
             <Fill step="p0-home">사는 곳 넣기</Fill>
           )}
-        </Item>
+        </Check>
         {assetGated(n) && (
-          <Item
+          <Check
             ok={s.totalAssetsEok === null ? null : !v.assetBlocked}
             label={`총자산 ${PUBLIC_ASSET_CAP_EOK}억 이하`}
           >
@@ -291,44 +334,49 @@ export function MyEligibility({
             ) : (
               `우리 가구 ${s.totalAssetsEok}억`
             )}
-          </Item>
+          </Check>
         )}
-      </List>
+      </CheckTable>
       {!blocked && hasNewlywed && (
         <>
           <H3>신혼부부 특별공급</H3>
-          <List>
+          <CheckTable>
             {!n.publicHousing && (
-              <Item
-                ok={s.marriedAt ? true : null}
-                label="혼인신고(민영은 필수)"
-              >
-                {s.marriedAt || <Fill step="married">혼인신고일 넣기</Fill>}
-              </Item>
+              // 혼인신고일이 비었으면 "아직 안 함"이라고 답한 것으로 본다.
+              <Check ok={!!s.marriedAt} label="혼인신고(민영은 필수)">
+                {s.marriedAt ? (
+                  s.marriedAt
+                ) : (
+                  <>
+                    아직 안 함 · 했다면{" "}
+                    <Fill step="married">혼인신고일 넣기</Fill>
+                  </>
+                )}
+              </Check>
             )}
             {people.map((p) => {
               if (!personFilled(p))
                 return (
-                  <Item
+                  <Check
                     key={p.name}
                     ok={null}
                     label={`${p.name}: ${accountLabel}`}
                   >
                     <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
-                  </Item>
+                  </Check>
                 );
               const a = account(p, n, today);
               return (
-                <Item
+                <Check
                   key={p.name}
                   ok={a.special}
                   label={`${p.name}: ${accountLabel}`}
                 >
                   {`${fmtYears(a.years)} · ${p.accountCount}회 · ${p.accountPaidMan.toLocaleString()}만 원`}
-                </Item>
+                </Check>
               );
             })}
-            <Item
+            <Check
               ok={pct === undefined ? null : landing !== -1}
               label={
                 cap
@@ -347,24 +395,24 @@ export function MyEligibility({
                   <Fill step="dualincome">맞벌이 여부 넣기</Fill>
                 </>
               )}
-            </Item>
-          </List>
+            </Check>
+          </CheckTable>
         </>
       )}
       {!blocked && main && (
         <>
           <H3>일반공급</H3>
-          <List>
+          <CheckTable>
             {people.map((p) => {
               if (!personFilled(p))
                 return (
-                  <Item
+                  <Check
                     key={p.name}
                     ok={null}
                     label={`${p.name}: ${rank1Label}`}
                   >
                     <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
-                  </Item>
+                  </Check>
                 );
               const a = account(p, n, today);
               const until =
@@ -372,24 +420,24 @@ export function MyEligibility({
                   ? ` · ${addYears(p.accountOpenedAt, RANK1_ACCOUNT.years)}에 2년`
                   : "";
               return (
-                <Item
+                <Check
                   key={p.name}
                   ok={a.rank1}
                   label={`${p.name}: ${rank1Label}`}
                 >
                   {`${fmtYears(a.years)} · ${n.publicHousing ? `${p.accountCount}회` : `${p.accountPaidMan.toLocaleString()}만 원`}${p.householder ? " · 세대주" : ""}${until}`}
-                </Item>
+                </Check>
               );
             })}
-          </List>
+          </CheckTable>
         </>
       )}
       {!blocked && !main && (
-        <List>
-          <Item ok={null} label="무주택">
+        <CheckTable>
+          <Check ok={null} label="무주택">
             통장·순위는 보지 않습니다. 지역 조건은 공고문으로
-          </Item>
-        </List>
+          </Check>
+        </CheckTable>
       )}
     </>
   );
