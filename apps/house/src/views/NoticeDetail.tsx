@@ -25,7 +25,7 @@ import { ic, setQuery } from "../util.ts";
 import { isFresh } from "./Settings.tsx";
 
 // 목록으로 → 제목·성격 → 탭(공고 정보 | 내 자격 | 일정). 한 번에 한 덩어리만 보이게 탭으로 나눈다.
-// 고른 탭은 ?tab= 에. 기본은 개인화했으면 "내 자격", 아니면 "공고 정보".
+// 고른 탭은 ?tab= 에. 기본은 늘 "공고 정보".
 // 아직 개인화하지 않았으면 "내 자격"은 개인화로 잇는 한 줄뿐이다.
 const TABS = ["complex", "eligibility", "schedule"] as const;
 type Tab = (typeof TABS)[number];
@@ -60,7 +60,7 @@ export function NoticeDetail({
     );
   const v = judge(n, s);
   const fresh = isFresh(s);
-  const defaultTab: Tab = fresh ? "complex" : "eligibility";
+  const defaultTab: Tab = "complex";
   const asked = query.get("tab") as Tab | null;
   const tab: Tab = asked && TABS.includes(asked) ? asked : defaultTab;
   const price =
