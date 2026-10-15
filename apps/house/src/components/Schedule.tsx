@@ -1,3 +1,4 @@
+import { supplyOf } from "@shared/classify.ts";
 import { fmtDate } from "@shared/dates.ts";
 import { isMainRound } from "@shared/site.ts";
 import type { Notice } from "@shared/types.ts";
@@ -29,7 +30,9 @@ export function milestones(n: Notice): Milestone[] {
     });
   if (n.r2Start)
     out.push({ label: "2순위 접수", date: n.r2Start, end: n.r2End });
-  if (n.winnerAt) out.push({ label: "당첨 발표", date: n.winnerAt });
+  // 선착순 매각은 발표가 없다(마이홈이 날짜 칸을 공고 끝날로 채워 온다)
+  if (n.winnerAt && supplyOf(n) !== "매각")
+    out.push({ label: "당첨 발표", date: n.winnerAt });
   if (n.contractStart)
     out.push({ label: "계약", date: n.contractStart, end: n.contractEnd });
   if (n.moveInYm)

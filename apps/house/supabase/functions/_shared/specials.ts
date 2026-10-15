@@ -1,7 +1,14 @@
 import { classify, isRegulatedZone } from "./classify.ts";
 import { yearsBetween } from "./dates.ts";
-import { earners, incomePct, personFilled } from "./eligibility.ts";
 import {
+  earners,
+  incomeBonusPct,
+  incomePct,
+  personFilled,
+  stagedNewlywed,
+} from "./eligibility.ts";
+import {
+  allOk,
   type Check,
   exclusiveAreas,
   homelessCheck,
@@ -75,12 +82,18 @@ function accountRows(
       kind === "rank1"
         ? rank1Checks(p, idx, n, s, today)
         : specialAccountChecks(p, idx, n, today);
-    return [...cs, ...(extra?.(p, idx) ?? [])]
-      .filter((c) => c.id !== "homeless" && c.id !== "nowin")
+    const own = cs
+      // 가구 단위 줄은 따로 한 번만(2주택 여부는 특공의 무주택 요건이 이미 본다)
+      .filter((c) => !["homeless", "nowin", "twohomes"].includes(c.id))
       .map((c) => ({
         ...c,
         label: `${p.name}: ${kind === "rank1" ? "1순위 " : "특공 "}${c.label}`,
       }));
+    const more = (extra?.(p, idx) ?? []).map((c) => ({
+      ...c,
+      label: `${p.name}: ${c.label}`,
+    }));
+    return [...own, ...more];
   });
 }
 /** 규제지역 1순위의 5년 내 당첨 없음은 가구 단위라 한 번만. */
@@ -99,7 +112,8 @@ function incomeCheck(
   law: string,
 ): Check[] {
   if (rule.capPct === undefined) return [];
-  const pct = incomePct(s);
+  const pct = incomePct(s, n);
+  const bonus = incomeBonusPct(n, s);
   const thisYear = n.announcedAt.startsWith(String(INCOME_BASE_YEAR));
   const over = pct !== undefined && pct > rule.capPct;
   const re = s.realEstateEok;
@@ -107,7 +121,8 @@ function incomeCheck(
   return [
     {
       id: "income",
-      label: `가구 소득 ${rule.capPct}% 이하(${earners(s)})${rule.realEstateAlt ? `, 넘으면 부동산 ${REAL_ESTATE_CAP_EOK}억 이하` : ""}`,
+      // 민영 신생아·생애최초는 맞벌이 구분이 없다
+      label: `가구 소득 ${rule.capPct}% 이하${n.publicHousing ? `(${earners(s)})` : ""}${rule.realEstateAlt ? `, 넘으면 부동산 ${REAL_ESTATE_CAP_EOK}억 이하` : ""}`,
       law,
       ok:
         pct === undefined || !thisYear
@@ -124,7 +139,7 @@ function incomeCheck(
           ? ""
           : !thisYear
             ? `${n.announcedAt.slice(0, 4)}년 공고라 그해 공고문 기준표 확인`
-            : `우리 가구 ${pct}%${viaRealEstate && re !== null ? ` · 부동산 ${re}억` : ""}`,
+            : `우리 가구 ${pct}%${bonus ? `(2023.3.28 이후 출생 자녀 가산 ${bonus}%p 뺌)` : ""}${viaRealEstate && re !== null ? ` · 부동산 ${re}억` : ""}`,
       need: viaRealEstate && re === null ? "realestate" : "income",
     },
   ];
@@ -139,15 +154,22 @@ export function specialsOf(
 ): SpecialPlan[] {
   const t = ticketsOf(n);
   const c = classify(n);
+  // 공공임대(분양전환)는 입주 자격이 다른 체계라 판정하지 않는다
+  if (c.supply === "공공임대") return [];
   const pub = n.publicHousing;
   const sector = pub ? "public" : "private";
   const e = earners(s);
-  const B6 = "공공주택 특별법 시행규칙 별표 6";
+  // 나눔형·토지임대부는 별표 6의6(생애최초·신생아 구간은 별표 6과 같다)
+  const B6 = stagedNewlywed(n)
+    ? "공공주택 특별법 시행규칙 별표 6의6"
+    : "공공주택 특별법 시행규칙 별표 6";
   const out: SpecialPlan[] = [];
   const married = !!s.marriedAt;
 
   if (t.newborn > 0) {
-    const law = pub ? `${B6} 2.마` : "규칙 제35조의3 ③";
+    const law = pub
+      ? `${B6} ${stagedNewlywed(n) ? "2.라" : "2.마"}`
+      : "규칙 제35조의3 ③";
     const rule = SPECIAL_TIERS.newborn[sector][e];
     out.push({
       key: "newborn",
@@ -409,4 +431,21 @@ export function landingOf(rule: SpecialRule, pct: number | undefined) {
     (x) => x.capPct === undefined || pct <= x.capPct,
   );
   return i < 0 ? rule.tiers.length : i;
+}
+
+/** 특공을 넣을 수 있나. 가구 요건(사람 줄이 아닌 것)이 하나라도 미충족이면 false.
+ *  사람 줄(p0-…, p1-…)은 넣을 사람 한 명만 되면 되므로, 모두 미충족인 사람밖에 없을 때만 false. */
+export function planOk(checks: Check[]): boolean | null {
+  const who = (c: Check) => /^p(\d+)-/.exec(c.id)?.[1];
+  const household = checks.filter((c) => who(c) === undefined);
+  const people = new Map<string, Check[]>();
+  for (const c of checks) {
+    const k = who(c);
+    if (k !== undefined) people.set(k, [...(people.get(k) ?? []), c]);
+  }
+  const h = allOk(household);
+  if (h === false || people.size === 0) return h;
+  const each = [...people.values()].map(allOk);
+  if (each.every((x) => x === false)) return false;
+  return each.some((x) => x === true) ? h : null;
 }

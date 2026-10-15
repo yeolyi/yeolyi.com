@@ -77,3 +77,16 @@ test("가점: 배우자 통장은 가입 기간의 절반을 같은 표로 셈�
     0,
   );
 });
+
+test("가점: 집이 있으면 무주택 0점, 부양가족은 넘겨준 수", () => {
+  const b = bonusPoints({
+    birth: "1980-01-01",
+    marriedAt: "2010-01-01",
+    today: "2026-10-16",
+    accountYears: 10,
+    ownsHome: true,
+    dependents: 3,
+  });
+  assert.equal(b.homeless, 0);
+  assert.equal(b.dependents, 20);
+});

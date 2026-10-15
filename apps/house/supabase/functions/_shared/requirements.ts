@@ -152,6 +152,21 @@ export function rank1Checks(
   if (isRegulatedZone(c.zone)) {
     out.push(householderCheck(p, idx, law), noRecentWinCheck(s, law));
     if (c.housing === "국민") out.push(homelessCheck(s, law));
+    // 민영: 2주택 이상 세대는 1순위가 아니다(제28조 ① 1호 다목 4)). 집 수는 묻지 않으니 집이 있으면 모름
+    else
+      out.push({
+        id: "twohomes",
+        label: "세대가 2주택 이상이 아님",
+        law,
+        ok: s.ownsHome === null ? null : s.ownsHome ? null : true,
+        mine:
+          s.ownsHome === null
+            ? ""
+            : s.ownsHome
+              ? "집이 있음 · 몇 채인지 확인"
+              : "집 없음",
+        need: "ownshome",
+      });
   }
   return out;
 }
@@ -189,11 +204,7 @@ export function specialAccountChecks(
 }
 
 /** 무순위·재공급·임의공급 등 순위 없는 공급의 가구 요건. 거주 요건처럼 공고문에만 있는 건 모름으로. */
-export function noRankChecks(
-  n: Notice,
-  s: Settings,
-  local: boolean | null,
-): Check[] {
+export function noRankChecks(n: Notice, s: Settings): Check[] {
   const c = classify(n);
   if (c.supply === "무순위")
     return [
@@ -207,23 +218,17 @@ export function noRankChecks(
         mine: "공고문 확인",
       },
     ];
-  if (c.supply === "재공급")
+  // 해당 시·군 거주는 화면 맨 위 지역 줄이 이미 본다
+  if (c.supply === "재공급") {
+    const head = s.people.find((p) => p.householder);
     return [
-      {
-        id: "residence",
-        label: "해당 주택건설지역(시·군) 거주",
-        law: "규칙 제47조의3 ②",
-        ok: local,
-        mine: local === null ? "" : local ? "거주" : "거주 안 함",
-        need: "p0-home",
-      },
       homelessCheck(s, "규칙 제47조의3 ②"),
       {
         id: "householder",
         label: "세대주",
         law: "규칙 제47조의3 ②",
-        ok: s.people.some((p) => p.householder) || null,
-        mine: "",
+        ok: head ? true : null,
+        mine: head ? `${head.name}: 세대주` : "세대주인 사람이 없음",
         need: "p0-householder",
       },
       {
@@ -235,6 +240,7 @@ export function noRankChecks(
         need: "wonrecently",
       },
     ];
+  }
   if (c.supply === "임의공급")
     return [
       {

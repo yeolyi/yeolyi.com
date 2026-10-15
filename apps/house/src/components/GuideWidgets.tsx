@@ -310,15 +310,31 @@ export function TierChart({
                   .flatMap((t) =>
                     t.capPct === undefined ? [] : [{ ...t, capPct: t.capPct }],
                   )
-                  .map((t) => (
-                    <span
-                      key={t.label}
-                      className="absolute -translate-x-1/2"
-                      style={{ left: pct(t.capPct) }}
-                    >
-                      {t.capPct}
-                    </span>
-                  ))}
+                  .map((t, i, all) => {
+                    // 좁은 화면에서 붙은 두 경계(120·140)가 겹치지 않게 앞 것은 왼쪽, 뒤 것은 오른쪽으로 비킨다
+                    const near = (a?: number, b?: number) =>
+                      a !== undefined &&
+                      b !== undefined &&
+                      Math.abs(a - b) < AXIS_MAX * 0.12;
+                    const before = near(t.capPct, all[i + 1]?.capPct);
+                    const after = near(t.capPct, all[i - 1]?.capPct);
+                    return (
+                      <span
+                        key={t.label}
+                        className={clsx(
+                          "absolute",
+                          before
+                            ? "-translate-x-full pr-0.5"
+                            : after
+                              ? "pl-0.5"
+                              : "-translate-x-1/2",
+                        )}
+                        style={{ left: pct(t.capPct) }}
+                      >
+                        {t.capPct}
+                      </span>
+                    );
+                  })}
               </div>
             </div>
           );

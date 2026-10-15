@@ -1,19 +1,27 @@
-import { isMainRound } from "@shared/site.ts";
+import { supplyOf } from "@shared/classify.ts";
 import type { Notice } from "@shared/types.ts";
 
 // 공고의 성격을 한 줄로: "경기 · 공공 일반형 · 본청약 · 투기과열지구". 풀이는 상세 아래 관련 가이드에 있다.
 export function facts(n: Notice): string[] {
+  const supply = supplyOf(n);
   const sector =
-    n.kind === "신혼희망타운"
+    n.kind === "신혼희망타운" || /신혼희망타운/.test(n.name)
       ? "신혼희망타운"
-      : n.publicHousing
-        ? `공공 ${n.publicType ?? "일반형"}`
-        : "민영";
-  const round = isMainRound(n)
-    ? "본청약"
-    : n.kind === "임의공급"
-      ? "임의공급"
-      : "잔여세대(무순위)";
+      : supply === "공공임대"
+        ? "분양전환 공공임대"
+        : n.publicHousing
+          ? `공공 ${n.publicType ?? "일반형"}`
+          : "민영";
+  const round = {
+    본청약: "본청약",
+    공공임대: "본청약",
+    무순위: "잔여세대(무순위)",
+    재공급: "재공급(계약 취소된 집)",
+    임의공급: "임의공급",
+    LH잔여: "LH 잔여세대",
+    매각: "선착순 매각",
+    모름: "처음 보는 공급 구분",
+  }[supply];
   return [
     sector,
     round,

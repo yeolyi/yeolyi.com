@@ -112,11 +112,13 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
           </>
         ) : (
           <>
-            사는 곳 기준으로 넣을 수 있는{" "}
+            <a href="/settings">개인화</a>에 맞춰 골랐습니다. 본청약은 사는 곳의
+            권역(
             {regionsOf(s.people.map((p) => p.sido).filter(Boolean))
               .map((r) => r.label)
-              .join("·") || "전국"}{" "}
-            공고를 <a href="/settings">개인화</a>에 맞춰 골랐습니다.
+              .join("·") || "전국"}
+            ) 공고만, 무순위·임의공급·LH 잔여세대는 사는 곳을 따지지 않아 전국
+            공고를 보여 드립니다.
           </>
         )}
       </p>

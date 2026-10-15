@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import {
+  incomePct,
+  newlywedCheck,
+  stagedNewlywed,
+} from "../../supabase/functions/_shared/eligibility.ts";
 import { SPECIAL_TIERS } from "../../supabase/functions/_shared/rules.ts";
 import {
   landingOf,
+  planOk,
   specialsOf,
 } from "../../supabase/functions/_shared/specials.ts";
 import { notice, settings, TODAY, unit } from "./helpers.ts";
@@ -146,4 +152,68 @@ test("소득 몫: 우선 → 일반 → 추첨, 상한을 넘으면 몫 없음",
   assert.equal(landingOf(r, 90), 0);
   assert.equal(landingOf(r, 120), 1);
   assert.equal(landingOf(r, 150), 3);
+});
+
+test("신혼 요건: 민영은 혼인신고 뒤 7년 이내, 공공은 예비신혼·6세 이하 자녀도", () => {
+  const priv = notice();
+  const pub = notice({ publicHousing: true });
+  assert.equal(newlywedCheck(priv, settings()).ok, false); // 신고 안 함
+  assert.equal(
+    newlywedCheck(priv, settings({ marriedAt: "2020-01-01" })).ok,
+    true,
+  );
+  assert.equal(
+    newlywedCheck(priv, settings({ marriedAt: "2014-10-01" })).ok,
+    false,
+  );
+  assert.equal(newlywedCheck(pub, settings()).ok, true); // 예비신혼
+  // 공공, 혼인 12년: 자녀 없으면 안 됨, 2세 미만이면 됨, 자녀 나이 모르면 모름
+  const old = settings({ marriedAt: "2014-10-01" });
+  assert.equal(newlywedCheck(pub, old).ok, false);
+  assert.equal(
+    newlywedCheck(pub, { ...old, children: 1, newbornChild: true }).ok,
+    true,
+  );
+  assert.equal(newlywedCheck(pub, { ...old, children: 1 }).ok, null);
+  // 혼자, 자녀 없음: 공공도 안 됨
+  const alone = settings({ people: [settings().people[0]!] });
+  assert.equal(newlywedCheck(pub, alone).ok, false);
+});
+
+test("신혼희망타운·나눔형은 단계식 구간, 2세 미만 자녀는 공공 소득에서 10%p 뺀다", () => {
+  assert.equal(
+    stagedNewlywed(notice({ kind: "신혼희망타운", publicHousing: true })),
+    true,
+  );
+  assert.equal(
+    stagedNewlywed(notice({ publicHousing: true, publicType: "나눔형" })),
+    true,
+  );
+  assert.equal(stagedNewlywed(notice({ publicHousing: true })), false);
+  const s = settings({ children: 1, newbornChild: true });
+  assert.equal(
+    (incomePct(s) ?? 0) - (incomePct(s, notice({ publicHousing: true })) ?? 0),
+    10,
+  );
+  assert.equal(incomePct(s, notice()), incomePct(s)); // 민영은 가산 없음
+});
+
+test("특공 가능 여부: 넣을 사람 한 명만 되면 된다, 가구 요건이 안 되면 안 된다", () => {
+  const c = (id: string, ok: boolean | null) => ({
+    id,
+    label: "",
+    law: "",
+    ok,
+    mine: "",
+  });
+  assert.equal(
+    planOk([c("homeless", true), c("p0-years", true), c("p1-years", false)]),
+    true,
+  );
+  assert.equal(
+    planOk([c("homeless", true), c("p0-years", false), c("p1-years", false)]),
+    false,
+  );
+  assert.equal(planOk([c("homeless", false), c("p0-years", true)]), false);
+  assert.equal(planOk([c("homeless", null), c("p0-years", true)]), null);
 });

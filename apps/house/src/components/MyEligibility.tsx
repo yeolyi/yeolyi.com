@@ -1,17 +1,21 @@
-import { classify } from "@shared/classify.ts";
+import { classify, isRegulatedZone } from "@shared/classify.ts";
 import { addYears, fmtYears, yearsBetween } from "@shared/dates.ts";
 import {
   account,
   earners,
   householdSize,
+  incomeBonusPct,
   incomePct,
   newlywedAllowed,
+  newlywedCheck,
+  newlywedStage,
+  newlywedTiersFor,
   personFilled,
   residency,
+  stagedNewlywed,
   who,
 } from "@shared/eligibility.ts";
 import {
-  allOk,
   type Check,
   homelessCheck,
   noRankChecks,
@@ -25,7 +29,6 @@ import {
   incomeBaseMan,
   LOTTERY_HOMELESS_PCT,
   lotteryHomelessFirst,
-  NEWLYWED_TIERS,
   PUBLIC_ASSET_CAP_EOK,
   PUBLIC_GENERAL,
   PUBLIC_RANK1_HOMELESS_YEARS,
@@ -33,7 +36,12 @@ import {
   regionsOf,
 } from "@shared/rules.ts";
 import { isMainRound } from "@shared/site.ts";
-import { landingOf, type SpecialPlan, specialsOf } from "@shared/specials.ts";
+import {
+  landingOf,
+  planOk,
+  type SpecialPlan,
+  specialsOf,
+} from "@shared/specials.ts";
 import type { Notice, Person, Settings } from "@shared/types.ts";
 import { assetGated, type Verdict } from "@shared/verdict.ts";
 import { clsx } from "clsx";
@@ -179,8 +187,14 @@ export function MyEligibility({
   const special = sumBy(units, (u) => u.special);
   const general = total - special;
   const t = v.tickets;
-  const kind =
-    n.kind === "신혼희망타운"
+  const cls = classify(n);
+  // 분양전환 공공임대는 입주 자격이 다른 체계라 판정하지 않는다. 신혼희망타운은 일반공급이 없다(별표 6의3).
+  const rental = cls.supply === "공공임대";
+  const hope = n.kind === "신혼희망타운";
+  const staged = stagedNewlywed(n);
+  const kind = rental
+    ? "분양전환 공공임대"
+    : hope || /신혼희망타운/.test(n.name)
       ? "신혼희망타운"
       : n.publicHousing
         ? `공공분양(${n.publicType ?? "일반형"})`
@@ -191,8 +205,12 @@ export function MyEligibility({
 
   // 신혼부부 특공의 재료
   const e = earners(s);
-  const pct = incomePct(s);
-  const tiers = NEWLYWED_TIERS[sector][e];
+  const pct = incomePct(s, n);
+  const bonus = incomeBonusPct(n, s);
+  // 소득 기준표는 2026년 것만 있다. 다른 해 공고는 그해 표가 기준이라 순위 탭에서 우리 자리를 그리지 않는다.
+  const thisYearTable = n.announcedAt.startsWith(String(INCOME_BASE_YEAR));
+  const rankPct = thisYearTable ? pct : undefined;
+  const tiers = newlywedTiersFor(n, e);
   const chartTiers = tiers.filter(
     (x, i) =>
       i === 0 || x.capPct === undefined || x.capPct !== tiers[i - 1]?.capPct,
@@ -205,14 +223,16 @@ export function MyEligibility({
     },
   ];
   const landing =
-    pct === undefined
+    rankPct === undefined
       ? -2
-      : tiers.findIndex((x) => x.capPct === undefined || pct <= x.capPct);
+      : tiers.findIndex((x) => x.capPct === undefined || rankPct <= x.capPct);
   const land = tiers[landing];
   const size = householdSize(s);
   const w = who(n, v, s, today);
   const applicant = w.people.find((f) => f.special)?.person;
-  const hasNewlywed = main && t.newlywed > 0;
+  const hasNewlywed = main && !rental && t.newlywed > 0;
+  const hasGeneral = main && !rental && !hope;
+  const stage = newlywedStage(n, s);
   // 신혼 말고 다른 특공(신생아·생애최초·다자녀·노부모·청년). 요건은 specials.ts
   const specials = main ? specialsOf(n, s, today) : [];
   /** "우선 100% 이하 70% → 일반 140% 이하 20% → 추첨 10%" */
@@ -250,26 +270,48 @@ export function MyEligibility({
     <>
       {!main ? (
         <P>
-          {kind}의 {n.kind === "임의공급" ? "임의공급" : "무순위(잔여세대)"}
-          입니다. 본청약에서 남거나 취소된 집을 통장과 순위 없이 추첨
-          {n.kind === "임의공급" ? "이나 선착순" : ""}으로 다시 팝니다.
+          {cls.supply === "매각"
+            ? "선착순 매각 공고입니다. 청약이 아니라서 통장·순위 없이 사업주체가 정한 방법으로 팝니다."
+            : cls.supply === "LH잔여"
+              ? `${kind}의 남은 집을 LH가 직접 파는 공고입니다. 자격과 뽑는 방법은 공고문이 정합니다.`
+              : cls.supply === "재공급"
+                ? `${kind}에서 불법행위로 계약이 취소된 집을 해당 시·군에 사는 무주택 세대주에게 다시 공급합니다.`
+                : `${kind}의 ${n.kind === "임의공급" ? "임의공급" : "무순위(잔여세대)"}입니다. 본청약에서 남거나 취소된 집을 통장과 순위 없이 추첨${n.kind === "임의공급" ? "이나 선착순" : ""}으로 다시 팝니다.`}
+        </P>
+      ) : rental ? (
+        <P>
+          {kind} 본청약입니다. 입주 자격이 분양과 다른 체계라 이 서비스는
+          판정하지 않습니다. 공고문으로 확인하세요.
         </P>
       ) : (
         <>
           <P>
             {kind} 본청약입니다.{" "}
-            {total
-              ? `${total}세대 중 특별공급 ${special}세대, 일반공급 ${general}세대.`
-              : "세대 수는 공고문에 있습니다."}
+            {!total
+              ? "세대 수는 공고문에 있습니다."
+              : hope
+                ? `${total}세대 모두 신혼부부·예비신혼부부·한부모가족 몫입니다.`
+                : `${total}세대 중 특별공급 ${special}세대, 일반공급 ${general}세대.`}
           </P>
           <SupplyMap at={[`${sector}-special`, `${sector}-general`]} />
           {hasNewlywed && (
             <>
               <H3>신혼부부 특별공급 · {t.newlywed}세대</H3>
-              <P>
-                가구 소득으로 구간을 나눠 뽑고, 앞 구간에서 떨어지면 다음
-                구간으로 내려갑니다. 가구에서 한 명만 넣습니다.
-              </P>
+              {staged ? (
+                <P>
+                  혼인 2년 이내·2세 이하 자녀·예비신혼부부는 1단계(30%, 약{" "}
+                  {seats(t.newlywed, 30)}세대), 혼인 2~7년·3~6세 자녀는
+                  2단계(60%, 약 {seats(t.newlywed, 60)}세대)에서 소득{" "}
+                  {tiers[0]?.capPct}% 이하끼리 점수 순으로 뽑고, 1단계에서
+                  떨어지면 2단계로 넘어갑니다. 나머지(약 {seats(t.newlywed, 10)}
+                  세대)는 추첨입니다. 가구에서 한 명만 넣습니다.
+                </P>
+              ) : (
+                <P>
+                  가구 소득으로 구간을 나눠 뽑고, 앞 구간에서 떨어지면 다음
+                  구간으로 내려갑니다. 가구에서 한 명만 넣습니다.
+                </P>
+              )}
               <TierChart
                 rows={chartRows}
                 caption={`${chartTiers.map((x) => `${x.label} 약 ${seats(t.newlywed, x.sharePct)}세대`).join(" · ")}. 막대 아래 숫자는 도시근로자 월평균소득 대비 % 경계.`}
@@ -287,9 +329,9 @@ export function MyEligibility({
               </P>
             </Fragment>
           ))}
-          <H3>일반공급{general > 0 ? ` · ${general}세대` : ""}</H3>
-          {n.publicHousing ? (
+          {!hasGeneral ? null : n.publicHousing ? (
             <>
+              <H3>일반공급{general > 0 ? ` · ${general}세대` : ""}</H3>
               <P>
                 2세 미만 자녀 가구 50% → 1순위 순서대로 30% → 추첨 20%. 앞
                 몫에서 떨어지면 다음 몫으로 내려갑니다.
@@ -315,6 +357,7 @@ export function MyEligibility({
             </>
           ) : (
             <>
+              <H3>일반공급{general > 0 ? ` · ${general}세대` : ""}</H3>
               <P>
                 1순위 안에서 가점제로 먼저 뽑고, 떨어지면 추첨제로 넘어갑니다.
                 {lotteryHomelessFirst(n.sido, classify(n).zone) &&
@@ -345,7 +388,6 @@ export function MyEligibility({
   // 요건은 requirements.ts 의 표에서 나온다(공고 분류 × 사람 답). 여기서는 섹션으로 묶어 그리기만 한다.
   const sidos = people.map((p) => p.sido).filter(Boolean);
   const regions = regionsOf(sidos);
-  const cls = classify(n);
   const blocked = v.region === "out" || !!v.assetBlocked || !!v.notSubscription;
   const cap = tiers.at(-1)?.capPct;
   const local = sidos.length
@@ -375,7 +417,9 @@ export function MyEligibility({
           ? local
             ? "해당 시·군 거주"
             : "해당 시·군 거주 안 함"
-          : "전국(거주 요건은 아래)"
+          : cls.supply === "무순위"
+            ? "전국(거주 요건은 아래)"
+            : "사업주체가 정함(공고문)"
       : "",
     need: "p0-home",
   };
@@ -391,7 +435,7 @@ export function MyEligibility({
       }
     : undefined;
   // 사람별 요건에서 가구 단위(무주택·5년 내 당첨)는 따로 한 번만 보인다.
-  const HOUSEHOLD_IDS = ["homeless", "nowin"];
+  const HOUSEHOLD_IDS = ["homeless", "nowin", "twohomes"];
   const personRows = (cs: Req[]) =>
     cs.filter((c) => !HOUSEHOLD_IDS.includes(c.id));
   const householdRows = (cs: Req[]) => {
@@ -404,16 +448,34 @@ export function MyEligibility({
   const generalAll = filledPeople.flatMap((p) =>
     rank1Checks(p, people.indexOf(p), n, s, today),
   );
-  const _specialAll = filledPeople.flatMap((p) =>
-    specialAccountChecks(p, people.indexOf(p), n, today),
-  );
-  const thisYearTable = n.announcedAt.startsWith(String(INCOME_BASE_YEAR));
   const overIncome = pct !== undefined && cap !== undefined && pct > cap;
   const privateLotteryOnly =
     !n.publicHousing &&
     pct !== undefined &&
     landing >= 0 &&
     tiers[landing]?.capPct === undefined;
+
+  // 공공 일반공급 소득(별표 6 1.가 2): 60㎡ 이하만, 별표 6의6 1.가 2): 나눔형·토지임대부는 면적과 상관없이) 100%, 맞벌이 200%
+  const smallUnits = units.some((u) => exclusiveArea(u) <= 60);
+  const generalCap = PUBLIC_GENERAL.smallAreaCapPct[e];
+  const generalIncome: Req | undefined =
+    n.publicHousing && (staged || smallUnits)
+      ? {
+          id: "general-income",
+          label: `${staged ? "" : "60㎡ 이하 주택형: "}가구 소득 ${generalCap}% 이하(${e})`,
+          law: staged
+            ? "공공주택 특별법 시행규칙 별표 6의6 1.가"
+            : "공공주택 특별법 시행규칙 별표 6 1.가",
+          ok: pct === undefined || !thisYearTable ? null : pct <= generalCap,
+          mine:
+            pct === undefined
+              ? ""
+              : thisYearTable
+                ? `우리 가구 ${pct}%`
+                : `${n.announcedAt.slice(0, 4)}년 공고라 그해 공고문 기준표 확인`,
+          need: "income",
+        }
+      : undefined;
 
   const missingPeopleRows = people
     .filter((p) => !personFilled(p))
@@ -457,7 +519,7 @@ export function MyEligibility({
               <CheckRow c={homelessCheck(s, "규칙 제4조 ①")} Fill={Fill} />
             )}
           {!main &&
-            noRankChecks(n, s, local).map((c) => (
+            noRankChecks(n, s).map((c) => (
               <CheckRow key={c.id} c={c} Fill={Fill} />
             ))}
           {cls.supply === "모름" && (
@@ -490,21 +552,8 @@ export function MyEligibility({
         <>
           <H3>신혼부부 특별공급</H3>
           <CheckTable>
-            {!n.publicHousing && (
-              // 혼인신고일이 비었으면 "아직 안 함"이라고 답한 것으로 본다.
-              <CheckRow
-                c={{
-                  id: "married",
-                  label: "혼인신고(민영은 필수)",
-                  law: "규칙 제41조",
-                  ok: !!s.marriedAt,
-                  mine: s.marriedAt || "아직 안 함",
-                  need: s.marriedAt ? undefined : "married",
-                }}
-                Fill={Fill}
-                linkEvenIfKnown
-              />
-            )}
+            {/* 혼인신고일이 비었으면 "아직 안 함"이라고 답한 것으로 본다. */}
+            <CheckRow c={newlywedCheck(n, s)} Fill={Fill} linkEvenIfKnown />
             <CheckRow c={homelessCheck(s, "규칙 제41조 ①")} Fill={Fill} />
             {filledPeople.flatMap((p) =>
               personRows(
@@ -524,16 +573,14 @@ export function MyEligibility({
                 label: cap
                   ? `가구 소득 ${cap}% 이하(${e})`
                   : "가구 소득(추첨 구간은 상한 없음)",
-                law: n.publicHousing
-                  ? "공공주택 특별법 시행규칙 별표 6"
-                  : "규칙 제41조 ②",
+                law: newlywedCheck(n, s).law,
                 // 소득 기준표는 2026년 것만 있다. 다른 해 공고는 그해 표가 기준이라 판정하지 않는다.
                 ok: pct === undefined || !thisYearTable ? null : !overIncome,
                 mine:
                   pct === undefined
                     ? ""
                     : thisYearTable
-                      ? `우리 가구 ${pct}%`
+                      ? `우리 가구 ${pct}%${bonus ? `(2023.3.28 이후 출생 자녀 가산 ${bonus}%p 뺌)` : ""}`
                       : `${n.announcedAt.slice(0, 4)}년 공고라 그해 공고문 기준표 확인`,
                 need: "income",
               }}
@@ -566,13 +613,14 @@ export function MyEligibility({
             </CheckTable>
           </Fragment>
         ))}
-      {!blocked && main && cls.supply !== "공공임대" && (
+      {!blocked && hasGeneral && (
         <>
           <H3>일반공급 1순위</H3>
           <CheckTable>
             {householdRows(generalAll).map((c) => (
               <CheckRow key={c.id} c={c} Fill={Fill} />
             ))}
+            {generalIncome && <CheckRow c={generalIncome} Fill={Fill} />}
             {filledPeople.flatMap((p) =>
               personRows(rank1Checks(p, people.indexOf(p), n, s, today)).map(
                 (c) => (
@@ -606,9 +654,25 @@ export function MyEligibility({
           1순위에서 다 차면 기회가 없습니다
         </Item>
       );
+    // 국민주택 일반공급은 무주택 세대만(제4조 ① 1호)
+    if (n.publicHousing && s.ownsHome === true)
+      return (
+        <Item key={p.name} ok={false} label={`${p.name}: 넣을 수 없음`}>
+          공공분양 일반공급은 무주택 가구만 넣습니다
+        </Item>
+      );
     if (!n.publicHousing) {
+      // 규제지역에서 집이 있는 세대는 가점제에서 빠지고 추첨제로만(제28조 ⑥). 2주택 이상이면 1순위도 아니다.
+      if (s.ownsHome === true && isRegulatedZone(cls.zone))
+        return (
+          <Item key={p.name} ok={true} label={`${p.name}: 추첨제만`}>
+            집이 있는 세대라 가점제에서 빠집니다(2주택 이상이면 1순위가 아님)
+          </Item>
+        );
       // 혼인신고를 했으면 배우자 통장 기간의 절반을 점수로 더한다(별표 1 비고 2)
       const spouse = people.find((q) => q !== p && q.accountOpenedAt);
+      // 부양가족: 배우자·미성년 자녀·3년 이상 모신 부모(적어도 한 분)
+      const deps = (s.marriedAt ? 1 : 0) + s.children + (s.elderParent ? 1 : 0);
       const b = bonusPoints({
         birth: p.birth,
         marriedAt: s.marriedAt,
@@ -617,15 +681,24 @@ export function MyEligibility({
         spouseAccountYears: spouse
           ? yearsBetween(spouse.accountOpenedAt, today)
           : undefined,
+        ownsHome: s.ownsHome,
+        dependents: deps,
       });
       return (
         <Item key={p.name} ok={true} label={`${p.name}: 가점 ${b.total}점`}>
-          {`무주택 ${b.homeless} · 부양가족 ${b.dependents} · 통장 ${b.account}${b.spouse ? `(배우자 통장 ${b.spouse} 포함)` : ""}. 가점제에서 떨어지면 추첨제`}
+          {`무주택 ${b.homeless}${s.ownsHome ? "(집 있음)" : ""} · 부양가족 ${b.dependents}(${deps}명) · 통장 ${b.account}${b.spouse ? `(배우자 통장 ${b.spouse} 포함)` : ""}. 가점제에서 떨어지면 추첨제`}
         </Item>
       );
     }
     const start = homelessStart({ birth: p.birth, marriedAt: s.marriedAt });
     const yrs = start.date <= today ? yearsBetween(start.date, today) : 0;
+    // 2세 미만 자녀 가구는 일반공급 50% 우선 몫에 먼저 들어간다(별표 6 1.나)
+    if (s.newbornChild)
+      return (
+        <Item key={p.name} ok={true} label={`${p.name}: 2세 미만 자녀 우선 몫`}>
+          {`일반공급의 ${PUBLIC_GENERAL.childFirstSharePct}%를 2세 미만 자녀 가구에 먼저. 떨어지면 순서 몫(무주택 ${fmtYears(yrs)})`}
+        </Item>
+      );
     return yrs >= PUBLIC_RANK1_HOMELESS_YEARS ? (
       <Item key={p.name} ok={true} label={`${p.name}: 순서 몫 1순차`}>
         {`무주택 ${fmtYears(yrs)} · 저축총액 ${p.accountPaidMan.toLocaleString()}만 원 순`}
@@ -639,31 +712,42 @@ export function MyEligibility({
   const applicantLocal = applicant
     ? residency(applicant, n, today).localOk
     : false;
-  const rank = !blocked && main && (
+  const rank = !blocked && main && !rental && (
     <>
-      {hasNewlywed && newlywedAllowed(n, s) && (
+      {hasNewlywed && newlywedAllowed(n, s) && s.ownsHome !== true && (
         <>
           <H3>신혼부부 특별공급</H3>
           {/* 소득을 안 넣었어도 구간 막대는 그린다(세로선만 없다). */}
           <TierChart
             rows={chartRows}
             marker={
-              pct === undefined
+              rankPct === undefined
                 ? undefined
-                : { pct, label: `우리 가구 ${pct}%` }
+                : { pct: rankPct, label: `우리 가구 ${rankPct}%` }
             }
             caption={
-              pct === undefined
-                ? "월소득을 넣으면 우리 가구 자리를 세로선으로 보여 드립니다."
-                : `세로선이 우리 가구 ${pct}%(월 ${won(s.incomeMan ?? 0)} ÷ ${size <= 3 ? "3인 이하" : `${size}인`} 가구 기준 ${won(incomeBaseMan(size))}).`
+              !thisYearTable
+                ? `${n.announcedAt.slice(0, 4)}년 공고라 그해 공고문의 소득 기준표로 확인하세요.`
+                : pct === undefined
+                  ? "월소득을 넣으면 우리 가구 자리를 세로선으로 보여 드립니다."
+                  : `세로선이 우리 가구 ${pct}%(월 ${won(s.incomeMan ?? 0)} ÷ ${size <= 3 ? "3인 이하" : `${size}인`} 가구 기준 ${won(incomeBaseMan(size))}).`
             }
           />
           <List>
+            {staged && (
+              <Item ok={true} label={`${stage}단계(${stage === 1 ? 30 : 60}%)`}>
+                {stage === 1
+                  ? "혼인 2년 이내·2세 이하 자녀·예비신혼부부. 떨어지면 2단계"
+                  : "혼인 2~7년·3~6세 자녀"}
+              </Item>
+            )}
             <Item
-              ok={pct === undefined ? null : !!land}
+              ok={rankPct === undefined ? null : !!land}
               label={land ? `${land.label} 구간에서 시작` : "시작 구간"}
             >
-              {pct === undefined ? (
+              {!thisYearTable ? (
+                "그해 공고문 기준표 확인"
+              ) : pct === undefined ? (
                 <Fill step="income">월소득 넣기</Fill>
               ) : land ? (
                 `약 ${seats(t.newlywed, land.sharePct)}세대${
@@ -715,10 +799,10 @@ export function MyEligibility({
         // 소득 구간이 없거나 이미 자격이 안 되는 특공은 순위를 따지지 않는다
         if (
           !rule?.tiers.some((x) => x.capPct !== undefined) ||
-          allOk(sp.checks) === false
+          planOk(sp.checks) === false
         )
           return null;
-        const at = landingOf(rule, pct);
+        const at = landingOf(rule, rankPct);
         const tier = rule.tiers[at];
         return (
           <Fragment key={sp.key}>
@@ -728,7 +812,9 @@ export function MyEligibility({
                 ok={at < 0 ? null : !!tier}
                 label={tier ? `${tier.label} 구간에서 시작` : "시작 구간"}
               >
-                {at < 0 ? (
+                {!thisYearTable ? (
+                  "그해 공고문 기준표 확인"
+                ) : at < 0 ? (
                   <Fill step="income">월소득 넣기</Fill>
                 ) : tier ? (
                   `약 ${seats(sp.units, tier.sharePct)}세대${
@@ -747,18 +833,22 @@ export function MyEligibility({
           </Fragment>
         );
       })}
-      <H3>일반공급</H3>
-      <List>
-        {people.map((p) =>
-          personFilled(p) ? (
-            generalRank(p)
-          ) : (
-            <Item key={p.name} ok={null} label={p.name}>
-              <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
-            </Item>
-          ),
-        )}
-      </List>
+      {hasGeneral && (
+        <>
+          <H3>일반공급</H3>
+          <List>
+            {people.map((p) =>
+              personFilled(p) ? (
+                generalRank(p)
+              ) : (
+                <Item key={p.name} ok={null} label={p.name}>
+                  <Fill step={personStep(p)}>{p.name} 정보 넣기</Fill>
+                </Item>
+              ),
+            )}
+          </List>
+        </>
+      )}
     </>
   );
 
@@ -770,7 +860,9 @@ export function MyEligibility({
         <P>
           {blocked
             ? "넣을 수 없는 공고라 순위를 따지지 않습니다. 내 자격 탭을 보세요."
-            : "무순위·임의공급은 순위 없이 추첨합니다."}
+            : rental
+              ? "공공임대는 이 서비스가 판정하지 않습니다. 공고문으로 확인하세요."
+              : "무순위·임의공급은 순위 없이 추첨합니다."}
         </P>
       )}
     </div>

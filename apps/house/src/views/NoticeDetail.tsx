@@ -93,7 +93,7 @@ export function NoticeDetail({
       {n.url && (
         <p className="mt-[0.25rlh]">
           <a href={n.url} target="_blank" rel="noreferrer">
-            청약홈에서 공고문 보기
+            {n.source === "myhome" ? "마이홈" : "청약홈"}에서 공고문 보기
           </a>
         </p>
       )}
@@ -302,7 +302,7 @@ function Units({ n }: { n: Notice }) {
           <p className="text-muted-foreground mt-[0.5rlh] text-base">
             돈은 최고 분양가로 어림한 값이고 판정에는 쓰지 않습니다. 계약금은
             흔한 비율(10~20%)이라 공고문의 비율로 확인하세요. 대출 뒤 내 돈은
-            분양가에서 대출 어림(LTV {MONEY_EXAMPLE.ltvPct}%
+            분양가에서 대출 어림(생애최초 기준 LTV {MONEY_EXAMPLE.ltvPct}%
             {capped
               ? ", 수도권·규제지역 금액 상한 집값 15억 이하 6억·25억 이하 4억·그 위 2억 중 작은 쪽"
               : ", 금액 상한 없음"}

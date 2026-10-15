@@ -188,6 +188,25 @@ export const REAL_ESTATE_CAP_EOK = 3.31;
 /** 공공 생애최초 저축액(별표 6 2.다 1)가)): 선납금 포함 600만 원 이상. */
 export const PUBLIC_FIRST_HOME_SAVINGS_MAN = 600;
 
+/** 신혼희망타운(별표 6의3 2.)과 나눔형·토지임대부(별표 6의6 2.나)의 신혼 특공. 소득 구간이 아니라 혼인 기간으로 단계를 나눈다.
+ *  1단계 30%: 혼인 2년 이내·2세 이하 자녀·예비신혼부부(·2세 이하 자녀 한부모), 2단계 60%: 혼인 2~7년·3~6세 자녀. 둘 다 소득 130%(맞벌이 140%)
+ *  이하에서 점수 순이고, 앞 단계에서 떨어지면 뒤 단계로. 나머지 10%는 자격(130%, 맞벌이 200%) 안에서 추첨.
+ *  화면의 구간 막대는 소득만 보므로 1·2단계를 "우선" 한 칸(90%)으로 묶는다. */
+export const NEWLYWED_STAGED_TIERS: Record<Earners, readonly Tier[]> = {
+  맞벌이: [
+    { label: "우선", capPct: 140, sharePct: 90 },
+    { label: "추첨", capPct: 200, sharePct: 10 },
+  ],
+  외벌이: [
+    { label: "우선", capPct: 130, sharePct: 90 },
+    { label: "추첨", capPct: 130, sharePct: 10 },
+  ],
+};
+/** 1단계(혼인 2년 이내) 경계. */
+export const NEWLYWED_STAGE1_YEARS = 2;
+/** 신혼 특공 혼인 기간 상한(규칙 제41조, 별표 6 2.나·6의3·6의6). 공공은 넘어도 6세 이하 자녀가 있으면 된다. */
+export const NEWLYWED_MAX_YEARS = 7;
+
 /** 공공 일반형 일반공급(별표 6 1.): 50% 2세 미만 자녀 가구 → 30% 소득 칸 안에서 제27조 순차 → 20% 추첨.
  *  소득 상한은 외벌이 100%, 맞벌이 140%(자녀 우선·순차 칸) / 200%(60㎡ 이하의 자격 요건). */
 export const PUBLIC_GENERAL = {
@@ -257,21 +276,26 @@ export function pointsOf(input: {
   };
 }
 
-/** 민영 가점 어림. 무주택기간은 homelessStart(만 30세, 그 전 혼인이면 혼인신고일)부터, 부양가족은 배우자 하나로 본다. */
+/** 민영 가점 어림. 무주택기간은 homelessStart(만 30세, 그 전 혼인이면 혼인신고일)부터 세고, 지금 집이 있으면 0(별표 1 1.가).
+ *  부양가족은 넘겨준 수(배우자·미혼 자녀·3년 이상 같은 등본의 직계존속), 안 주면 배우자 하나. */
 export function bonusPoints(input: {
   birth: string;
   marriedAt?: string;
   today: string;
   accountYears: number;
   spouseAccountYears?: number;
+  ownsHome?: boolean | null;
+  dependents?: number;
 }) {
   const start = homelessStart(input);
   const homelessYears =
-    start.date <= input.today ? yearsBetween(start.date, input.today) : 0;
+    input.ownsHome !== true && start.date <= input.today
+      ? yearsBetween(start.date, input.today)
+      : 0;
   return {
     ...pointsOf({
       homelessYears,
-      dependents: input.marriedAt ? 1 : 0,
+      dependents: input.dependents ?? (input.marriedAt ? 1 : 0),
       accountYears: input.accountYears,
       spouseAccountYears: input.marriedAt
         ? input.spouseAccountYears
