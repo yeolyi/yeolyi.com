@@ -482,13 +482,20 @@ export function MyEligibility({
       {hasNewlywed && newlywedAllowed(n, s) && (
         <>
           <H3>신혼부부 특별공급</H3>
-          {pct !== undefined && (
-            <TierChart
-              rows={chartRows}
-              marker={{ pct, label: `우리 가구 ${pct}%` }}
-              caption={`세로선이 우리 가구 ${pct}%(월 ${won(s.incomeMan ?? 0)} ÷ ${size <= 3 ? "3인 이하" : `${size}인`} 가구 기준 ${won(incomeBaseMan(size))}).`}
-            />
-          )}
+          {/* 소득을 안 넣었어도 구간 막대는 그린다(세로선만 없다). */}
+          <TierChart
+            rows={chartRows}
+            marker={
+              pct === undefined
+                ? undefined
+                : { pct, label: `우리 가구 ${pct}%` }
+            }
+            caption={
+              pct === undefined
+                ? "월소득을 넣으면 우리 가구 자리를 세로선으로 보여 드립니다."
+                : `세로선이 우리 가구 ${pct}%(월 ${won(s.incomeMan ?? 0)} ÷ ${size <= 3 ? "3인 이하" : `${size}인`} 가구 기준 ${won(incomeBaseMan(size))}).`
+            }
+          />
           <List>
             <Item
               ok={pct === undefined ? null : !!land}
