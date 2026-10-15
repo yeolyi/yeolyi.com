@@ -57,6 +57,8 @@ export default function MonthCalendar({
   const paged = months.length > MAX_MONTHS;
   const [page, setPage] = useState(0);
   const shown = paged ? months.slice(page * PAGE, page * PAGE + PAGE) : months;
+  // 넘겨 보거나 두 달을 나란히 둘 때 달마다 주 수(4~6)가 달라 높이가 흔들리지 않게, 펼치는 달 전체에서 가장 긴 주 수로 맞춘다.
+  const rows = fixedWeeks ? 6 : Math.max(...months.map(weeksIn));
   return (
     <div className={className}>
       {/* 한 달뿐이면 글 폭을 다 쓴다(두 칸 틀에서 왼쪽 절반만 차면 아래 목록과 폭이 어긋난다). */}
@@ -72,7 +74,7 @@ export default function MonthCalendar({
             month={mo}
             events={sorted}
             today={today}
-            fixedWeeks={fixedWeeks}
+            rows={rows}
           />
         ))}
       </div>
@@ -93,16 +95,24 @@ export default function MonthCalendar({
   );
 }
 
+/** 그 달이 차지하는 주 수(첫 주 앞 빈칸 포함). */
+function weeksIn(month: string) {
+  const [y, m] = month.split("-").map(Number) as [number, number];
+  const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+  const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return Math.ceil((first + days) / 7);
+}
+
 function Month({
   month,
   events,
   today,
-  fixedWeeks,
+  rows,
 }: {
   month: string;
   events: CalendarEvent[];
   today?: string;
-  fixedWeeks: boolean;
+  rows: number;
 }) {
   const [y, m] = month.split("-").map(Number) as [number, number];
   const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
@@ -111,9 +121,7 @@ function Month({
     ...Array(first).fill(null),
     ...Array.from({ length: days }, (_, i) => i + 1),
   ];
-  // 달마다 주 수(4~6)가 달라, fixedWeeks 면 높이가 흔들리지 않게 늘 6주로 그린다.
-  while (cells.length % 7 || (fixedWeeks && cells.length < 42))
-    cells.push(null);
+  while (cells.length < rows * 7) cells.push(null);
   const weeks = Array.from({ length: cells.length / 7 }, (_, w) =>
     cells.slice(w * 7, w * 7 + 7),
   );
