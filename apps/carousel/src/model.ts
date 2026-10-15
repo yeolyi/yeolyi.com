@@ -232,7 +232,7 @@ export function runsToMarkup(runs: Run[]): string {
     const parts = r.text.split("\n");
     parts.forEach((p, i) => {
       if (i > 0) {
-        for (const [k, m] of [...order].reverse())
+        for (const [k, m] of order.toReversed())
           if (st[k]) {
             out += m;
             st[k] = false;
@@ -240,7 +240,7 @@ export function runsToMarkup(runs: Run[]): string {
         out += "\n";
       }
       if (!p) return;
-      for (const [k, m] of [...order].reverse())
+      for (const [k, m] of order.toReversed())
         if (st[k] && !r[k]) {
           out += m;
           st[k] = false;
@@ -253,7 +253,7 @@ export function runsToMarkup(runs: Run[]): string {
       out += p;
     });
   }
-  for (const [k, m] of [...order].reverse()) if (st[k]) out += m;
+  for (const [k, m] of order.toReversed()) if (st[k]) out += m;
   return out;
 }
 

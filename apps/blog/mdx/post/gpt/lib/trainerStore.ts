@@ -52,21 +52,16 @@ const initialState: TrainerState = {
 
 type Listener = () => void;
 
-/** 워커 응답을 기다리는 대기자. 워커가 error를 보내면 reject된다 */
-interface Waiter<T> {
-  resolve: (r: T) => void;
-  reject: (e: Error) => void;
-}
-
 export class TrainerStore {
   private worker: Worker | null = null;
   private state: TrainerState = initialState;
   private listeners = new Set<Listener>();
-  private readyWaiters: Waiter<void>[] = [];
-  private attentionWaiters: Waiter<
+  // 워커 응답을 기다리는 대기자. 워커가 error 를 보내면 reject 된다
+  private readyWaiters: PromiseWithResolvers<void>[] = [];
+  private attentionWaiters: PromiseWithResolvers<
     Extract<WorkerToMain, { type: "attentionResult" }>
   >[] = [];
-  private weightsWaiters: Waiter<{
+  private weightsWaiters: PromiseWithResolvers<{
     header: CheckpointHeader;
     buffer: ArrayBuffer;
   }>[] = [];
@@ -174,9 +169,9 @@ export class TrainerStore {
    * "ready"여도 loadWeights의 ready를 제대로 기다릴 수 있다.
    */
   private nextReady(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.readyWaiters.push({ resolve, reject });
-    });
+    const w = Promise.withResolvers<void>();
+    this.readyWaiters.push(w);
+    return w.promise;
   }
 
   /**
@@ -285,22 +280,23 @@ export class TrainerStore {
   attention(prompt: string, layer: number) {
     // 이전 실패의 오류 표시가 새 요청에도 남지 않게 지운다
     this.set({ error: null });
-    return new Promise<Extract<WorkerToMain, { type: "attentionResult" }>>(
-      (resolve, reject) => {
-        this.attentionWaiters.push({ resolve, reject });
-        this.send({ type: "attention", prompt, layer });
-      },
-    );
+    const w =
+      Promise.withResolvers<
+        Extract<WorkerToMain, { type: "attentionResult" }>
+      >();
+    this.attentionWaiters.push(w);
+    this.send({ type: "attention", prompt, layer });
+    return w.promise;
   }
 
   async saveToBrowser(key = "my-model") {
-    const { header, buffer } = await new Promise<{
+    const w = Promise.withResolvers<{
       header: CheckpointHeader;
       buffer: ArrayBuffer;
-    }>((resolve, reject) => {
-      this.weightsWaiters.push({ resolve, reject });
-      this.send({ type: "exportWeights" });
-    });
+    }>();
+    this.weightsWaiters.push(w);
+    this.send({ type: "exportWeights" });
+    const { header, buffer } = await w.promise;
     await saveCheckpoint(key, header, buffer);
   }
 

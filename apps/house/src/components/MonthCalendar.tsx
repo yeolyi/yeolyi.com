@@ -38,7 +38,7 @@ export default function MonthCalendar({
   today?: string;
   className?: string;
 }) {
-  const sorted = [...events].sort((a, b) => (a.start < b.start ? -1 : 1));
+  const sorted = events.toSorted((a, b) => (a.start < b.start ? -1 : 1));
   const first = sorted[0];
   const months = first
     ? monthsBetween(

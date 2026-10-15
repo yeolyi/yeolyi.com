@@ -82,7 +82,7 @@ function WaveformPanel({
   const viewH = 1 + padding.top + padding.bottom;
   const toY = (v: number) => padding.top + (1 - v);
 
-  const sortedLevels = [...levels].sort((a, b) => a - b);
+  const sortedLevels = levels.toSorted((a, b) => a - b);
   const thresholds = sortedLevels
     .slice(0, -1)
     .map((l, i) => (l + sortedLevels[i + 1]) / 2);

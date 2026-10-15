@@ -115,7 +115,7 @@ export function Panel(p: Props & { children?: ReactNode }) {
 
 // 이 장의 모든 요소. 위가 앞이고, 행마다 위·아래 버튼으로 겹침 순서를 바꾼다.
 function LayerList({ deck, si, layer, commit, setSel, onDelete }: Props) {
-  const shown = [...deck.slides[si].layers].reverse();
+  const shown = deck.slides[si].layers.toReversed();
   // 화면 순서(앞→뒤)에서 한 칸 옮긴 뒤 다시 뒤집어 저장한다.
   const move = (i: number, dir: -1 | 1) => {
     const next = [...shown];
