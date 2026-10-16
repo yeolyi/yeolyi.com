@@ -54,7 +54,7 @@ const NOT_YET = "";
 const won = (man: number) =>
   man >= 10000 ? `${man / 10000}억` : `${man.toLocaleString()}만 원`;
 const dateText = (ymd: string) =>
-  ymd ? `${ymd.slice(0, 4)}년 ${fmtDate(ymd)}` : "";
+  ymd ? `${ymd.slice(0, 4)}년 ${fmtDate(ymd, ymd)}` : "";
 // 날짜 칸은 비워 둘 수 있지만, 넣었다면 실제 있는 날짜여야 한다.
 const dateProblem = (ymd: string) =>
   ymd && !isRealDate(ymd)

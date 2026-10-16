@@ -1,7 +1,7 @@
 import { supplyOf } from "@shared/classify.ts";
 import { addDays, fmtDate, todayYmd } from "@shared/dates.ts";
 import { regionsOf } from "@shared/rules.ts";
-import { applyEnd, isLive, isMainRound } from "@shared/site.ts";
+import { applyEnd, dedupeNotices, isLive, isMainRound } from "@shared/site.ts";
 import type { Notice, Settings } from "@shared/types.ts";
 import { judge, type Verdict } from "@shared/verdict.ts";
 import Input from "@yeolyi/ui/Input";
@@ -46,7 +46,7 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
   const needle = q.replace(/\s+/g, "").toLowerCase();
   const judged = useMemo(
     () =>
-      dedupe(notices.data ?? [])
+      dedupeNotices(notices.data ?? [])
         .filter(
           (n) =>
             !needle ||
@@ -230,18 +230,6 @@ function List({ rows, scope }: { rows: Row[]; scope: Scope }) {
       ))}
     </ul>
   );
-}
-
-/** 마이홈은 같은 공고를 다른 번호로 두 번 싣기도 한다(이름·공고일·발표일이 같다). 하나만 남긴다. */
-function dedupe(ns: Notice[]): Notice[] {
-  const seen = new Set<string>();
-  return ns.filter((n) => {
-    if (n.source !== "myhome") return true;
-    const k = `${n.name}|${n.announcedAt}|${n.winnerAt ?? ""}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
 }
 
 /** 한 줄 요약. 제외는 걸린 이유를 먼저. */

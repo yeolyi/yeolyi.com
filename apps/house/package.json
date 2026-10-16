@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit && deno check supabase/functions/*/index.ts",
-    "test": "node --test 'tests/unit/*.test.ts'"
+    "test": "node --test 'tests/unit/*.test.ts'",
+    "test:e2e": "node --test 'tests/e2e/*.test.ts'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -26,6 +27,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^6.1.2",
+    "playwright": "^1.63.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^7.0.2",
     "vite": "^8.3.3"

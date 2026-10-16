@@ -66,7 +66,7 @@ export function Feedback({ from }: { from: string }) {
         {from && (
           <div className="mt-[0.5rlh]">
             <Checkbox checked={withPage} onCheckedChange={setWithPage}>
-              보던 화면({from})도 같이 보내기
+              보던 화면(<span className="break-all">{from}</span>)도 같이 보내기
             </Checkbox>
           </div>
         )}

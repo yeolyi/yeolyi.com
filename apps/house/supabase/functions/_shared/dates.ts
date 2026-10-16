@@ -27,9 +27,12 @@ export function normalizeYmd(v: string | undefined): string | undefined {
     : v;
 }
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
-export function fmtDate(ymd: string): string {
+/** "7/9(목)". 올해가 아니면 앞에 연도를 붙인다(상시 공고는 발표가 내년이기도 하다). */
+export function fmtDate(ymd: string, today = todayYmd()): string {
   const d = new Date(ymd + KST);
-  return `${d.getMonth() + 1}/${d.getDate()}(${DAYS[d.getDay()]})`;
+  const year =
+    ymd.slice(0, 4) === today.slice(0, 4) ? "" : `${ymd.slice(0, 4)}/`;
+  return `${year}${d.getMonth() + 1}/${d.getDate()}(${DAYS[d.getDay()]})`;
 }
 export const fmtYears = (y: number) =>
   y >= 1 ? `${Math.floor(y)}년` : `${Math.max(0, Math.round(y * 12))}개월`;

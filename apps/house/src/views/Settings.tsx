@@ -1,15 +1,11 @@
+import { exportSettings, parseSettings } from "@shared/settingsFile.ts";
 import { DEFAULT_SETTINGS, type Settings } from "@shared/types.ts";
 import Button from "@yeolyi/ui/Button";
 import { uniq } from "es-toolkit";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { Progress } from "../components/Progress.tsx";
-import {
-  exportSettings,
-  parseSettings,
-  useClearSettings,
-  useSaveSettings,
-} from "../data.ts";
+import { useClearSettings, useSaveSettings } from "../data.ts";
 import { type Step, stepsFor } from "../settings/steps.tsx";
 import { go, ic } from "../util.ts";
 

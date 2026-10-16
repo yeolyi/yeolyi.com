@@ -152,3 +152,16 @@ test("선착순(동·호 지정) LH 잔여는 청약이 아닌 판매로 본다"
     "LH잔여",
   );
 });
+
+test("선착순은 개인화와 상관없이 청약 아님으로 판정돼 후보에서 빠진다", () => {
+  const v = judge(
+    notice({
+      source: "myhome",
+      kind: "LH잔여",
+      name: "[선착순 동·호지정] 영천문외 센트럴타운 추가입주자 모집 공고",
+    }),
+    s,
+  );
+  assert.equal(v.notSubscription, true);
+  assert.notEqual(v.status, "candidate");
+});

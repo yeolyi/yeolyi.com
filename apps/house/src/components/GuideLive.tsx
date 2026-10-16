@@ -80,9 +80,10 @@ export function SectorNow() {
   ];
   return (
     <Frame busy={busy} status={status}>
-      <div className="grid gap-x-6 gap-y-[0.5rlh] sm:grid-cols-2">
+      {/* grid-cols-1·min-w-0: 칸이 긴 공고 이름만큼 늘어나지 않고 줄임표로 자른다(390px 에서 가로로 넘쳤다) */}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-[0.5rlh] sm:grid-cols-2">
         {groups.map((g) => (
-          <div key={g.label}>
+          <div key={g.label} className="min-w-0">
             <p className="font-bold">{g.label}</p>
             <div className="mt-1">
               <Rows

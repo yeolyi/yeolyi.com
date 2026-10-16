@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   applyEnd,
+  dedupeNotices,
   isLive,
   siteKey,
 } from "../../supabase/functions/_shared/site.ts";
@@ -55,4 +56,22 @@ test("단지 키는 주소에서 번지·일원·공백을 지운 것. 주소가
     ),
     "양주회천#A18,A21",
   );
+});
+
+test("마이홈이 같은 공고를 번호만 바꿔 두 번 실으면 하나만 남긴다", () => {
+  const a = notice({
+    id: "mh:1",
+    source: "myhome",
+    name: "양주옥정 추가모집",
+    winnerAt: "2026-10-01",
+  });
+  const b = { ...a, id: "mh:2" };
+  const other = { ...a, id: "mh:3", winnerAt: "2026-10-08" };
+  assert.deepEqual(
+    dedupeNotices([a, b, other]).map((n) => n.id),
+    ["mh:1", "mh:3"],
+  );
+  // 청약홈 공고는 이름이 같아도 건드리지 않는다
+  const c = notice({ id: "ah:1" });
+  assert.equal(dedupeNotices([c, { ...c, id: "ah:2" }]).length, 2);
 });

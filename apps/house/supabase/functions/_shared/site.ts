@@ -16,6 +16,18 @@ export const isLive = (n: Notice, today: string) => applyEnd(n) >= today;
 export const isMainRound = (n: Notice) =>
   n.kind === "APT" || n.kind === "신혼희망타운";
 
+/** 마이홈은 같은 공고를 다른 번호로 두 번 싣기도 한다(이름·공고일·발표일이 같다). 하나만 남긴다. */
+export function dedupeNotices(ns: Notice[]): Notice[] {
+  const seen = new Set<string>();
+  return ns.filter((n) => {
+    if (n.source !== "myhome") return true;
+    const k = `${n.name}|${n.announcedAt}|${n.winnerAt ?? ""}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
 // 한 단지는 여러 번 공고되고 청약홈은 그때마다 번호를 새로 매기지만 공급위치 주소는 그대로다(12개월 168쌍 실측).
 // 그래서 주소가 단지의 키다. 좌표·소요시간·분양가를 앞선 공고에서 물려받을 때 쓴다. 화면은 이 키를 모른다.
 export function siteKey(n: Notice): string {

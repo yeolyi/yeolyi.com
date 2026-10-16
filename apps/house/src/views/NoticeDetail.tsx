@@ -2,6 +2,7 @@ import { classify } from "@shared/classify.ts";
 import { todayYmd } from "@shared/dates.ts";
 import { loanExampleMan, MONEY_EXAMPLE } from "@shared/rules.ts";
 import type { Notice, Settings, Unit } from "@shared/types.ts";
+import { unitLabel } from "@shared/units.ts";
 import { judge } from "@shared/verdict.ts";
 import Tabs from "@yeolyi/ui/Tabs";
 import { ArrowLeft } from "lucide-react";
@@ -146,8 +147,8 @@ export function NoticeDetail({
             label: "내 자격",
             content: fresh ? (
               <p>
-                <a href="/settings">개인화</a>하면 이 공고에서 우리 가구가
-                어떤지 풀어 드립니다.
+                <a href="/settings">개인화</a>하면 우리 가구가 이 공고에 넣을 수
+                있는지 보여 줍니다.
               </p>
             ) : (
               <>
@@ -170,8 +171,8 @@ export function NoticeDetail({
             label: "내 순위",
             content: fresh ? (
               <p>
-                <a href="/settings">개인화</a>하면 이 공고에서 우리 가구가
-                어떤지 풀어 드립니다.
+                <a href="/settings">개인화</a>하면 우리 가구가 이 공고에서 몇
+                순위인지 보여 줍니다.
               </p>
             ) : (
               <>
@@ -202,18 +203,6 @@ export function NoticeDetail({
     </article>
   );
 }
-
-/** 청약홈 주택형 "084.9100A" → "84.91㎡ A". 전용면적과 타입 글자. */
-export const unitLabel = (type: string) => {
-  const m = /^0*(\d+(?:\.\d+)?)(.*)$/.exec(type.trim());
-  if (!m) return type;
-  const [, num = "", rest = ""] = m;
-  const area = Number.parseFloat(num);
-  const suffix = rest.trim();
-  // 반올림하면 59.9968 이 "60.0" 이 되어 60㎡ 초과처럼 보인다. 둘째 자리에서 버린다.
-  const shown = (Math.floor(area * 100) / 100).toString();
-  return `${shown}㎡${suffix ? ` ${suffix}` : ""}`;
-};
 
 type Col = { head: string; cell: (u: Unit) => string };
 
