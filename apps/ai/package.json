@@ -1,0 +1,28 @@
+{
+  "name": "ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.1",
+    "@tailwindcss/vite": "^4.1.18",
+    "@yeolyi/site": "workspace:*",
+    "@yeolyi/track": "workspace:*",
+    "@yeolyi/ui": "workspace:*",
+    "astro": "^7.1.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "^5.9.3"
+  }
+}

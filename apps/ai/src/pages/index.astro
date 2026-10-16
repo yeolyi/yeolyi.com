@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import Page from "../layouts/Page.astro";
+
+const prompts = (await getCollection("prompts")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+
+<Page>
+  <header class="border-border border-b pb-[0.5rlh]">
+    <h1>AI</h1>
+    <p class="text-muted-foreground mt-[0.25rlh]">
+      AI로 해 본 것들을 모아 둡니다. 프롬프트는 복사해서 아무 AI에 붙여 넣으면
+      됩니다.
+    </p>
+  </header>
+  <ul class="plain mt-[1.5rlh] flex flex-col gap-[1rlh]">
+    {
+      prompts.map((p) => (
+        <li>
+          <a class="py-1.5" href={`/${p.id}`}>
+            {p.data.title}
+          </a>
+          <p class="text-muted-foreground">{p.data.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Page>

@@ -10,6 +10,7 @@ export const SITES = {
   logic: { url: "https://logic.yeolyi.com", port: 4325 },
   cs: { url: "https://cs.yeolyi.com", port: 4326 },
   stats: { url: "https://stats.yeolyi.com", port: 4327 },
+  ai: { url: "https://ai.yeolyi.com", port: 4328 },
 } as const;
 
 export type SiteName = keyof typeof SITES;

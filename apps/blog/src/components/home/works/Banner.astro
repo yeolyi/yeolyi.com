@@ -2,6 +2,7 @@
 import { getImage } from "astro:assets";
 import ColorStrips from "@yeolyi/ui/ColorStrips";
 import type { Work } from "@/components/work/works";
+import AiBanner from "./AiBanner";
 import appleTree from "./assets/apple-tree.png";
 import chadBg from "./assets/chad-bg.png";
 import chadFace from "./assets/chad-face.png";
@@ -46,3 +47,4 @@ const trees =
 {chadImg && <ChadBanner client:visible {...chadImg} />}
 {id === "logic-gate-simulator" && <LogicBanner client:visible />}
 {id === "house" && <HouseBanner client:visible />}
+{id === "ai" && <AiBanner client:visible />}

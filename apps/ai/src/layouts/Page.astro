@@ -1,0 +1,51 @@
+---
+// 모든 페이지의 틀: 서비스 헤더(yeolyi.com / AI) → 글 머리(제목·설명) → 본문.
+import ServiceHeader from "@yeolyi/ui/ServiceHeader";
+import { THEME_INIT } from "@yeolyi/ui/theme-store";
+import "../styles.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline set:html={THEME_INIT} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} · AI` : "AI · yeolyi.com"}</title>
+    {description && <meta name="description" content={description} />}
+    <link
+      rel="preload"
+      href="/fonts/PretendardVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/MonoplexKR-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+  </head>
+  <body>
+    <ServiceHeader client:load name="AI" className="measure-col pt-[1.5rlh]" />
+    <main class="measure-col mt-[2rlh] pb-[5rlh] [&_astro-island]:block">
+      <slot />
+    </main>
+    <script>
+      import { startTracking } from "@yeolyi/track";
+      startTracking("ai");
+    </script>
+  </body>
+</html>

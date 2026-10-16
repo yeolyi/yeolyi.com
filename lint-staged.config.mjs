@@ -9,6 +9,7 @@ const CHECK = {
   carousel: "pnpm --filter carousel typecheck",
   logic: "pnpm --filter logic typecheck",
   stats: "pnpm --filter stats typecheck",
+  ai: "pnpm --filter ai check",
 };
 
 export default {

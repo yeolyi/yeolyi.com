@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import { Details, Summary } from "@yeolyi/ui/Details";
+import ClaudeCode from "../components/ClaudeCode";
+import CopyButton from "../components/CopyButton";
+import Page from "../layouts/Page.astro";
+
+export async function getStaticPaths() {
+  const prompts = await getCollection("prompts");
+  return prompts.map((p) => ({ params: { id: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const text = (p.body ?? "").trim();
+const date = p.data.date.toISOString().slice(0, 10);
+---
+
+<Page title={p.data.title} description={p.data.description}>
+  <header class="border-border border-b pb-[0.5rlh]">
+    <p class="text-muted-foreground font-mono text-base">
+      <a href="/" class="text-muted-foreground">AI</a> · {date}
+    </p>
+    <h1>{p.data.title}</h1>
+    <p class="text-muted-foreground mt-[0.25rlh]">{p.data.description}</p>
+  </header>
+  <!-- 예시 대화가 먼저: 어떤 말투인지 보고 나서 복사한다. -->
+  <ClaudeCode turns={p.data.examples} className="mt-[1.5rlh]" />
+  <div class="mt-[1.5rlh]">
+    <CopyButton client:load text={text} />
+  </div>
+  <!-- 원문은 길어서 접어 둔다. 복사는 위 버튼으로. -->
+  <Details className="mt-[1rlh]">
+    <Summary>프롬프트 보기</Summary>
+    <pre class="font-mono text-base whitespace-pre-wrap">{text}</pre>
+  </Details>
+</Page>

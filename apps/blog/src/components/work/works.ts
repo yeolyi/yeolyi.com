@@ -13,7 +13,8 @@ export interface Work {
     | "jeongeum"
     | "chadcn-ui"
     | "logic-gate-simulator"
-    | "house";
+    | "house"
+    | "ai";
   // 자기 사이트가 있는 작업은 홈에서 그리로 바로 가고 소개 페이지(/work/<slug>)를 두지 않는다.
   // site 는 yeolyi.com 아래 앱(개발 중엔 로컬로), href 는 바깥 주소.
   site?: SiteName;
@@ -49,6 +50,13 @@ export const WORKS: Work[] = [
     banner: "chadcn-ui",
     name: "chadcn/ui",
     summary: "잊을 수 없게, 인터랙티브하게.",
+  },
+  {
+    slug: "ai",
+    site: "ai",
+    banner: "ai",
+    name: "AI",
+    summary: "직접 해 본 실험과 바로 쓰는 프롬프트",
   },
   {
     slug: "logic-gate-simulator",

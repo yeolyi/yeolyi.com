@@ -10,6 +10,7 @@ apps/carousel   인스타 캐러셀 편집기 (Vite + React)
 apps/logic      논리 게이트 시뮬레이터 (Vite + React). logic.yeolyi.com. 편집기와 예제 회로
 apps/cs         성열의 컴퓨터공학 (Astro). cs.yeolyi.com. 글은 apps/cs/mdx, 추천·조회수·구독은 서버 액션
 apps/stats      방문 지표 대시보드 (Vite + React). stats.yeolyi.com. 나만 본다(analytics.admins). 수집·집계 SQL 은 apps/stats/supabase/sql
+apps/ai         AI 관련 실험·프롬프트 모음 (Astro, 정적). ai.yeolyi.com. 프롬프트는 apps/ai/src/prompts/<id>.md, 본문이 복사되는 원문
 apps/house      청약 알리미 (Vite + React + Supabase Edge Functions). house.yeolyi.com
 apps/jeongeum   정음 크롬 확장 (순수 JS, 빌드 도구 없음). `pnpm --filter jeongeum zip` 이 스토어용 zip 과 블로그 내려받기(/d/정음.zip)를 함께 만든다
 packages/ui     @yeolyi/ui. 디자인 시스템 컴포넌트와 토큰(theme.css)
@@ -41,6 +42,7 @@ packages/track  @yeolyi/track. 방문 기록 `startTracking(사이트)`. 모든 
 | logic    | logic.yeolyi.com    | localhost:4325 |
 | cs       | cs.yeolyi.com       | localhost:4326 |
 | stats    | stats.yeolyi.com    | localhost:4327 |
+| ai       | ai.yeolyi.com       | localhost:4328 |
 
 - 비밀값은 레포 루트 `.env`(gitignore). 블로그는 `vite.envDir` 로 이걸 읽는다.
   로컬 블로그도 운영 Supabase 를 쓰니 조회수 등이 실제로 쌓인다.

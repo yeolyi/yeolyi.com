@@ -5,14 +5,15 @@
   "packageManager": "pnpm@10.8.0",
   "scripts": {
     "prepare": "husky",
-    "dev": "pnpm --parallel --filter blog --filter design --filter house --filter carousel --filter logic --filter cs --filter stats dev",
+    "dev": "pnpm --parallel --filter blog --filter design --filter house --filter carousel --filter logic --filter cs --filter stats --filter ai dev",
     "blog": "pnpm --filter blog",
     "carousel": "pnpm --filter carousel",
     "design": "pnpm --filter design",
     "house": "pnpm --filter house",
     "logic": "pnpm --filter logic",
     "cs": "pnpm --filter cs",
-    "stats": "pnpm --filter stats"
+    "stats": "pnpm --filter stats",
+    "ai": "pnpm --filter ai"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.13",
