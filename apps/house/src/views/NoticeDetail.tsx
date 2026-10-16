@@ -33,6 +33,8 @@ export function NoticeDetail({
 }) {
   const { notice: n, isPending } = useNotice(id);
   const today = todayYmd();
+  // 거주·통장·무주택 기간 같은 자격은 입주자모집공고일 기준(주택공급에 관한 규칙). 공고일이 없으면 오늘로 어림한다.
+  const asOf = n?.announcedAt || today;
   const back = (
     <a href="/" className="inline-flex items-center gap-1">
       <ArrowLeft {...ic} />
@@ -139,7 +141,7 @@ export function NoticeDetail({
             value: "explain",
             label: "뽑는 방식",
             content: (
-              <MyEligibility n={n} v={v} s={s} today={today} part="explain" />
+              <MyEligibility n={n} v={v} s={s} asOf={asOf} part="explain" />
             ),
           },
           {
@@ -156,7 +158,7 @@ export function NoticeDetail({
                   n={n}
                   v={v}
                   s={s}
-                  today={today}
+                  asOf={asOf}
                   part="eligibility"
                 />
                 <p className="text-muted-foreground mt-[2rlh] text-base">
@@ -176,7 +178,7 @@ export function NoticeDetail({
               </p>
             ) : (
               <>
-                <MyEligibility n={n} v={v} s={s} today={today} part="rank" />
+                <MyEligibility n={n} v={v} s={s} asOf={asOf} part="rank" />
                 <p className="text-muted-foreground mt-[2rlh] text-base">
                   개인화에 넣은 답으로 계산한 참고용입니다. 자격은 공고문으로
                   확인하세요.

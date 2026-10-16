@@ -165,17 +165,18 @@ const List = ({ children }: { children: ReactNode }) => (
 );
 
 /** part: 공고 상세의 탭 하나 — 뽑는 방식(explain) · 내 자격(eligibility) · 내 순위(rank). 재료는 같이 계산한다. */
+// asOf 는 자격을 따지는 기준일. 법은 입주자모집공고일 기준이라 상세는 공고일을 넘긴다(마감 공고를 볼 때도 그때 자격으로).
 export function MyEligibility({
   n,
   v,
   s,
-  today,
+  asOf: today,
   part,
 }: {
   n: Notice;
   v: Verdict;
   s: Settings;
-  today: string;
+  asOf: string;
   part: "explain" | "eligibility" | "rank";
 }) {
   const back = `${location.pathname}?tab=${part}`;

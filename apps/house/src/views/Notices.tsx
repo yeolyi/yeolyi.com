@@ -15,7 +15,7 @@ import { isFresh } from "./Settings.tsx";
 
 // 블로그 글 목록과 같은 꼴: 날짜(고정폭) + 제목 링크, 아래에 한 줄. 판정의 근거와 나머지는 상세에.
 // 아직 개인화하지 않았으면 판정하지 않는다(기본값은 임의의 가정이라 남의 조건으로 거르는 셈이다). 진행 중·마감만 나눈다.
-// 조건을 넣었으면 진행 중인 공고를 후보·제외로 나누고, 마감은 판정과 상관없이 최근 3개월.
+// 조건을 넣었으면 진행 중인 공고를 후보·제외로 나누고, 마감(최근 3개월)도 같은 판정으로 두 묶음으로 나눈다.
 type Scope = "candidate" | "rejected" | "live" | "closed";
 const CLOSED_DAYS = 90;
 const SCOPES: Record<Scope, { label: string; empty: string }> = {
@@ -191,8 +191,43 @@ export function Notices({ query, s }: { query: URLSearchParams; s: Settings }) {
                 </section>
               ),
           )
+        ) : scope === "closed" && !fresh ? (
+          // 마감도 개인화했으면 후보 탭과 같이 본청약·무순위로 나누고, 빠진 공고는 맨 아래에 이유와 함께.
+          // 놓친 공고를 보고 다음 공고를 기다리게 한다.
+          (
+            [
+              [
+                "넣을 수 있었던 본청약",
+                rows.filter(
+                  (x) => x.v.status === "candidate" && isMainRound(x.n),
+                ),
+                region ? `사는 곳의 권역(${region}) 공고입니다.` : "",
+              ],
+              [
+                "넣을 수 있었던 무순위·임의공급",
+                rows.filter(
+                  (x) => x.v.status === "candidate" && !isMainRound(x.n),
+                ),
+                "",
+              ],
+              ["빠진 공고", rows.filter((x) => x.v.status === "rejected"), ""],
+            ] as const
+          ).map(
+            ([title, part, note]) =>
+              part.length > 0 && (
+                <section key={title} className="mt-[1.5rlh] first:mt-0">
+                  <h2 className="text-base font-bold">
+                    {title} {part.length}
+                  </h2>
+                  {note && (
+                    <p className="text-muted-foreground text-base">{note}</p>
+                  )}
+                  <List rows={part} scope={scope} why={title === "빠진 공고"} />
+                </section>
+              ),
+          )
         ) : (
-          <List rows={rows} scope={scope} />
+          <List rows={rows} scope={scope} why={scope === "rejected"} />
         )}
       </div>
     </>
@@ -205,7 +240,16 @@ type Row = {
   next: ReturnType<typeof nextMilestone>;
   when: string | undefined;
 };
-function List({ rows, scope }: { rows: Row[]; scope: Scope }) {
+// why: 줄 아래에 걸린 이유를 보인다(제외 탭, 마감의 빠진 공고).
+function List({
+  rows,
+  scope,
+  why = false,
+}: {
+  rows: Row[];
+  scope: Scope;
+  why?: boolean;
+}) {
   return (
     <ul className="mt-[0.5rlh] space-y-[0.5rlh]">
       {rows.map(({ n, v, next, when }) => (
@@ -224,7 +268,7 @@ function List({ rows, scope }: { rows: Row[]; scope: Scope }) {
           )}
           <a href={`/notices/${encodeURIComponent(n.id)}`}>{n.name}</a>
           <p className="text-muted-foreground text-base">
-            {summary(n, v, scope)}
+            {summary(n, v, why)}
           </p>
         </li>
       ))}
@@ -233,9 +277,9 @@ function List({ rows, scope }: { rows: Row[]; scope: Scope }) {
 }
 
 /** 한 줄 요약. 제외는 걸린 이유를 먼저. */
-function summary(n: Notice, v: Verdict, scope: Scope): string {
+function summary(n: Notice, v: Verdict, why: boolean): string {
   // 제외 묶음은 걸린 이유만 보인다(지역·분양가 같은 부가 정보는 상세에).
-  if (scope === "rejected")
+  if (why)
     return v.notSubscription
       ? "청약 아님(선착순 매각)"
       : v.region === "out"
