@@ -4,8 +4,8 @@
 import { domToJpeg } from "modern-screenshot";
 import { useEffect, useState } from "react";
 import { AssetResolver, localResolve, type Resolve } from "./assets";
-import { type Deck, H, normalizeDeck, W } from "./model";
-import { codeLayersReady, SlideView } from "./SlideView";
+import { type Deck, normalizeDeck } from "./model";
+import { codeLayersReady, SHOT_OPTIONS, SlideView } from "./SlideView";
 
 // server/export.ts 가 Playwright 로 기다리고 읽는 dev 훅.
 declare global {
@@ -81,13 +81,7 @@ function RenderDeck({
       window.__capture = (i: number) =>
         domToJpeg(
           document.querySelector(`[data-slide-index="${i}"]`) as HTMLElement,
-          {
-            width: W,
-            height: H,
-            scale: 1,
-            quality: 0.92,
-            backgroundColor: "#fff",
-          },
+          SHOT_OPTIONS,
         );
       window.__layout = measure;
       window.__ready = true;

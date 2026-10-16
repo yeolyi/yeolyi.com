@@ -3,8 +3,8 @@
 import { strToU8, zipSync } from "fflate";
 import { domToJpeg } from "modern-screenshot";
 import { createRoot } from "react-dom/client";
-import { type Deck, H, W } from "./model";
-import { codeLayersReady, SlideView } from "./SlideView";
+import { type Deck, W } from "./model";
+import { codeLayersReady, SHOT_OPTIONS, SlideView } from "./SlideView";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -61,13 +61,7 @@ export async function renderDeck(
       ...host.querySelectorAll<HTMLElement>("[data-slide-index]"),
     ];
     for (const [i, el] of slides.entries()) {
-      const url = await domToJpeg(el, {
-        width: W,
-        height: H,
-        scale: 1,
-        quality: 0.92,
-        backgroundColor: "#fff",
-      });
+      const url = await domToJpeg(el, SHOT_OPTIONS);
       files.push({
         name: `${name}.${String(i + 1).padStart(3, "0")}.jpeg`,
         bytes: dataUrlToBytes(url),

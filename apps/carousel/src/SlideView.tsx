@@ -24,6 +24,21 @@ import {
   WATERMARK,
 } from "./model";
 
+// 브라우저 내보내기(modern-screenshot) 옵션. 복제본은 계산된 너비(465.17px 같은 소수)를 그대로 받는데,
+// SVG 로 다시 그릴 때 글자 폭이 조금이라도 넓게 재지면 마지막 띄어쓰기에서 줄이 바뀐다(Safari).
+// 그래서 글 상자 복제본만 너비를 다시 내용에 맞춘다. 캔버스 끝 제한(max-width)은 그대로 남는다.
+export const SHOT_OPTIONS = {
+  width: W,
+  height: H,
+  scale: 1,
+  quality: 0.92,
+  backgroundColor: "#fff",
+  onCloneEachNode: (n: Node) => {
+    if (n instanceof HTMLElement && n.classList.contains("txt"))
+      n.style.width = "max-content";
+  },
+};
+
 export function textBoxStyle(l: TextLayer): CSSProperties {
   const st = TEXT_STYLES[l.style];
   return {
