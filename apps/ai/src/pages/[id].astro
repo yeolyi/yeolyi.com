@@ -22,11 +22,11 @@ const date = p.data.date.toISOString().slice(0, 10);
     <h1>{p.data.title}</h1>
     <p class="text-muted-foreground mt-[0.25rlh]">{p.data.description}</p>
   </header>
-  <!-- 예시 대화가 먼저: 어떤 말투인지 보고 나서 복사한다. -->
-  <ClaudeCode turns={p.data.examples} className="mt-[1.5rlh]" />
+  <!-- 복사가 이 페이지의 할 일이라 맨 위에. 어떤 말투인지는 아래 실제 대화로 본다. -->
   <div class="mt-[1.5rlh]">
     <CopyButton client:load text={text} />
   </div>
+  <ClaudeCode turns={p.data.examples} className="mt-[1.5rlh]" />
   <!-- 원문은 길어서 접어 둔다. 복사는 위 버튼으로. -->
   <Details className="mt-[1rlh]">
     <Summary>프롬프트 보기</Summary>
