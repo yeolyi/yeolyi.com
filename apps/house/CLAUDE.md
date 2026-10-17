@@ -12,7 +12,7 @@ src/                       화면(Vite + React). 판정은 브라우저에서 �
   views/Guide.tsx          가이드(처음 보는 사람용 안내, 한 페이지에 개념 하나)
 supabase/functions/_shared/ 도메인. 화면(@shared 별칭)과 Edge Function 이 같은 파일을 쓴다. CLI 가 functions 밖 파일을 함수에 싣지 않아 여기 둔다
   classify(공고 분류: 국민·민영 × 공급 구분 × 지역 등급) · requirements(조문 단위 요건 → 충족/미충족/모름) · specials(신혼 말고 다른 특공의 요건) · rules(규칙의 숫자)
-  verdict(목록의 후보·제외) · routes(공고마다 신혼·다른 특공·1순위 길이 열렸나. 개인화 화면의 "남은 공고" 줄) · eligibility(사람·통장·소득 구간) · site(단지 키·살아있음·마이홈 중복) · types · dates · links(지도 링크)
+  verdict(목록의 후보·제외) · routes(공고마다 신혼·다른 특공·1순위 길이 열렸나. 개인화 화면의 "최근 3개월 본청약 중 몇 건" 줄) · eligibility(사람·통장·소득 구간) · site(단지 키·살아있음·마이홈 중복) · types · dates · links(지도 링크)
   settingsFile(개인화 저장 형식의 판·옛 판 고치기·내보내기 파일) · units(주택형 표기). 화면만 쓰지만 node 테스트가 부르게 여기 둔다
 supabase/sql/              house 스키마. 적용은 carousel 과 같이 `supabase db query --linked -f`(db push 금지)
 supabase/functions/
