@@ -48,3 +48,13 @@ test("길: 권역 밖 공고는 목록에서 빠지므로 길을 따지지 않�
     [],
   );
 });
+
+test("길: 공공임대는 판정하지 않아 모름(열린 것)으로 센다", () => {
+  const rental = notice({
+    name: "○○ 10년 공공임대주택",
+    publicHousing: true,
+    rental: true,
+  });
+  const rs = routesOf(rental, settings());
+  assert.deepEqual(rs, [{ key: "rental", ok: null }]);
+});

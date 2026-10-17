@@ -32,9 +32,10 @@ export function routesOf(
   asOf = n.announcedAt,
 ): Route[] {
   const v = judge(n, s);
-  // 목록에서 이미 빠지는 공고·본청약이 아닌 공고(무순위·임의공급은 통장·순위가 없다)·공공임대는 길을 따지지 않는다
-  if (!v.pass || !isMainRound(n) || classify(n).supply === "공공임대")
-    return [];
+  // 목록에서 이미 빠지는 공고·본청약이 아닌 공고(무순위·임의공급은 통장·순위가 없다)는 길을 따지지 않는다
+  if (!v.pass || !isMainRound(n)) return [];
+  // 공공임대(분양전환)는 입주 자격이 다른 체계라 판정하지 않는다. 막힌 게 아니라 모름이다(세면 넣을 수 있는 쪽)
+  if (classify(n).supply === "공공임대") return [{ key: "rental", ok: null }];
   const routes: Route[] = [];
   const thisYear = n.announcedAt.startsWith(String(INCOME_BASE_YEAR));
   const pct = incomePct(s, n);
