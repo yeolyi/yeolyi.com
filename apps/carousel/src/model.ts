@@ -141,11 +141,12 @@ export function layoutSlide(
   return { boxes, overflow: Math.max(0, total - space) };
 }
 
-// 세로 가운데: 상자 전체가 아니라 눈에 보이는 무게의 중심을 맞춘다. 그림·코드는 면적 그대로,
+// 세로 가운데: 상자 전체의 가운데와 눈에 보이는 무게의 중심 사이(WEIGHT_PULL)를 맞춘다. 그림·코드는 면적 그대로,
 // 글은 획이 가늘어 면적의 TEXT_WEIGHT 만큼으로 센다. 큰 그림이 하나 있으면 그 그림이 가운데에 오고 글은 위아래에 매달린다.
 // 맞추는 자리는 정가운데보다 OPTICAL_LIFT 위(광학적 중심). 위아래 여백은 넘지 않는다.
 const TEXT_WEIGHT = 0.3;
-const OPTICAL_LIFT = Math.round(H * 0.04);
+const OPTICAL_LIFT = Math.round(H * 0.03);
+const WEIGHT_PULL = 0.25;
 
 function centerTop(
   sized: { l: Layer; w: number; h: number }[],
@@ -164,7 +165,11 @@ function centerTop(
   const lo = MARGIN.top;
   const hi = H - MARGIN.bottom - total;
   if (hi <= lo) return lo;
-  return clamp(H / 2 - OPTICAL_LIFT - c, lo, hi);
+  // 무게 중심만 맞추면 큰 그림 위의 글이 위 여백에 붙고 아래가 휑해진다. 상자 가운데와 반반 섞는다.
+  const target = H / 2 - OPTICAL_LIFT;
+  const byBox = target - total / 2;
+  const byWeight = target - c;
+  return clamp(byBox + (byWeight - byBox) * WEIGHT_PULL, lo, hi);
 }
 
 // ---- 정규화 ----
