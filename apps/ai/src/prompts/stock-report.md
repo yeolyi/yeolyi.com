@@ -5,9 +5,13 @@ description:
   분석합니다."
 date: 2026-10-17
 template: /templates/stock-report.html
-page:
-  src: /examples/stock-report.html
-  title: "계정주의 Claude Code 기록으로 만든 종목 분석 보고서 예시"
+images:
+  - src: /examples/stock-report-1.jpg
+    alt:
+      "종목 분석 보고서 첫 장. ㈜ㄱㄱ홀딩스, 헤드라인 실행은 ㄱㄱ 방향은
+      아니아니, 투자의견 HOLD"
+  - src: /examples/stock-report-2.jpg
+    alt: "둘째 장. 위험 요인 표, 주간 발화 주가 추이, 말버릇별 거래량, 투자의견"
 ---
 
 지금까지 나눈 대화를 근거로, 나라는 사람이 주식시장에 상장된 기업이라고 가정하고

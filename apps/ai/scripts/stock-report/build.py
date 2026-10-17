@@ -1,6 +1,8 @@
-# 종목 리포트의 HTML 틀(public/templates)과 예시(public/examples)를 만든다. 둘은 같은 꼴이라 손으로 따로 고치지 말고 여기서 고친 뒤
+# 종목 리포트의 HTML 틀(public/templates)과 예시(example.html, 사이트엔 그 그림)를 만든다. 둘은 같은 꼴이라 손으로 따로 고치지 말고 여기서 고친 뒤
 #   python3 apps/ai/scripts/stock-report/build.py
-# 로 다시 만든다. 결과는 스크립트 없이 그려지는 정적 HTML 이다(스크립트를 막는 미리보기에서도 보이게). 예시 내용은 example.json.
+# 로 다시 만들고, 예시 그림은
+#   node apps/ai/scripts/stock-report/shot.mjs
+# 로 다시 찍는다. 결과는 스크립트 없이 그려지는 정적 HTML 이다(스크립트를 막는 미리보기에서도 보이게). 예시 내용은 example.json.
 import json, math, sys
 
 CSS = """:root{--c:#e65817;--k:#1c1917;--l:#e7e5e4;--m:#78716c;--s:#f5f5f4;--g:#c9c5c2}
@@ -149,9 +151,6 @@ def page(R, extra_head="", extra_body=""):
 </body></html>
 """
 
-EMB_HEAD='.embed,.embed body{background:transparent}.embed .pg{margin:0 auto 12px}.embed .pg:last-child{margin-bottom:0}'
-EMB_BODY='\n<script>\n// 사이트 예시처럼 iframe 에 들어가면 배경을 비우고, 안에서 스크롤하지 않게 높이를 바깥에 알린다(보고서 자체는 스크립트 없이 그려진다)\nif(self!==top){document.documentElement.classList.add("embed");const tell=()=>parent.postMessage({reportHeight:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*");tell();addEventListener("resize",tell);addEventListener("load",tell)}\n</script>'
-
 def template():
     R={"broker":"{{가상의 증권사}}","date":"{{YYYY.MM.DD}}","name":"{{회사 이름}}","code":"{{6자리}}","headline":"{{리포트 제목}}",
     "lead":"{{요약 첫 줄}}","summary":"{{요약 3~4문장, 마지막은 투자의견}}",
@@ -195,5 +194,6 @@ if __name__=="__main__":
     import os
     here=os.path.dirname(os.path.abspath(__file__)); pub=os.path.join(here,"..","..","public")
     R=json.load(open(os.path.join(here,"example.json")))
-    open(os.path.join(pub,"examples","stock-report.html"),"w").write(page(R,EMB_HEAD,EMB_BODY))
+    # 예시는 HTML 로 만들어 두고, 사이트엔 shot.mjs 로 찍은 그림(public/examples/stock-report-*.webp)을 올린다
+    open(os.path.join(here,"example.html"),"w").write(page(R))
     open(os.path.join(pub,"templates","stock-report.html"),"w").write(template())

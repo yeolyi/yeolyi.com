@@ -42,24 +42,15 @@ const date = p.data.date.toISOString().slice(0, 10);
     )
   }
   {
-    p.data.page && (
-      <iframe
-        src={p.data.page.src}
-        title={p.data.page.title}
+    p.data.images.map((img) => (
+      <img
+        src={img.src}
+        alt={img.alt}
         loading="lazy"
-        class="border-border mt-[1.5rlh] block aspect-[800/2400] w-full border"
+        class="border-border mt-[1.5rlh] w-full border"
       />
-    )
+    ))
   }
-  <script>
-    // 문서 예시는 안에서 스크롤하지 않게, iframe 이 알려 준 높이로 늘린다
-    addEventListener("message", (e) => {
-      const h = e.data?.reportHeight;
-      const f = document.querySelector("iframe");
-      if (f && typeof h === "number" && e.source === f.contentWindow)
-        f.style.height = `${h + f.offsetHeight - f.clientHeight}px`;
-    });
-  </script>
   <!-- 원문은 길어서 접어 둔다. 복사는 위 버튼으로. -->
   <Details className="mt-[1rlh]">
     <Summary>프롬프트 보기</Summary>
