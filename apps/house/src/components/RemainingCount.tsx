@@ -26,8 +26,9 @@ export function RemainingCount({ d }: { d: Settings }) {
       className="text-muted-foreground mt-[0.5rlh] text-base"
       aria-live="polite"
     >
-      최근 3개월 본청약 {c.all}건 중 지금 답으로 넣을 수 있는{" "}
-      <strong className="text-foreground">{c.open}건</strong>
+      최근 3개월 본청약 {c.all}건 중{" "}
+      <strong className="text-foreground">{c.open}건</strong>에 넣을 수
+      있습니다.
     </p>
   );
 }
