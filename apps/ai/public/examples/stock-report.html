@@ -79,7 +79,10 @@ svg{display:block;width:100%;overflow:visible}svg text{font-family:inherit;font-
 .op{display:grid;grid-template-columns:42mm 1fr;border:1.5px solid var(--k);margin-top:3mm}.op .r{background:var(--k);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:30px;font-weight:800}.op .r small{font-size:11px;font-weight:400;opacity:.7}.op div+div{padding:3.5mm 5mm;font-size:12.5px;line-height:1.75}
 </style></head><body>
 <div id="out"></div>
+<noscript><p style="padding:24px">이 보고서는 자바스크립트로 그린다. 이 화면에서 스크립트가 막혀 있으면 파일을 저장해 브라우저로 연다.</p></noscript>
 <script>
+// 그리다 실패하면 빈 화면 대신 이유를 보여 준다(R 의 문법 오류가 흔하다)
+onerror=(m)=>{document.getElementById("out").innerHTML=`<p style="padding:24px;background:#fff">보고서를 그리지 못했다: ${typeof R==="undefined"?"R 객체에 문법 오류가 있다(따옴표·쉼표·괄호를 확인)":m}</p>`};
 const h=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const num=s=>Number(String(s).replace(/[^\d.-]/g,""));
 const sign=v=>String(v).trim().startsWith("+")?`<span class="up">${h(v)}</span>`:h(v);
@@ -136,7 +139,7 @@ const render=k=>{document.getElementById("out").innerHTML=`
    <h4>Price Trend (월 거래량)</h4><div style="margin-top:3mm">${line(R.monthly,230,115,{peak:true})}</div>
   </div>
  </div>
- <div class="bt"><span>${h(R.broker)} 리서치센터</span><span>양식 이성열 · @yeol.dev　　1</span></div>
+ <div class="bt"><span>${h(R.broker)} 리서치센터</span><span>양식: 개발자 성열 · @yeol.dev　　1</span></div>
 </div>
 <div class="pg">
  <div class="hd"><div class="l">${h(R.name)}<span>(${h(R.code)})</span></div>${logo}</div>
@@ -158,7 +161,7 @@ let k=1;render(k);const pages=()=>document.querySelectorAll(".pg"),over=pg=>pg.s
 while(over(pages()[1])&&k>.6){k-=.05;render(k)}
 for(const pg of pages()){const f=pg.querySelector(".fit");for(let z=1;over(pg)&&z>.8;){z-=.02;f.style.zoom=z}}
 // 화면이 A4 보다 좁으면(휴대폰 등) 페이지 전체를 폭에 맞춰 줄인다. 인쇄는 원래 크기
-const fit=()=>{document.body.style.zoom=Math.min(1,document.documentElement.clientWidth/(794+(self===top?32:0)))};fit();addEventListener("resize",fit);
+const fit=()=>{const w=document.documentElement.clientWidth;if(w)document.body.style.zoom=Math.min(1,w/(794+(self===top?32:0)))};fit();addEventListener("resize",fit);
 // 사이트 예시처럼 iframe 에 들어가면 배경을 비우고, 안에서 스크롤하지 않게 높이를 바깥에 알린다
 if(self!==top){document.documentElement.classList.add("embed");const tell=()=>parent.postMessage({reportHeight:Math.ceil(document.body.getBoundingClientRect().height)},"*");tell();addEventListener("resize",tell)}
 </script></body></html>
