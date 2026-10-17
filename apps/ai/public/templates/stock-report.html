@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><title>Company Report</title>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Company Report</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <script>
 // ▼ 이 R 객체의 값만 바꾼다. 아래 HTML·CSS·스크립트는 그대로 둔다.
@@ -42,7 +42,7 @@ const R = {
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#e7e5e4;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--k);font-size:12px;line-height:1.6;word-break:keep-all}
 .pg{width:210mm;height:297mm;margin:16px auto;background:#fff;padding:12mm 13mm 9mm;display:flex;flex-direction:column}
-@page{size:A4;margin:0}@media print{body{background:#fff}.pg{margin:0;break-after:page}}
+@page{size:A4;margin:0}@media print{body{background:#fff;zoom:1!important}.pg{margin:0;break-after:page}}
 .hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid var(--k);padding-bottom:2.5mm}
 .hd .l{font-size:13px;font-weight:600}.hd .l span{font-weight:400;color:var(--m);margin-left:8px}
 .logo{font-size:17px;font-weight:800;letter-spacing:-.3px}.logo:before{content:"";display:inline-block;width:11px;height:11px;background:var(--c);margin-right:5px}
@@ -149,4 +149,6 @@ const render=k=>{document.getElementById("out").innerHTML=`
 let k=1;render(k);const pages=()=>document.querySelectorAll(".pg"),over=pg=>pg.scrollHeight>pg.clientHeight+1;
 while(over(pages()[1])&&k>.6){k-=.05;render(k)}
 for(const pg of pages()){const f=pg.querySelector(".fit");for(let z=1;over(pg)&&z>.8;){z-=.02;f.style.zoom=z}}
+// 화면이 A4 보다 좁으면(휴대폰 등) 페이지 전체를 폭에 맞춰 줄인다. 인쇄는 원래 크기
+const fit=()=>{document.body.style.zoom=Math.min(1,document.documentElement.clientWidth/(794+(self===top?32:0)))};fit();addEventListener("resize",fit);
 </script></body></html>
