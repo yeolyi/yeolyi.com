@@ -121,7 +121,7 @@ export function Editor({ slug }: { slug: string }) {
             src,
             nw,
             nh,
-            full: false,
+            size: "normal",
             crop: { x: 0, y: 0, w: 1, h: 1 },
           });
         } catch (e) {

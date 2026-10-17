@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import {
   type Deck,
   type ImageLayer,
+  type ImageSize,
   type Layer,
   plainText,
   type TextLayer,
@@ -244,12 +245,13 @@ function ImageProps({
         </p>
         <RadioGroup
           aria-label="폭"
-          value={l.full ? "full" : "content"}
+          value={l.size}
           options={[
-            { value: "content", label: "본문 폭" },
+            { value: "small", label: "작게" },
+            { value: "normal", label: "본문 폭" },
             { value: "full", label: "꽉 채움" },
           ]}
-          onValueChange={(v) => set({ full: v === "full" })}
+          onValueChange={(v) => set({ size: v as ImageSize })}
         />
       </section>
       <section>

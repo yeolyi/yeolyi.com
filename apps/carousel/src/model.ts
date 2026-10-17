@@ -28,6 +28,13 @@ export const WATERMARK = {
 export type TextStyle = keyof typeof TEXT_STYLES;
 export type VAlign = "top" | "center";
 export type Crop = { x: number; y: number; w: number; h: number };
+export type ImageSize = "small" | "normal" | "full";
+// 그림 폭. 작게는 아이콘·로고처럼 본문 폭이면 너무 커지는 그림용(본문 폭의 절반).
+export const IMAGE_W: Record<ImageSize, number> = {
+  small: 460,
+  normal: 920,
+  full: 1080,
+};
 
 export type TextLayer = {
   id: string;
@@ -38,7 +45,7 @@ export type TextLayer = {
   color: "black" | "red";
 };
 
-// 크기는 배치가 정한다: 폭은 본문 폭(920) 또는 꽉 채움(1080), 높이는 크롭한 비율대로.
+// 크기는 배치가 정한다: 폭은 size 로(작게 460·본문 폭 920·꽉 채움 1080), 높이는 크롭한 비율대로.
 // 남은 높이보다 크면 비율을 지킨 채 줄어든다. crop 은 원본 대비 보일 영역 비율 {x,y,w,h}(0~1).
 export type ImageLayer = {
   id: string;
@@ -46,7 +53,7 @@ export type ImageLayer = {
   src: string;
   nw: number;
   nh: number;
-  full: boolean;
+  size: ImageSize;
   crop: Crop;
 };
 
@@ -104,7 +111,7 @@ export function layoutSlide(
     0,
   );
   const natural = (l: ImageLayer) => {
-    const w = l.full ? W : CONTENT_W;
+    const w = IMAGE_W[l.size];
     return { w, h: w / imageRatio(l) };
   };
   const imgH = ls.reduce(
@@ -126,7 +133,8 @@ export function layoutSlide(
   const boxes: Record<string, Box> = {};
   for (const it of sized) {
     // 꽉 채운 그림도 줄어들면 꽉 차지 않으니 다른 요소처럼 왼쪽 여백에 붙인다.
-    const x = it.l.type === "image" && it.l.full && k === 1 ? 0 : MARGIN.x;
+    const x =
+      it.l.type === "image" && it.l.size === "full" && k === 1 ? 0 : MARGIN.x;
     boxes[it.l.id] = { x, y, w: it.w, h: it.h };
     y += it.h + GAP;
   }
@@ -219,7 +227,12 @@ function normalizeLayer(raw: any): Layer | null {
       src: raw.src,
       nw: num(raw.nw, 1000),
       nh: num(raw.nh, 1000),
-      full: raw.full === true,
+      size:
+        raw.size === "small" || raw.size === "full"
+          ? raw.size
+          : raw.full === true
+            ? "full"
+            : "normal",
       crop: {
         x: clamp01(num(c.x, 0)),
         y: clamp01(num(c.y, 0)),
@@ -259,7 +272,14 @@ function migrateSlide(raw: any) {
               h: ((y1 - y0) / h) * c.h,
             }
           : c;
-      return { ...l, crop, full: x <= 1 && x + w >= W - 1 };
+      // 좌우를 다 덮던 건 꽉 채움, 가로세로 다 작던 건(아이콘 등) 작게.
+      const size =
+        x <= 1 && x + w >= W - 1
+          ? "full"
+          : w < 600 && h < 600
+            ? "small"
+            : "normal";
+      return { ...l, crop, size };
     });
   const first = layers.length ? Math.min(...layers.map(top)) : 0;
   return { ...raw, layers: out, valign: first > 200 ? "center" : "top" };
