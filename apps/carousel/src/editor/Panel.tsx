@@ -243,16 +243,19 @@ function ImageProps({
         <p className="text-muted-foreground font-mono text-base break-all">
           {l.src.replace(/^assets\//, "")}
         </p>
-        <RadioGroup
-          aria-label="폭"
-          value={l.size}
-          options={[
-            { value: "small", label: "작게" },
-            { value: "normal", label: "본문 폭" },
-            { value: "full", label: "꽉 채움" },
-          ]}
-          onValueChange={(v) => set({ size: v as ImageSize })}
-        />
+        {/* 세그먼트가 패널 폭으로 늘어나지 않게 감싼다 */}
+        <div className="flex">
+          <RadioGroup
+            aria-label="폭"
+            value={l.size}
+            options={[
+              { value: "small", label: "작게" },
+              { value: "normal", label: "본문 폭" },
+              { value: "full", label: "꽉 채움" },
+            ]}
+            onValueChange={(v) => set({ size: v as ImageSize })}
+          />
+        </div>
       </section>
       <section>
         <h3>크롭</h3>
