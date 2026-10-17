@@ -1,167 +1,99 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Company Report</title>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>㈜ㄱㄱ홀딩스 Company Report</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<script>
-// ▼ 이 R 객체의 값만 바꾼다. 아래 HTML·CSS·스크립트는 그대로 둔다.
-const R = {
-  broker: "한국어시스템증권", date: "2026.10.16",
-  name: "㈜ㄱㄱ홀딩스", code: "001705",
-  headline: "실행은 ㄱㄱ, 방향은 아니아니",
-  lead: "상장 10개월, 누적 발화 42,807건. 실행 속도보다 방향 수정 속도가 빠르다",
-  summary: "2025년 12월 상장 이후 세션 1,969개, 일평균 156건을 기록했다. 4월 월 거래량은 7,422건으로 상장 첫 달의 5.6배다. 다만 \"아니\"로 시작하는 발화가 1,968건으로 \"ㄱㄱ\" 1,705건을 웃돈다. 출발 신호보다 정정 공시가 많은 구조다. 투자의견 HOLD를 유지한다.",
-  sections: [
-    ["핵심 사업: 전자문서 프론트엔드와 AI 티 제거업", "본업은 전자문서 프론트엔드(발화 6,567건)다. 실적을 실제로 끌어올린 것은 신사업인 AI 티 제거업이다. \"주석\" 언급이 482회, \"너무\"가 1,056회, \"짧게·줄여\"가 492회다. 대표 공시는 \"야 아니 너무 AI스럽잖아\", \"주석이 ai스럽고 수사적인게 있어\", \"주저리주저리 주석이 필요한가\". 이 회사의 품질 기준은 단 하나, 사람이 쓴 것 같은가다."],
-    ["경쟁력: 근본 원인 분석과 과설계 절단", "\"원인·근본\" 언급 104회. 고장 난 것보다 \"원래는 왜 됐고 지금은 안되는지\"를 먼저 묻는다. 실수를 지적할 때도 \"너가 지난번에도 이렇게 잘못 적었는데 원인을 찾아줘\"라며 재발 경로를 노린다. 반대 방향의 감각도 갖췄다. \"그건 오버엔지니어링같아\", \"하위 호환 필요없어\"로 남이 쌓은 설계를 과감히 걷어낸다. 업계 평균 대비 드문 조합이다."],
-    ["자체 도구 부문: 비서를 만들고, 비서의 비서를 만든다", "메일·일정·문서를 한데 묶은 개인 비서, 세션 인수인계 명령(54회), 세션 이어가기 도구까지 직접 만들었다. 반복 작업을 발견하면 \"스킬로 만들어줘\"를 공시한다. 같은 기간 \"스킬은 없애줘\"도 공시했다. 시장은 두 공시 중 어느 쪽이 최신인지 확인하지 못했다."],
-  ],
-  forecast: { unit: "(단위: 회, 2027E는 연환산)", est: "2027E", rows: [
-    ["ㄱㄱ류", "1,705", "1,969", "세션 수와 같아짐"],
-    ["ㅇㅇ류", "1,669", "1,928", "상동"],
-    ["\"아니\"로 시작", "1,968", "2,273", "ㄱㄱ를 추월"],
-    ["\"흠\"", "1,875", "2,166", "고민 중"],
-    ["ultrathink", "131", "151", "\"아냐 너무 덜 찾았어. 더 많이 찾아봐 ultrathink\""],
-    ["감사 표현", "30", "35", "\"굿\" 304회로 대체 지급"],
-  ], source: "자료: ~/.claude/history.jsonl (2025.12.03~2026.10.15), 한국어시스템증권 리서치센터" },
-  rating: "HOLD", ratingMark: "(M)", ratingKo: "보유",
-  target: "89,064원", targetMark: "(U)", prevTarget: "15,912원", price: "42,807원", priceDate: "10/15", upside: "+108.1%",
-  targetNote: "목표주가: 피크 월(4월) 7,422건 × 12. 직전: 상장 첫 달 1,326건 × 12",
-  stock: [["시가총액", "1,969억 원"], ["상장일", "2025.12.03"], ["발행주식수", "42,807주"], ["일평균 거래량", "156건"], ["52주 최고 (4/14)", "583건"], ["세션당 발화 (중앙값)", "6건"], ["하루 최대 세션", "32개"], ["최대주주", "개인 비서 외 특수관계인"], ["배당수익률", "0.07%"]],
-  returns: { head: ["1M", "3M", "10M"], abs: ["-51.3", "-46.3", "+85.8"], note: "월 발화 기준. 10월은 15일까지 집계" },
-  monthly: { x: ["25.12", "26.01", "26.02", "26.03", "26.04", "26.05", "26.06", "26.07", "26.08", "26.09", "26.10"], y: [1326, 1100, 4500, 5500, 7422, 2600, 4700, 4400, 2100, 4800, 2200] },
-  risks: [
-    ["조급증", "\"오래걸려\" 계열 57회. \"이게 뭐라고 이렇게 오래걸려\", \"왤케 오래걸려\". 오타를 고칠 시간도 아끼는 것으로 보인다.", "치명"],
-    ["잦은 방향 전환", "\"아니\"로 시작 1,968회, \"말고\" 1,298회, \"롤백\" 184회. \"아니아니 wrap으로 해줘\". 경영 전략은 확정 전까지 최소 두 번 바뀐다.", "높음"],
-    ["재공시 남발", "30자 이상 같은 프롬프트를 308회 다시 보냈다. \"아 곧 끝날듯? 일단 로컬에서 수정하고 수정사항 보여줘\" 단독 10회. 곧 끝나지 않았다.", "중간"],
-    ["중도 중단", "남은 세션 표본에서 발화의 6.3%(383회)가 작업을 끊었다. 도구 실행 거절도 111회. 대표 공시는 \"잠만\"(890회).", "중간"],
-    ["범위 확장", "\"그리고\" 4,474회. 하나를 시키면 같은 메시지 안에서 셋이 된다.", "관찰"],
-  ],
-  weekly: { note: "주간 발화 건수, 점선은 4주 이동평균",
-    y: [30, 150, 400, 500, 520, 100, 250, 150, 20, 400, 1750, 1400, 1400, 900, 1000, 1750, 1100, 2447, 2100, 1750, 1050, 1300, 1000, 1150, 650, 120, 1000, 1470, 950, 1300, 830, 1000, 1170, 980, 850, 700, 0, 250, 1200, 1400, 1250, 1200, 450, 1450, 1100, 900],
-    ticks: [[0, '25.12'], [9, '26.02'], [18, '26.04'], [27, '26.06'], [36, '26.08'], [45, '26.10']],
-    marks: [[10, "2/9 인수인계 명령 도입, +348%", "up"], [17, "사상 최고 2,447", "up"], [25, "-80%", "dn"], [27, "\"스킬로 만들어줘\" 공시", "up"], [36, "거래정지 12일", "dn", "l"]] },
-  words: { note: "Top 10, 누적 발화", hi: "ㄱㄱ", data: [["그리고", 4474], ["아니", 1968], ["다시", 1893], ["흠", 1875], ["ㄱㄱ", 1705], ["ㅇㅇ", 1669], ["말고", 1298], ["너무", 1056], ["잠만", 890], ["주석", 482]] },
-  opinion: { buy: "원인을 찾을 때까지 놓지 않고, 남이 쌓은 과설계를 잘라내는 감각은 업계 상위권이다.", sell: "지시가 끝나기 전에 \"아니\"가 먼저 도착한다. 실적 가이던스는 평균 33자다.", end: "펀더멘털은 좋은데 공시 해석이 어렵다. 매매 신호는 \"ㄱㄱ\" 두 글자로만 나온다." },
-};
-// ▲ 여기까지
-</script>
 <style>
 :root{--c:#e65817;--k:#1c1917;--l:#e7e5e4;--m:#78716c;--s:#f5f5f4;--g:#c9c5c2}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#e7e5e4;font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--k);font-size:12px;line-height:1.6;word-break:keep-all}
-.pg{width:210mm;height:297mm;margin:16px auto;background:#fff;padding:12mm 13mm 9mm;display:flex;flex-direction:column}
-@page{size:A4;margin:0}@media print{body{background:#fff;zoom:1!important}.pg{margin:0;break-after:page}}
-.embed,.embed body{background:transparent;overflow:hidden}.embed #out{display:flow-root}.embed .pg{margin:0 0 12px}.embed .pg:last-child{margin:0}
-.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid var(--k);padding-bottom:2.5mm}
+html{background:#e7e5e4}
+body{font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--k);font-size:12.5px;line-height:1.65;word-break:keep-all}
+.pg{max-width:800px;margin:16px auto;background:#fff;padding:44px 48px 28px}
+.hd{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2.5px solid var(--k);padding-bottom:9px}
 .hd .l{font-size:13px;font-weight:600}.hd .l span{font-weight:400;color:var(--m);margin-left:8px}
-.logo{font-size:17px;font-weight:800;letter-spacing:-.3px}.logo:before{content:"";display:inline-block;width:11px;height:11px;background:var(--c);margin-right:5px}
-h1{margin-top:6mm;font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.2;border-left:5px solid var(--c);padding-left:3mm}h1 small{font-size:17px;font-weight:500;margin-left:6px}
-.hl{font-size:21px;font-weight:700;margin:3mm 0 5mm}
-.cols{display:grid;grid-template-columns:1fr 63mm;gap:8mm;flex:1}
-.sum{background:var(--s);padding:4mm 5mm}.sum b{display:block;font-size:13.5px;margin-bottom:1mm}
-h3{font-size:14px;margin:5mm 0 1.2mm}
+.logo{font-size:17px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}.logo:before{content:"";display:inline-block;width:11px;height:11px;background:var(--c);margin-right:5px}
+h1{margin-top:24px;font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.2;border-left:5px solid var(--c);padding-left:12px}h1 small{font-size:17px;font-weight:500;margin-left:6px;white-space:nowrap}
+.hl{font-size:21px;font-weight:700;margin:12px 0 22px;line-height:1.4}
+.cols{display:grid;grid-template-columns:1fr 240px;grid-template-areas:"main top" "main rest";grid-template-rows:auto 1fr;gap:0 32px}
+.main{grid-area:main}.top{grid-area:top}.rest{grid-area:rest}
+.sum{background:var(--s);padding:15px 18px}.sum b{display:block;font-size:13.5px;margin-bottom:4px}
+h3{font-size:14px;margin:20px 0 4px}
 p{text-align:justify}
-.tt{display:flex;justify-content:space-between;align-items:baseline;margin-top:6mm;border-bottom:1.5px solid var(--k);padding-bottom:1.2mm}.tt b{font-size:13.5px}.tt span{font-size:10px;color:var(--m)}
+.tt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:24px;border-bottom:1.5px solid var(--k);padding-bottom:5px}.tt b{font-size:13.5px}.tt span{font-size:10px;color:var(--m)}
 table{width:100%;border-collapse:collapse}
-.ft th{font-weight:600;text-align:left;padding:1.5mm 1.5mm;border-bottom:1px solid var(--k)}.ft td{padding:1.4mm 1.5mm;border-bottom:1px solid var(--l)}.ft .n{text-align:right;font-variant-numeric:tabular-nums}.ft td:last-child{color:var(--m)}
-.src{font-size:10px;color:var(--m);margin-top:1.5mm}
-.rate{background:var(--k);color:#fff;text-align:center;font-size:30px;font-weight:800;padding:2.5mm 0;letter-spacing:.5px}.rate small{font-size:13px;font-weight:400;margin-left:4px}
-.kv td{padding:1.3mm 0;border-bottom:1px solid var(--l)}.kv td+td{text-align:right;font-variant-numeric:tabular-nums}
-.kv tr.big td{font-size:14px;font-weight:700;padding-top:2.5mm}.kv tr.big td+td{color:var(--c)}
-.side .note{font-size:10px;color:var(--m);margin-top:1.2mm;line-height:1.5}
-.side h4{font-size:13px;margin-top:5mm;border-bottom:1.5px solid var(--k);padding-bottom:1.2mm}
-.rt td{padding:1.3mm 0;text-align:right;border-bottom:1px solid var(--l)}.rt td:first-child{text-align:left}
+.ft th{font-weight:600;text-align:left;padding:6px;border-bottom:1px solid var(--k)}.ft td{padding:5px 6px;border-bottom:1px solid var(--l)}.ft .n{text-align:right;white-space:nowrap}.ft td:last-child{color:var(--m)}
+.src{font-size:10px;color:var(--m);margin-top:6px}
+.rate{background:var(--k);color:#fff;text-align:center;font-size:30px;font-weight:800;padding:10px 0;letter-spacing:.5px}.rate small{font-size:13px;font-weight:400;margin-left:4px}
+.kv td{padding:5px 0;border-bottom:1px solid var(--l)}.kv td+td{text-align:right}
+.kv tr.big td{font-size:14px;font-weight:700;padding-top:10px}.kv tr.big td+td{color:var(--c)}
+.note{font-size:10px;color:var(--m);margin-top:5px;line-height:1.5}
+.rest h4{font-size:13px;margin-top:20px;border-bottom:1.5px solid var(--k);padding-bottom:5px}
+.rt td{padding:5px 0;text-align:right;border-bottom:1px solid var(--l)}.rt td:first-child{text-align:left}
 .up{color:var(--c)}
-.bt{border-top:1px solid var(--g);padding-top:2mm;display:flex;justify-content:space-between;font-size:10px;color:var(--m);margin-top:4mm}
-h2{display:flex;justify-content:space-between;align-items:baseline;font-size:17px;margin-top:6mm;border-bottom:1.5px solid var(--k);padding-bottom:1.5mm}h2 span{font-size:10.5px;font-weight:400;color:var(--m)}
-.rk td{padding:1.8mm 3mm;border-bottom:1px solid var(--l);vertical-align:top}.rk td:first-child{background:var(--s);font-weight:700;width:30mm}.rk td:last-child{width:17mm;text-align:center;font-weight:700;font-size:11px}
-.lv0{background:var(--c);color:#fff}.lv1{background:#f08a55;color:#fff}.lv2{background:#fdece2;color:var(--c)}.lv3{background:var(--s);color:var(--m)}
-svg{display:block;width:100%;overflow:visible}svg text{font-family:inherit;font-size:9px;fill:var(--m)}
-.op{display:grid;grid-template-columns:42mm 1fr;border:1.5px solid var(--k);margin-top:3mm}.op .r{background:var(--k);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:30px;font-weight:800}.op .r small{font-size:11px;font-weight:400;opacity:.7}.op div+div{padding:3.5mm 5mm;font-size:12.5px;line-height:1.75}
+.bt{border-top:1px solid var(--g);padding-top:8px;margin-top:28px;display:flex;justify-content:space-between;gap:12px;font-size:10px;color:var(--m)}
+h2{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:17px;margin-top:26px;border-bottom:1.5px solid var(--k);padding-bottom:6px}h2 span{font-size:10.5px;font-weight:400;color:var(--m)}
+.rk td{padding:8px 12px;border-bottom:1px solid var(--l);vertical-align:top}.rk td:first-child{background:var(--s);font-weight:700;width:120px}.rk td:last-child{width:64px;text-align:center;font-weight:700;font-size:11px}
+.rk .l1{background:var(--c);color:#fff}.rk .l2{background:#f08a55;color:#fff}.rk .l3{background:#fdece2;color:var(--c)}.rk .l4{background:var(--s);color:var(--m)}
+.ch{position:relative;margin:18px 0 24px 40px}
+.ch svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ar{fill:var(--s)}.ln{fill:none;stroke:var(--k);stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linejoin:round}.ma{fill:none;stroke:var(--c);stroke-width:1.4;stroke-dasharray:4 3;vector-effect:non-scaling-stroke}
+.gy{position:absolute;left:0;right:0;border-top:1px solid var(--l)}.gy span{position:absolute;right:100%;margin-right:6px;transform:translateY(-50%);font-size:9px;color:var(--m);white-space:nowrap}
+.gx{position:absolute;top:100%;margin-top:4px;transform:translateX(-50%);font-size:9px;color:var(--m);white-space:nowrap}
+.pt{font-style:normal;position:absolute;width:7px;height:7px;border-radius:50%;background:var(--k);transform:translate(-50%,-50%)}.pt.up{background:var(--c)}
+.pt b{position:absolute;white-space:nowrap;font-size:10px}.pt.up b{bottom:8px;left:50%;transform:translateX(-50%);color:var(--c)}.pt.dn b{left:10px;top:50%;transform:translateY(-50%)}.pt.dn.l b{left:auto;right:10px}
+.bars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;position:relative;margin:18px 0 30px 40px}
+.b{position:relative}.b em{position:absolute;bottom:0;left:20%;right:20%;background:var(--g)}.b.max em{background:var(--c)}.b.hi em{background:var(--k)}
+.b i{position:absolute;left:0;right:0;text-align:center;font-size:9px;color:var(--m);font-style:normal;transform:translateY(-100%);margin-top:-3px}
+.b span{position:absolute;top:100%;left:-4px;right:-4px;margin-top:5px;text-align:center;font-size:11px;font-weight:600;line-height:1.2;overflow-wrap:anywhere}
+.op{display:grid;grid-template-columns:160px 1fr;border:1.5px solid var(--k);margin-top:12px}.op .r{background:var(--k);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:30px;font-weight:800;padding:12px}.op .r small{font-size:11px;font-weight:400;opacity:.7}.op div+div{padding:14px 18px;line-height:1.75}
+@media (max-width:700px){
+ .pg{margin:0 0 8px;padding:28px 18px 18px}
+ h1{font-size:26px}.hl{font-size:18px}
+ .cols{grid-template-columns:1fr;grid-template-areas:"top" "main" "rest"}.top{margin-bottom:22px}
+ .rk td{padding:7px 8px}.rk td:first-child{width:84px}.rk td:last-child{width:46px}
+ .b span{font-size:9.5px}
+ .op{grid-template-columns:1fr}
+}
+@media print{html{background:#fff}.pg{margin:0 auto;break-after:page}}.embed,.embed body{background:transparent}.embed .pg{margin:0 auto 12px}.embed .pg:last-child{margin-bottom:0}
 </style></head><body>
-<div id="out"></div>
-<noscript><p style="padding:24px">이 보고서는 자바스크립트로 그린다. 이 화면에서 스크립트가 막혀 있으면 파일을 저장해 브라우저로 연다.</p></noscript>
-<script>
-// 그리다 실패하면 빈 화면 대신 이유를 보여 준다(R 의 문법 오류가 흔하다)
-onerror=(m)=>{document.getElementById("out").innerHTML=`<p style="padding:24px;background:#fff">보고서를 그리지 못했다: ${typeof R==="undefined"?"R 객체에 문법 오류가 있다(따옴표·쉼표·괄호를 확인)":m}</p>`};
-const h=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
-const num=s=>Number(String(s).replace(/[^\d.-]/g,""));
-const sign=v=>String(v).trim().startsWith("+")?`<span class="up">${h(v)}</span>`:h(v);
-const fmt=n=>n.toLocaleString("ko-KR");
-// 눈금 간격: 4칸 이하가 되는 가장 작은 1·2·2.5·5 배수
-function nice(max){max=Math.max(max,1);const e=10**Math.floor(Math.log10(max)-1);return [1,2,2.5,5,10,20,25,50,100].map(f=>f*e).find(st=>Math.ceil(max/st)<=4)}
-// 꺾은선: c={y,ticks:[[i,label]],marks:[[i,label,"up"|"dn"]]}, ma=이동평균 창
-function line(c,W,H,{ma=0,area=false,peak=false}={}){const L=34,T=14,B=18,st=nice(Math.max(...c.y)),top=st*Math.ceil(Math.max(...c.y)/st),n=c.y.length;
- const X=i=>L+i*(W-L-6)/(n-1),Y=v=>T+(1-v/top)*(H-T-B);let g="";
- for(let v=0;v<=top;v+=st)g+=`<line x1="${L}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e7e5e4"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${fmt(v)}</text>`;
- const pts=c.y.map((v,i)=>`${X(i)},${Y(v)}`).join(" ");
- if(area)g+=`<polygon fill="#f5f5f4" points="${X(0)},${Y(0)} ${pts} ${X(n-1)},${Y(0)}"/>`;
- if(ma){const m=c.y.map((_,i)=>i<ma-1?null:c.y.slice(i-ma+1,i+1).reduce((a,b)=>a+b)/ma);g+=`<polyline fill="none" stroke="#e65817" stroke-width="1.4" stroke-dasharray="4 3" points="${m.map((v,i)=>v==null?"":`${X(i)},${Y(v)}`).join(" ")}"/>`}
- g+=`<polyline fill="none" stroke="#1c1917" stroke-width="1.8" points="${pts}"/>`;
- const marks=c.marks||(peak?[[c.y.indexOf(Math.max(...c.y)),fmt(Math.max(...c.y)),"up"]]:[]);
- // up 은 점 위 가운데, dn 은 점 옆(기본 오른쪽, 넷째 값 "l" 이면 왼쪽)
- for(const[i,t,k,side]of marks){const up=k==="up",col=up?"#e65817":"#1c1917",x=X(i),y=Y(c.y[i]);
-  const tx=up?x:side==="l"?x-6:x+6,ty=up?y-8:y+3,anc=up?"middle":side==="l"?"end":"start";
-  g+=`<circle cx="${x}" cy="${y}" r="3.2" fill="${col}"/><text x="${tx}" y="${ty}" text-anchor="${anc}" style="fill:${col};font-weight:700;font-size:10px">${h(t)}</text>`}
- const ticks=c.ticks||c.x.map((x,i)=>[i,x]).filter((_,i)=>i%3===0);
- for(const[i,t]of ticks)g+=`<text x="${X(i)}" y="${H-3}" text-anchor="middle">${h(t)}</text>`;
- return `<svg viewBox="0 0 ${W} ${H}">${g}</svg>`}
-function bars(w,W,H){const L=34,T=16,B=22,max=Math.max(...w.data.map(d=>d[1])),st=nice(max),top=st*Math.ceil(max/st),n=w.data.length,bw=(W-L)/n;
- const Y=v=>T+(1-v/top)*(H-T-B);let g="";
- for(let v=0;v<=top;v+=st)g+=`<line x1="${L}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e7e5e4"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${fmt(v)}</text>`;
- w.data.forEach(([t,v],i)=>{const x=L+i*bw+bw*.2,col=v===max?"#e65817":t===w.hi?"#1c1917":"#c9c5c2";
-  g+=`<rect x="${x}" y="${Y(v)}" width="${bw*.6}" height="${Y(0)-Y(v)}" fill="${col}"/><text x="${x+bw*.3}" y="${Y(v)-4}" text-anchor="middle">${fmt(v)}</text><text x="${x+bw*.3}" y="${H-5}" text-anchor="middle" style="fill:#1c1917;font-size:11px;font-weight:600">${h(t)}</text>`});
- return `<svg viewBox="0 0 ${W} ${H}">${g}</svg>`}
-const LV=["치명","높음","중간","관찰"];
-const kv=rows=>rows.map(([k,v])=>`<tr><td>${h(k)}</td><td>${h(v)}</td></tr>`).join("");
-const logo=`<div class="logo">${h(R.broker)}</div>`;
-const render=k=>{document.getElementById("out").innerHTML=`
 <div class="pg">
- <div class="hd"><div class="l">Company Report<span>${h(R.date)}</span></div>${logo}</div>
- <h1>${h(R.name)}<small>(${h(R.code)})</small></h1>
- <div class="hl">${h(R.headline)}</div>
- <div class="cols fit">
-  <div>
-   <div class="sum"><b>${h(R.lead)}</b><p>${h(R.summary)}</p></div>
-   ${R.sections.map(([t,b])=>`<h3>${h(t)}</h3><p>${h(b)}</p>`).join("")}
-   <div class="tt"><b>Forecasts and valuations</b><span>${h(R.forecast.unit)}</span></div>
-   <table class="ft"><tr><th>지표</th><th class="n">누적 실적</th><th class="n">${h(R.forecast.est)}</th><th>코멘트</th></tr>
-   ${R.forecast.rows.map(r=>`<tr><td>${h(r[0])}</td><td class="n">${h(r[1])}</td><td class="n">${h(r[2])}</td><td>${h(r[3])}</td></tr>`).join("")}</table>
-   <div class="src">${h(R.forecast.source)}</div>
+ <div class="hd"><div class="l">Company Report<span>2026.10.16</span></div><div class="logo">한국어시스템증권</div></div>
+ <h1>㈜ㄱㄱ홀딩스<small>(001705)</small></h1>
+ <div class="hl">실행은 ㄱㄱ, 방향은 아니아니</div>
+ <div class="cols">
+  <div class="main">
+   <div class="sum"><b>상장 10개월, 누적 발화 42,807건. 실행 속도보다 방향 수정 속도가 빠르다</b><p>2025년 12월 상장 이후 세션 1,969개, 일평균 156건을 기록했다. 4월 월 거래량은 7,422건으로 상장 첫 달의 5.6배다. 다만 "아니"로 시작하는 발화가 1,968건으로 "ㄱㄱ" 1,705건을 웃돈다. 출발 신호보다 정정 공시가 많은 구조다. 투자의견 HOLD를 유지한다.</p></div>
+   <h3>핵심 사업: 전자문서 프론트엔드와 AI 티 제거업</h3><p>본업은 전자문서 프론트엔드(발화 6,567건)다. 실적을 실제로 끌어올린 것은 신사업인 AI 티 제거업이다. "주석" 언급이 482회, "너무"가 1,056회, "짧게·줄여"가 492회다. 대표 공시는 "야 아니 너무 AI스럽잖아", "주석이 ai스럽고 수사적인게 있어", "주저리주저리 주석이 필요한가". 이 회사의 품질 기준은 단 하나, 사람이 쓴 것 같은가다.</p><h3>경쟁력: 근본 원인 분석과 과설계 절단</h3><p>"원인·근본" 언급 104회. 고장 난 것보다 "원래는 왜 됐고 지금은 안되는지"를 먼저 묻는다. 실수를 지적할 때도 "너가 지난번에도 이렇게 잘못 적었는데 원인을 찾아줘"라며 재발 경로를 노린다. 반대 방향의 감각도 갖췄다. "그건 오버엔지니어링같아", "하위 호환 필요없어"로 남이 쌓은 설계를 과감히 걷어낸다. 업계 평균 대비 드문 조합이다.</p><h3>자체 도구 부문: 비서를 만들고, 비서의 비서를 만든다</h3><p>메일·일정·문서를 한데 묶은 개인 비서, 세션 인수인계 명령(54회), 세션 이어가기 도구까지 직접 만들었다. 반복 작업을 발견하면 "스킬로 만들어줘"를 공시한다. 같은 기간 "스킬은 없애줘"도 공시했다. 시장은 두 공시 중 어느 쪽이 최신인지 확인하지 못했다.</p>
+   <div class="tt"><b>Forecasts and valuations</b><span>(단위: 회, 2027E는 연환산)</span></div>
+   <table class="ft"><tr><th>지표</th><th class="n">누적 실적</th><th class="n">2027E</th><th>코멘트</th></tr><tr><td>ㄱㄱ류</td><td class="n">1,705</td><td class="n">1,969</td><td>세션 수와 같아짐</td></tr><tr><td>ㅇㅇ류</td><td class="n">1,669</td><td class="n">1,928</td><td>상동</td></tr><tr><td>"아니"로 시작</td><td class="n">1,968</td><td class="n">2,273</td><td>ㄱㄱ를 추월</td></tr><tr><td>"흠"</td><td class="n">1,875</td><td class="n">2,166</td><td>고민 중</td></tr><tr><td>ultrathink</td><td class="n">131</td><td class="n">151</td><td>"아냐 너무 덜 찾았어. 더 많이 찾아봐 ultrathink"</td></tr><tr><td>감사 표현</td><td class="n">30</td><td class="n">35</td><td>"굿" 304회로 대체 지급</td></tr></table>
+   <div class="src">자료: ~/.claude/history.jsonl (2025.12.03~2026.10.15), 한국어시스템증권 리서치센터</div>
   </div>
-  <div class="side">
-   <div class="rate">${h(R.rating)}<small>${h(R.ratingMark)}</small></div>
-   <table class="kv"><tr class="big"><td>목표주가</td><td>${h(R.target)} ${h(R.targetMark)}</td></tr>
-   ${kv([["직전 목표주가",R.prevTarget],[`현재주가 (${R.priceDate})`,R.price]])}<tr><td>상승여력</td><td>${sign(R.upside)}</td></tr></table>
-   <div class="note">${h(R.targetNote)}</div>
-   <h4>Stock Data</h4><table class="kv">${kv(R.stock)}</table>
-   <h4>주가수익률 (%)</h4><table class="rt"><tr><td></td>${R.returns.head.map(x=>`<td>${h(x)}</td>`).join("")}</tr><tr><td>절대</td>${R.returns.abs.map(x=>`<td>${sign(x)}</td>`).join("")}</tr></table>
-   <div class="note">${h(R.returns.note)}</div>
-   <h4>Price Trend (월 거래량)</h4><div style="margin-top:3mm">${line(R.monthly,230,115,{peak:true})}</div>
+  <div class="top">
+   <div class="rate">HOLD<small>(M)</small></div>
+   <table class="kv"><tr class="big"><td>목표주가</td><td>89,064원 (U)</td></tr><tr><td>직전 목표주가</td><td>15,912원</td></tr><tr><td>현재주가 (10/15)</td><td>42,807원</td></tr><tr><td>상승여력</td><td><span class="up">+108.1%</span></td></tr></table>
+   <div class="note">목표주가: 피크 월(4월) 7,422건 × 12. 직전: 상장 첫 달 1,326건 × 12</div>
+  </div>
+  <div class="rest">
+   <h4>Stock Data</h4><table class="kv"><tr><td>시가총액</td><td>1,969억 원</td></tr><tr><td>상장일</td><td>2025.12.03</td></tr><tr><td>발행주식수</td><td>42,807주</td></tr><tr><td>일평균 거래량</td><td>156건</td></tr><tr><td>52주 최고 (4/14)</td><td>583건</td></tr><tr><td>세션당 발화 (중앙값)</td><td>6건</td></tr><tr><td>하루 최대 세션</td><td>32개</td></tr><tr><td>최대주주</td><td>개인 비서 외 특수관계인</td></tr><tr><td>배당수익률</td><td>0.07%</td></tr></table>
+   <h4>주가수익률 (%)</h4><table class="rt"><tr><td></td><td>1M</td><td>3M</td><td>10M</td></tr><tr><td>절대</td><td>-51.3</td><td>-46.3</td><td><span class="up">+85.8</span></td></tr></table>
+   <div class="note">월 발화 기준. 10월은 15일까지 집계</div>
+   <h4>Price Trend (월 거래량)</h4><div class="ch" style="height:110px"><div class="gy" style="top:100%"><span>0</span></div><div class="gy" style="top:75%"><span>2,000</span></div><div class="gy" style="top:50%"><span>4,000</span></div><div class="gy" style="top:25%"><span>6,000</span></div><div class="gy" style="top:0%"><span>8,000</span></div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline class="ln" points="0,83.42 10,86.25 20,43.75 30,31.25 40,7.225 50,67.5 60,41.25 70,45 80,73.75 90,40 100,72.5"/></svg><i class="pt up" style="left:40%;top:7.225%"><b>7,422</b></i><span class="gx" style="left:0%">25.12</span><span class="gx" style="left:30%">26.03</span><span class="gx" style="left:60%">26.06</span><span class="gx" style="left:90%">26.09</span></div>
   </div>
  </div>
- <div class="bt"><span>${h(R.broker)} 리서치센터</span><span>양식: 개발자 성열 · @yeol.dev　　1</span></div>
+ <div class="bt"><span>한국어시스템증권 리서치센터</span><span>양식: 개발자 성열 · @yeol.dev　　1</span></div>
 </div>
 <div class="pg">
- <div class="hd"><div class="l">${h(R.name)}<span>(${h(R.code)})</span></div>${logo}</div>
- <div class="fit">
+ <div class="hd"><div class="l">㈜ㄱㄱ홀딩스<span>(001705)</span></div><div class="logo">한국어시스템증권</div></div>
  <h2>위험 요인<span>Risk Factors</span></h2>
- <table class="rk">${R.risks.map(([k,t,l])=>`<tr><td>${h(k)}</td><td>${h(t)}</td><td class="lv${LV.indexOf(l)}">${h(l)}</td></tr>`).join("")}</table>
- <h2>주가 추이<span>${h(R.weekly.note)}</span></h2>
- <div style="margin-top:5mm">${line(R.weekly,680,215*k,{ma:4,area:true})}</div>
- <h2>말버릇별 거래량<span>${h(R.words.note)}</span></h2>
- <div style="margin-top:5mm">${bars(R.words,680,150*k)}</div>
+ <table class="rk"><tr><td>조급증</td><td>"오래걸려" 계열 57회. "이게 뭐라고 이렇게 오래걸려", "왤케 오래걸려". 오타를 고칠 시간도 아끼는 것으로 보인다.</td><td class="l1">치명</td></tr><tr><td>잦은 방향 전환</td><td>"아니"로 시작 1,968회, "말고" 1,298회, "롤백" 184회. "아니아니 wrap으로 해줘". 경영 전략은 확정 전까지 최소 두 번 바뀐다.</td><td class="l2">높음</td></tr><tr><td>재공시 남발</td><td>30자 이상 같은 프롬프트를 308회 다시 보냈다. "아 곧 끝날듯? 일단 로컬에서 수정하고 수정사항 보여줘" 단독 10회. 곧 끝나지 않았다.</td><td class="l3">중간</td></tr><tr><td>중도 중단</td><td>남은 세션 표본에서 발화의 6.3%(383회)가 작업을 끊었다. 도구 실행 거절도 111회. 대표 공시는 "잠만"(890회).</td><td class="l3">중간</td></tr><tr><td>범위 확장</td><td>"그리고" 4,474회. 하나를 시키면 같은 메시지 안에서 셋이 된다.</td><td class="l4">관찰</td></tr></table>
+ <h2>주가 추이<span>주간 발화 건수, 점선은 4주 이동평균</span></h2>
+ <div class="ch" style="height:210px"><div class="gy" style="top:100%"><span>0</span></div><div class="gy" style="top:66.67%"><span>1,000</span></div><div class="gy" style="top:33.33%"><span>2,000</span></div><div class="gy" style="top:0%"><span>3,000</span></div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon class="ar" points="0,100 0,99 2.222,95 4.444,86.67 6.667,83.33 8.889,82.67 11.11,96.67 13.33,91.67 15.56,95 17.78,99.33 20,86.67 22.22,41.67 24.44,53.33 26.67,53.33 28.89,70 31.11,66.67 33.33,41.67 35.56,63.33 37.78,18.43 40,30 42.22,41.67 44.44,65 46.67,56.67 48.89,66.67 51.11,61.67 53.33,78.33 55.56,96 57.78,66.67 60,51 62.22,68.33 64.44,56.67 66.67,72.33 68.89,66.67 71.11,61 73.33,67.33 75.56,71.67 77.78,76.67 80,100 82.22,91.67 84.44,60 86.67,53.33 88.89,58.33 91.11,60 93.33,85 95.56,51.67 97.78,63.33 100,70 100,100"/><polyline class="ma" points="6.667,91 8.889,86.92 11.11,87.33 13.33,88.58 15.56,91.5 17.78,95.67 20,93.17 22.22,80.67 24.44,70.25 26.67,58.75 28.89,54.58 31.11,60.83 33.33,57.92 35.56,60.42 37.78,47.52 40,38.36 42.22,38.36 44.44,38.78 46.67,48.33 48.89,57.5 51.11,62.5 53.33,65.83 55.56,75.67 57.78,75.67 60,73 62.22,70.5 64.44,60.67 66.67,62.08 68.89,66 71.11,64.17 73.33,66.83 75.56,66.67 77.78,69.17 80,78.92 82.22,85 84.44,82.08 86.67,76.25 88.89,65.83 91.11,57.92 93.33,64.17 95.56,63.75 97.78,65 100,67.5"/><polyline class="ln" points="0,99 2.222,95 4.444,86.67 6.667,83.33 8.889,82.67 11.11,96.67 13.33,91.67 15.56,95 17.78,99.33 20,86.67 22.22,41.67 24.44,53.33 26.67,53.33 28.89,70 31.11,66.67 33.33,41.67 35.56,63.33 37.78,18.43 40,30 42.22,41.67 44.44,65 46.67,56.67 48.89,66.67 51.11,61.67 53.33,78.33 55.56,96 57.78,66.67 60,51 62.22,68.33 64.44,56.67 66.67,72.33 68.89,66.67 71.11,61 73.33,67.33 75.56,71.67 77.78,76.67 80,100 82.22,91.67 84.44,60 86.67,53.33 88.89,58.33 91.11,60 93.33,85 95.56,51.67 97.78,63.33 100,70"/></svg><i class="pt up" style="left:22.22%;top:41.67%"><b>2/9 인수인계 명령 도입, +348%</b></i><i class="pt up" style="left:37.78%;top:18.43%"><b>사상 최고 2,447</b></i><i class="pt dn" style="left:55.56%;top:96%"><b>-80%</b></i><i class="pt up" style="left:60%;top:51%"><b>"스킬로 만들어줘" 공시</b></i><i class="pt dn l" style="left:80%;top:100%"><b>거래정지 12일</b></i><span class="gx" style="left:0%">25.12</span><span class="gx" style="left:20%">26.02</span><span class="gx" style="left:40%">26.04</span><span class="gx" style="left:60%">26.06</span><span class="gx" style="left:80%">26.08</span><span class="gx" style="left:100%">26.10</span></div>
+ <h2>말버릇별 거래량<span>Top 10, 누적 발화</span></h2>
+ <div class="bars" style="height:150px"><div class="gy" style="top:100%"><span>0</span></div><div class="gy" style="top:66.67%"><span>2,000</span></div><div class="gy" style="top:33.33%"><span>4,000</span></div><div class="gy" style="top:0%"><span>6,000</span></div><div class="b max"><em style="height:74.57%"></em><i style="top:25.43%">4,474</i><span>그리고</span></div><div class="b"><em style="height:32.8%"></em><i style="top:67.2%">1,968</i><span>아니</span></div><div class="b"><em style="height:31.55%"></em><i style="top:68.45%">1,893</i><span>다시</span></div><div class="b"><em style="height:31.25%"></em><i style="top:68.75%">1,875</i><span>흠</span></div><div class="b hi"><em style="height:28.42%"></em><i style="top:71.58%">1,705</i><span>ㄱㄱ</span></div><div class="b"><em style="height:27.82%"></em><i style="top:72.18%">1,669</i><span>ㅇㅇ</span></div><div class="b"><em style="height:21.63%"></em><i style="top:78.37%">1,298</i><span>말고</span></div><div class="b"><em style="height:17.6%"></em><i style="top:82.4%">1,056</i><span>너무</span></div><div class="b"><em style="height:14.83%"></em><i style="top:85.17%">890</i><span>잠만</span></div><div class="b"><em style="height:8.033%"></em><i style="top:91.97%">482</i><span>주석</span></div></div>
  <h2>투자의견<span>Recommendation</span></h2>
- <div class="op"><div class="r">${h(R.rating)}<small>${h(R.ratingKo)}</small></div><div><b>매수 근거.</b> ${h(R.opinion.buy)}<br><b>매도 근거.</b> ${h(R.opinion.sell)}<br><b>결론.</b> ${h(R.opinion.end)}</div></div>
- </div>
- <div style="flex:1"></div>
+ <div class="op"><div class="r">HOLD<small>보유</small></div><div><b>매수 근거.</b> 원인을 찾을 때까지 놓지 않고, 남이 쌓은 과설계를 잘라내는 감각은 업계 상위권이다.<br><b>매도 근거.</b> 지시가 끝나기 전에 "아니"가 먼저 도착한다. 실적 가이던스는 평균 33자다.<br><b>결론.</b> 펀더멘털은 좋은데 공시 해석이 어렵다. 매매 신호는 "ㄱㄱ" 두 글자로만 나온다.</div></div>
  <div class="bt"><span>본 조사분석자료는 대화 기록을 바탕으로 작성되었으며, 투자 결과에 대한 법적 책임 소재의 증빙자료로 사용될 수 없습니다.</span><span>2</span></div>
-</div>`};
-// 내용이 길어 A4 를 넘치면 2쪽 그래프부터 낮추고, 그래도 넘치는 쪽은 글자를 조금씩 줄인다
-let k=1;render(k);const pages=()=>document.querySelectorAll(".pg"),over=pg=>pg.scrollHeight>pg.clientHeight+1;
-while(over(pages()[1])&&k>.6){k-=.05;render(k)}
-for(const pg of pages()){const f=pg.querySelector(".fit");for(let z=1;over(pg)&&z>.8;){z-=.02;f.style.zoom=z}}
-// 화면이 A4 보다 좁으면(휴대폰 등) 페이지 전체를 폭에 맞춰 줄인다. 인쇄는 원래 크기
-const fit=()=>{const w=document.documentElement.clientWidth;if(w)document.body.style.zoom=Math.min(1,w/(794+(self===top?32:0)))};fit();addEventListener("resize",fit);
-// 사이트 예시처럼 iframe 에 들어가면 배경을 비우고, 안에서 스크롤하지 않게 높이를 바깥에 알린다
-if(self!==top){document.documentElement.classList.add("embed");const tell=()=>parent.postMessage({reportHeight:Math.ceil(document.body.getBoundingClientRect().height)},"*");tell();addEventListener("resize",tell)}
-</script></body></html>
+</div>
+<script>
+// 사이트 예시처럼 iframe 에 들어가면 배경을 비우고, 안에서 스크롤하지 않게 높이를 바깥에 알린다(보고서 자체는 스크립트 없이 그려진다)
+if(self!==top){document.documentElement.classList.add("embed");const tell=()=>parent.postMessage({reportHeight:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*");tell();addEventListener("resize",tell);addEventListener("load",tell)}
+</script>
+</body></html>
