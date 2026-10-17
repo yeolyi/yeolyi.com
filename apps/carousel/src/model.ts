@@ -121,10 +121,8 @@ export function layoutSlide(
   });
   const total =
     sized.reduce((s, it) => s + it.h, 0) + GAP * Math.max(0, ls.length - 1);
-  let y =
-    slide.valign === "center"
-      ? MARGIN.top + Math.max(0, (space - total) / 2)
-      : MARGIN.top;
+  const y0 = slide.valign === "center" ? centerTop(sized, total) : MARGIN.top;
+  let y = y0;
   const boxes: Record<string, Box> = {};
   for (const it of sized) {
     // 꽉 채운 그림도 줄어들면 꽉 차지 않으니 다른 요소처럼 왼쪽 여백에 붙인다.
@@ -133,6 +131,32 @@ export function layoutSlide(
     y += it.h + GAP;
   }
   return { boxes, overflow: Math.max(0, total - space) };
+}
+
+// 세로 가운데: 상자 전체가 아니라 눈에 보이는 무게의 중심을 맞춘다. 그림·코드는 면적 그대로,
+// 글은 획이 가늘어 면적의 TEXT_WEIGHT 만큼으로 센다. 큰 그림이 하나 있으면 그 그림이 가운데에 오고 글은 위아래에 매달린다.
+// 맞추는 자리는 정가운데보다 OPTICAL_LIFT 위(광학적 중심). 위아래 여백은 넘지 않는다.
+const TEXT_WEIGHT = 0.3;
+const OPTICAL_LIFT = Math.round(H * 0.04);
+
+function centerTop(
+  sized: { l: Layer; w: number; h: number }[],
+  total: number,
+): number {
+  let y = 0;
+  let sum = 0;
+  let moment = 0;
+  for (const it of sized) {
+    const wt = it.w * it.h * (it.l.type === "text" ? TEXT_WEIGHT : 1);
+    sum += wt;
+    moment += wt * (y + it.h / 2);
+    y += it.h + GAP;
+  }
+  const c = sum > 0 ? moment / sum : total / 2;
+  const lo = MARGIN.top;
+  const hi = H - MARGIN.bottom - total;
+  if (hi <= lo) return lo;
+  return clamp(H / 2 - OPTICAL_LIFT - c, lo, hi);
 }
 
 // ---- 정규화 ----
