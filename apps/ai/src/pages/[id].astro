@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { readFileSync } from "node:fs";
 import { Details, Summary } from "@yeolyi/ui/Details";
 import ClaudeCode from "../components/ClaudeCode";
 import CopyButton from "../components/CopyButton";
@@ -10,7 +11,16 @@ export async function getStaticPaths() {
   return prompts.map((p) => ({ params: { id: p.id }, props: { p } }));
 }
 const { p } = Astro.props;
-const text = (p.body ?? "").trim();
+// 틀이 있으면 프롬프트 끝에 붙인다. 틀은 public/ 의 파일 하나가 정본이라 md 에 베껴 두지 않는다
+const template = p.data.template
+  ? readFileSync(`public${p.data.template}`, "utf8").trim()
+  : null;
+const text = [
+  (p.body ?? "").trim(),
+  template && `\`\`\`html\n${template}\n\`\`\``,
+]
+  .filter(Boolean)
+  .join("\n\n");
 const date = p.data.date.toISOString().slice(0, 10);
 ---
 
@@ -22,11 +32,34 @@ const date = p.data.date.toISOString().slice(0, 10);
     <h1>{p.data.title}</h1>
     <p class="text-muted-foreground mt-[0.25rlh]">{p.data.description}</p>
   </header>
-  <!-- 복사가 이 페이지의 할 일이라 맨 위에. 어떤 말투인지는 아래 실제 대화로 본다. -->
+  <!-- 복사가 이 페이지의 할 일이라 맨 위에. 무엇이 나오는지는 아래 실제 결과(대화나 그림)로 본다. -->
   <div class="mt-[1.5rlh]">
     <CopyButton client:load text={text} />
   </div>
-  <ClaudeCode turns={p.data.examples} className="mt-[1.5rlh]" />
+  {
+    p.data.examples.length > 0 && (
+      <ClaudeCode turns={p.data.examples} className="mt-[1.5rlh]" />
+    )
+  }
+  {
+    p.data.page && (
+      <iframe
+        src={p.data.page.src}
+        title={p.data.page.title}
+        loading="lazy"
+        class="border-border mt-[1.5rlh] block aspect-[794/2258] w-full border"
+      />
+    )
+  }
+  <script>
+    // 문서 예시는 안에서 스크롤하지 않게, iframe 이 알려 준 높이로 늘린다
+    addEventListener("message", (e) => {
+      const h = e.data?.reportHeight;
+      const f = document.querySelector("iframe");
+      if (f && typeof h === "number" && e.source === f.contentWindow)
+        f.style.height = `${h + f.offsetHeight - f.clientHeight}px`;
+    });
+  </script>
   <!-- 원문은 길어서 접어 둔다. 복사는 위 버튼으로. -->
   <Details className="mt-[1rlh]">
     <Summary>프롬프트 보기</Summary>

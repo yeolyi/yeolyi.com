@@ -3,3 +3,6 @@ pnpm-lock.yaml
 **/dist
 **/.vercel
 **/.astro
+# 프롬프트에 그대로 붙는 HTML 틀과 그 예시. 줄바꿈이 늘면 AI 가 다시 써야 할 분량도 는다
+apps/ai/public/templates
+apps/ai/public/examples
