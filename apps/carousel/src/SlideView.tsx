@@ -2,19 +2,22 @@
 import {
   type CSSProperties,
   type ReactNode,
-  type Ref,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { AssetResolver, assetUrl, useAssetUrl } from "./assets";
 import {
+  type Box,
+  CONTENT_W,
   type CodeLayer,
   type Deck,
   H,
   type ImageLayer,
   type Layer,
+  layoutSlide,
   parseMarkup,
   RED,
   type Slide,
@@ -39,18 +42,52 @@ export const SHOT_OPTIONS = {
   },
 };
 
-export function textBoxStyle(l: TextLayer): CSSProperties {
+export function textBoxStyle(l: TextLayer, box: Box): CSSProperties {
   const st = TEXT_STYLES[l.style];
   return {
-    left: l.x,
-    top: l.y,
-    // 내용에 맞춘 너비가 캔버스 오른쪽 끝을 넘지 않게. 넘을 만큼 긴 단어는 그 자리에서 접힌다.
-    maxWidth: W - Math.max(0, l.x),
+    left: box.x,
+    top: box.y,
+    // 내용에 맞춘 너비가 오른쪽 여백을 넘지 않게. 넘을 만큼 긴 단어는 그 자리에서 접힌다.
+    maxWidth: CONTENT_W,
     fontSize: st.size,
     lineHeight: st.lineHeight,
     color: l.color === "red" ? RED : st.color,
-    textAlign: l.align,
   };
+}
+
+// 장 하나의 배치. 글·코드 상자는 내용에 맞춰지므로 그려진 크기를 재서(크기가 바뀌면 다시) layoutSlide 에 넘긴다.
+// 돌려주는 ref(id) 를 그 상자들에 단다.
+export function useSlideLayout(slide: Slide) {
+  const els = useRef(new Map<string, HTMLElement>());
+  const [sizes, setSizes] = useState<Record<string, { w: number; h: number }>>(
+    {},
+  );
+  const measure = () => {
+    let changed = false;
+    const next: Record<string, { w: number; h: number }> = {};
+    for (const l of slide.layers) {
+      if (l.type === "image") continue;
+      const el = els.current.get(l.id);
+      const sz = { w: el?.offsetWidth ?? 0, h: el?.offsetHeight ?? 0 };
+      next[l.id] = sz;
+      if (sizes[l.id]?.w !== sz.w || sizes[l.id]?.h !== sz.h) changed = true;
+    }
+    if (changed) setSizes(next);
+  };
+  const measureRef = useRef(measure);
+  measureRef.current = measure;
+  useLayoutEffect(() => measureRef.current());
+  // 코드 레이어는 비동기로 그려지고 글꼴도 늦게 올 수 있어 크기 변화를 지켜본다.
+  useEffect(() => {
+    const ro = new ResizeObserver(() => measureRef.current());
+    for (const el of els.current.values()) ro.observe(el);
+    return () => ro.disconnect();
+  });
+  const ref = (id: string) => (el: HTMLElement | null) => {
+    if (el) els.current.set(id, el);
+    else els.current.delete(id);
+  };
+  return { ...layoutSlide(slide, sizes), sizes, ref };
 }
 
 // 블러(||…||): 글자를 투명하게 하고 같은 색 그림자를 흐리게 깐다(줄바꿈되는 인라인에도 먹고, 내보내기에도 그대로 찍힌다).
@@ -87,10 +124,18 @@ export function TextRuns({
   );
 }
 
-export function ImageContent({ slug, l }: { slug: string; l: ImageLayer }) {
+export function ImageContent({
+  slug,
+  l,
+  box,
+}: {
+  slug: string;
+  l: ImageLayer;
+  box: Box;
+}) {
   const url = useAssetUrl(slug, l.src);
-  const fw = l.w / l.crop.w;
-  const fh = l.h / l.crop.h;
+  const fw = box.w / l.crop.w;
+  const fh = box.h / l.crop.h;
   return (
     <img
       src={url}
@@ -113,7 +158,8 @@ export function ImageContent({ slug, l }: { slug: string; l: ImageLayer }) {
 type LayerProps = {
   slug: string;
   layer: Layer;
-  ref?: Ref<HTMLDivElement>;
+  box: Box;
+  ref?: (el: HTMLDivElement | null) => void;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -173,8 +219,14 @@ function CodeContent({ slug, l }: { slug: string; l: CodeLayer }) {
   );
 }
 
-// 내보내기 전에 코드 레이어가 다 그려질 때까지(최대 10초) 기다린다.
+// 내보내기 전에 코드 레이어가 다 그려질 때까지(최대 10초) 기다린다. 그 뒤 크기를 다시 재 배치가 한 번 더 바뀌므로 두 프레임 더 기다린다.
 export async function codeLayersReady(root: ParentNode) {
+  await codeLayersDrawn(root);
+  for (let i = 0; i < 2; i++)
+    await new Promise((r) => requestAnimationFrame(r));
+}
+
+async function codeLayersDrawn(root: ParentNode) {
   for (let i = 0; i < 100; i++) {
     if (
       [...root.querySelectorAll(".layer.code > div:first-child")].every((el) =>
@@ -189,6 +241,7 @@ export async function codeLayersReady(root: ParentNode) {
 export function LayerView({
   slug,
   layer: l,
+  box,
   ref,
   className,
   style,
@@ -203,7 +256,7 @@ export function LayerView({
         ref={ref}
         data-id={l.id}
         className={`layer code ${className ?? ""}`}
-        style={{ left: l.x, top: l.y, ...style }}
+        style={{ left: box.x, top: box.y, maxWidth: CONTENT_W, ...style }}
         onPointerDown={onPointerDown}
         onDoubleClick={onDoubleClick}
       >
@@ -219,12 +272,15 @@ export function LayerView({
         ref={ref}
         data-id={l.id}
         className={`layer txt ${className ?? ""}`}
-        style={{ ...textBoxStyle(l), ...style }}
+        style={{ ...textBoxStyle(l, box), ...style }}
         onPointerDown={onPointerDown}
         onDoubleClick={onDoubleClick}
       >
         {children ?? (
-          <TextRuns text={l.text} color={textBoxStyle(l).color as string} />
+          <TextRuns
+            text={l.text}
+            color={textBoxStyle(l, box).color as string}
+          />
         )}
       </div>
     );
@@ -235,11 +291,17 @@ export function LayerView({
       ref={ref}
       data-id={l.id}
       className={`layer img ${className ?? ""}`}
-      style={{ left: l.x, top: l.y, width: l.w, height: l.h, ...style }}
+      style={{
+        left: box.x,
+        top: box.y,
+        width: box.w,
+        height: box.h,
+        ...style,
+      }}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
     >
-      <ImageContent slug={slug} l={l} />
+      <ImageContent slug={slug} l={l} box={box} />
       {children}
     </div>
   );
@@ -275,6 +337,7 @@ export function SlideView({
   index: number;
   slide?: Slide;
 }) {
+  const { boxes, ref } = useSlideLayout(slide);
   return (
     <div
       className="slide"
@@ -282,7 +345,13 @@ export function SlideView({
       data-slide-index={index}
     >
       {slide.layers.map((l) => (
-        <LayerView key={l.id} slug={slug} layer={l} />
+        <LayerView
+          key={l.id}
+          slug={slug}
+          layer={l}
+          box={boxes[l.id]}
+          ref={l.type === "image" ? undefined : ref(l.id)}
+        />
       ))}
       <Watermark deck={deck} index={index} />
     </div>

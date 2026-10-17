@@ -11,10 +11,13 @@ export const TEXT_STYLES = {
   caption: { size: 30, lineHeight: 1.44, color: "#8E8E8E" },
 } as const;
 
-// #949494 는 흰 배경 대비 3.03:1. 30px 는 WCAG 의 큰 글자라 AA 기준 3:1 을 넘는다(#959595 부터는 미달).
-// 왼쪽·오른쪽 배치와 스냅에서 캔버스 가장자리와 둘 여백(텍스트·이미지 공통).
-export const EDGE_MARGIN = 80;
+// 배치 규칙: 좌표 없이 위에서 아래로 쌓는다. 가로는 왼쪽 여백에 붙이고(꽉 채운 그림만 0),
+// 요소 사이는 본문 한 줄(57.6px), 묶음 전체는 장마다 위(top) 또는 세로 가운데(center).
+export const MARGIN = { x: 80, top: 120, bottom: 120 };
+export const CONTENT_W = W - MARGIN.x * 2;
+export const GAP = TEXT_STYLES.body.size * TEXT_STYLES.body.lineHeight;
 
+// #949494 는 흰 배경 대비 3.03:1. 30px 는 WCAG 의 큰 글자라 AA 기준 3:1 을 넘는다(#959595 부터는 미달).
 export const WATERMARK = {
   size: 30,
   weight: 400,
@@ -23,31 +26,27 @@ export const WATERMARK = {
 };
 
 export type TextStyle = keyof typeof TEXT_STYLES;
-export type Align = "left" | "center" | "right";
+export type VAlign = "top" | "center";
 export type Crop = { x: number; y: number; w: number; h: number };
 
 export type TextLayer = {
   id: string;
   type: "text";
-  x: number;
-  y: number;
-  // 너비는 없다. 내용에 맞춰지고, 캔버스 오른쪽 끝에서 줄이 바뀐다.
+  // 너비는 없다. 내용에 맞춰지고, 오른쪽 여백에서 줄이 바뀐다.
   text: string;
   style: TextStyle;
   color: "black" | "red";
-  align: Align;
 };
 
+// 크기는 배치가 정한다: 폭은 본문 폭(920) 또는 꽉 채움(1080), 높이는 크롭한 비율대로.
+// 남은 높이보다 크면 비율을 지킨 채 줄어든다. crop 은 원본 대비 보일 영역 비율 {x,y,w,h}(0~1).
 export type ImageLayer = {
   id: string;
   type: "image";
   src: string;
   nw: number;
   nh: number;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  full: boolean;
   crop: Crop;
 };
 
@@ -57,8 +56,6 @@ export type ImageLayer = {
 export type CodeLayer = {
   id: string;
   type: "code";
-  x: number;
-  y: number;
   code: string;
   props: Record<string, unknown>;
 };
@@ -68,11 +65,13 @@ export type Layer = TextLayer | ImageLayer | CodeLayer;
 export type Slide = {
   id: string;
   memo: string;
+  valign: VAlign;
+  // 배열 순서 = 위에서 아래로 쌓는 순서
   layers: Layer[];
 };
 
 export type Deck = {
-  version: 1;
+  version: 2;
   title: string;
   watermark: string;
   caption: string; // 인스타 게시물 본문(해시태그 포함)
@@ -83,21 +82,77 @@ export const uid = () => Math.random().toString(36).slice(2, 8);
 
 const num = (v: unknown, d: number) =>
   typeof v === "number" && Number.isFinite(v) ? v : d;
-const round = (v: number) => Math.round(v * 100) / 100;
 
-// 사람(나 또는 Claude)이 손으로 쓴 JSON 을 받아 빠진 필드를 채운다. id·기본값·이미지 높이 등.
+// ---- 배치 ----
+
+export type Box = { x: number; y: number; w: number; h: number };
+
+// 그림이 크롭된 채 갖는 가로세로 비율(폭/높이).
+export const imageRatio = (l: ImageLayer) =>
+  (l.crop.w * l.nw) / (l.crop.h * l.nh);
+
+// 장 하나의 배치. 글·코드 높이는 그려 본 값(sizes)을 받는다. 그림은 남은 높이에 맞춰 모두 같은 비율로 줄어든다.
+// overflow 는 글이 너무 길어 아래 여백을 넘친 px(0 이면 정상).
+export function layoutSlide(
+  slide: Slide,
+  sizes: Record<string, { w: number; h: number }>,
+): { boxes: Record<string, Box>; overflow: number } {
+  const space = H - MARGIN.top - MARGIN.bottom;
+  const ls = slide.layers;
+  const fixed = ls.reduce(
+    (s, l) => s + (l.type === "image" ? 0 : (sizes[l.id]?.h ?? 0)),
+    0,
+  );
+  const natural = (l: ImageLayer) => {
+    const w = l.full ? W : CONTENT_W;
+    return { w, h: w / imageRatio(l) };
+  };
+  const imgH = ls.reduce(
+    (s, l) => s + (l.type === "image" ? natural(l).h : 0),
+    0,
+  );
+  const room = space - fixed - GAP * Math.max(0, ls.length - 1);
+  const k = imgH > 0 ? clamp(room / imgH, 0, 1) : 1;
+  const sized = ls.map((l) => {
+    if (l.type !== "image")
+      return { l, w: sizes[l.id]?.w ?? 0, h: sizes[l.id]?.h ?? 0 };
+    const n = natural(l);
+    return { l, w: n.w * k, h: n.h * k };
+  });
+  const total =
+    sized.reduce((s, it) => s + it.h, 0) + GAP * Math.max(0, ls.length - 1);
+  let y =
+    slide.valign === "center"
+      ? MARGIN.top + Math.max(0, (space - total) / 2)
+      : MARGIN.top;
+  const boxes: Record<string, Box> = {};
+  for (const it of sized) {
+    // 꽉 채운 그림도 줄어들면 꽉 차지 않으니 다른 요소처럼 왼쪽 여백에 붙인다.
+    const x = it.l.type === "image" && it.l.full && k === 1 ? 0 : MARGIN.x;
+    boxes[it.l.id] = { x, y, w: it.w, h: it.h };
+    y += it.h + GAP;
+  }
+  return { boxes, overflow: Math.max(0, total - space) };
+}
+
+// ---- 정규화 ----
+
+// 사람(나 또는 Claude)이 손으로 쓴 JSON 을 받아 빠진 필드를 채운다. id·기본값 등.
+// 좌표로 배치하던 옛 덱(version 1, Keynote 가져오기)은 위에서부터의 순서로 바꾼다(migrateSlide).
 // biome-ignore lint/suspicious/noExplicitAny: 손으로 쓴 JSON 은 모양을 믿을 수 없다
 export function normalizeDeck(raw: any): Deck {
   const slides: Slide[] = Array.isArray(raw?.slides)
-    ? raw.slides.map(normalizeSlide)
+    ? raw.slides.map((s: unknown) => normalizeSlide(migrateSlide(s)))
     : [];
   return {
-    version: 1,
+    version: 2,
     title: typeof raw?.title === "string" ? raw.title : "제목 없음",
     // 워터마크는 계정 설정(carousel.profiles)에서 온다. 덱에는 저장하지 않는다.
     watermark: typeof raw?.watermark === "string" ? raw.watermark : "",
     caption: typeof raw?.caption === "string" ? raw.caption : "",
-    slides: slides.length ? slides : [{ id: uid(), memo: "", layers: [] }],
+    slides: slides.length
+      ? slides
+      : [{ id: uid(), memo: "", valign: "top", layers: [] }],
   };
 }
 
@@ -106,6 +161,7 @@ function normalizeSlide(raw: any): Slide {
   return {
     id: typeof raw?.id === "string" ? raw.id : uid(),
     memo: typeof raw?.memo === "string" ? raw.memo : "",
+    valign: raw?.valign === "center" ? "center" : "top",
     layers: Array.isArray(raw?.layers)
       ? raw.layers.map(normalizeLayer).filter(Boolean)
       : [],
@@ -119,13 +175,9 @@ function normalizeLayer(raw: any): Layer | null {
     return {
       id,
       type: "text",
-      x: round(num(raw.x, 90)),
-      y: round(num(raw.y, 150)),
       text: typeof raw.text === "string" ? raw.text : "",
       style: raw.style === "caption" ? "caption" : "body",
       color: raw.color === "red" ? "red" : "black",
-      align:
-        raw.align === "center" || raw.align === "right" ? raw.align : "left",
     };
   }
   if (raw?.type === "code" && typeof raw.code === "string") {
@@ -133,42 +185,60 @@ function normalizeLayer(raw: any): Layer | null {
       raw.props && typeof raw.props === "object" && !Array.isArray(raw.props)
         ? raw.props
         : {};
-    return {
-      id,
-      type: "code",
-      x: round(num(raw.x, 80)),
-      y: round(num(raw.y, 150)),
-      code: raw.code,
-      props,
-    };
+    return { id, type: "code", code: raw.code, props };
   }
   if (raw?.type === "image" && typeof raw.src === "string") {
-    const nw = num(raw.nw, 1000);
-    const nh = num(raw.nh, 1000);
     const c = raw.crop ?? {};
-    const crop = {
-      x: clamp01(num(c.x, 0)),
-      y: clamp01(num(c.y, 0)),
-      w: clamp01(num(c.w, 1)) || 1,
-      h: clamp01(num(c.h, 1)) || 1,
-    };
-    const w = num(raw.w, Math.min(nw, W * 0.8));
-    // 높이를 안 적었으면 크롭 비율대로 계산한다.
-    const h = num(raw.h, (w * (crop.h * nh)) / (crop.w * nw));
     return {
       id,
       type: "image",
       src: raw.src,
-      nw,
-      nh,
-      x: round(num(raw.x, (W - w) / 2)),
-      y: round(num(raw.y, (H - h) / 2)),
-      w: round(w),
-      h: round(h),
-      crop,
+      nw: num(raw.nw, 1000),
+      nh: num(raw.nh, 1000),
+      full: raw.full === true,
+      crop: {
+        x: clamp01(num(c.x, 0)),
+        y: clamp01(num(c.y, 0)),
+        w: clamp01(num(c.w, 1)) || 1,
+        h: clamp01(num(c.h, 1)) || 1,
+      },
     };
   }
   return null;
+}
+
+// 옛 덱의 장 하나를 새 규칙으로: 위쪽 좌표 순으로 쌓고, 캔버스 밖으로 나간 그림은 보이던 부분만 크롭으로 남긴다.
+// 내용이 위에서 꽤 내려와 시작했으면 세로 가운데로 본다.
+// 레이어에 y 좌표가 있는 장만 옛 형식으로 본다.
+// biome-ignore lint/suspicious/noExplicitAny: 위와 같다
+function migrateSlide(raw: any) {
+  // biome-ignore lint/suspicious/noExplicitAny: 위와 같다
+  const layers: any[] = Array.isArray(raw?.layers) ? raw.layers : [];
+  if (!layers.some((l) => typeof l?.y === "number")) return raw;
+  const top = (l: { y?: unknown }) => num(l?.y, 0);
+  const out = layers
+    .toSorted((a, b) => top(a) - top(b))
+    .map((l) => {
+      if (l?.type !== "image") return l;
+      const { x = 0, y = 0, w = 0, h = 0 } = l;
+      const c = { x: 0, y: 0, w: 1, h: 1, ...l.crop };
+      const x0 = Math.max(x, 0);
+      const y0 = Math.max(y, 0);
+      const x1 = Math.min(x + w, W);
+      const y1 = Math.min(y + h, H);
+      const crop =
+        w > 0 && h > 0 && x1 > x0 && y1 > y0
+          ? {
+              x: c.x + ((x0 - x) / w) * c.w,
+              y: c.y + ((y0 - y) / h) * c.h,
+              w: ((x1 - x0) / w) * c.w,
+              h: ((y1 - y0) / h) * c.h,
+            }
+          : c;
+      return { ...l, crop, full: x <= 1 && x + w >= W - 1 };
+    });
+  const first = layers.length ? Math.min(...layers.map(top)) : 0;
+  return { ...raw, layers: out, valign: first > 200 ? "center" : "top" };
 }
 
 const clamp01 = (v: number) => Math.round(clamp(v, 0, 1) * 1e5) / 1e5;

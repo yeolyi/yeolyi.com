@@ -23,11 +23,11 @@ import {
   renderDeck,
   share,
 } from "../exportClient";
-import { type Deck, H, type Layer, uid, W } from "../model";
+import { type Deck, type Layer, uid } from "../model";
 import { ic } from "../ui";
 import { useMobile } from "../useMobile";
 import { CaptionBox } from "./CaptionBox";
-import { Panel, type ZOp } from "./Panel";
+import { Panel } from "./Panel";
 import { SlideList } from "./SlideList";
 import { Stage } from "./Stage";
 import { mapSlide, useDeckStore } from "./store";
@@ -105,33 +105,23 @@ export function Editor({ slug }: { slug: string }) {
         type: "text",
         style: "body",
         color: "black",
-        align: "left",
-        x: 90,
-        y: 150,
         text: "텍스트",
       },
       true,
     );
 
   const onFiles = useCallback(
-    async (files: File[], at?: Pt) => {
-      for (const [i, f] of files.entries()) {
+    async (files: File[]) => {
+      for (const f of files) {
         try {
           const { src, nw, nh } = await api.upload(slug, f);
-          const s = Math.min(1, (W * 0.8) / nw, (H * 0.8) / nh);
-          const w = nw * s;
-          const h = nh * s;
-          const c = at ?? { x: W / 2, y: H / 2 };
           addLayer({
             id: uid(),
             type: "image",
             src,
             nw,
             nh,
-            x: Math.round(c.x - w / 2 + i * 24),
-            y: Math.round(c.y - h / 2 + i * 24),
-            w: Math.round(w),
-            h: Math.round(h),
+            full: false,
             crop: { x: 0, y: 0, w: 1, h: 1 },
           });
         } catch (e) {
@@ -142,21 +132,16 @@ export function Editor({ slug }: { slug: string }) {
     [slug, addLayer, store.setError],
   );
 
-  const zMove = useCallback(
-    (id: string, op: ZOp) =>
+  // 쌓는 순서에서 한 칸 위(-1)·아래(1)로.
+  const reorder = useCallback(
+    (id: string, dir: -1 | 1) =>
       commit((d) =>
         mapSlide(d, cur, (ls) => {
           const i = ls.findIndex((l) => l.id === id);
-          if (i < 0) return ls;
+          const j = i + dir;
+          if (i < 0 || j < 0 || j >= ls.length) return ls;
           const next = [...ls];
-          const [l] = next.splice(i, 1);
-          const to = {
-            front: next.length,
-            back: 0,
-            forward: Math.min(next.length, i + 1),
-            backward: Math.max(0, i - 1),
-          }[op];
-          next.splice(to, 0, l);
+          [next[i], next[j]] = [next[j], next[i]];
           return next;
         }),
       ),
@@ -172,25 +157,19 @@ export function Editor({ slug }: { slug: string }) {
     [commit, cur],
   );
 
-  // 복사한 레이어를 지금 장에 붙인다. 같은 장에 같은 자리 레이어가 있으면 살짝 비켜 놓는다.
+  // 복사한 레이어를 지금 장 맨 아래에 붙인다.
   // 다른 덱에서 복사한 이미지는 이미지 파일도 이 덱으로 복사한다.
   const pasteLayer = useCallback(
     async (l: Layer, fromDeck: string) => {
       try {
         if (l.type === "image" && fromDeck !== slug)
           await api.copyAsset(fromDeck, slug, l.src);
-        const taken = layers.some((x) => x.x === l.x && x.y === l.y);
-        addLayer({
-          ...structuredClone(l),
-          id: uid(),
-          x: taken ? l.x + 24 : l.x,
-          y: taken ? l.y + 24 : l.y,
-        });
+        addLayer({ ...structuredClone(l), id: uid() });
       } catch (e) {
         store.setError(e instanceof Error ? e.message : String(e));
       }
     },
-    [slug, layers, addLayer, store.setError],
+    [slug, addLayer, store.setError],
   );
 
   // 단축키·클립보드. 핸들러는 매 렌더 새로 만들고, 리스너는 한 번만 달아 늘 최신 핸들러를 부른다
@@ -238,26 +217,9 @@ export function Editor({ slug }: { slug: string }) {
     } else if (e.key === "Enter" && selLayer.type === "image") {
       e.preventDefault();
       setCropping(id);
-    } else if (meta && e.code === "BracketRight") {
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault();
-      zMove(id, e.shiftKey ? "front" : "forward");
-    } else if (meta && e.code === "BracketLeft") {
-      e.preventDefault();
-      zMove(id, e.shiftKey ? "back" : "backward");
-    } else if (e.key.startsWith("Arrow")) {
-      e.preventDefault();
-      const n = e.shiftKey ? 10 : 1;
-      const dx = e.key === "ArrowLeft" ? -n : e.key === "ArrowRight" ? n : 0;
-      const dy = e.key === "ArrowUp" ? -n : e.key === "ArrowDown" ? n : 0;
-      commit(
-        (d) =>
-          mapSlide(d, cur, (ls) =>
-            ls.map((l) =>
-              l.id === id ? { ...l, x: l.x + dx, y: l.y + dy } : l,
-            ),
-          ),
-        `nudge:${id}`,
-      );
+      reorder(id, e.key === "ArrowUp" ? -1 : 1);
     }
   };
   // 레이어 복사: 시스템 클립보드에 표시가 붙은 JSON 으로 넣는다(다른 장·다른 덱·다른 탭에도 붙일 수 있게).
@@ -567,11 +529,9 @@ export function Editor({ slug }: { slug: string }) {
 // 단축키 안내(데스크톱 속성 패널 맨 아래).
 const SHORTCUTS: [string, string][] = [
   ["더블클릭", "글 편집·크롭"],
-  ["손잡이 끌기", "코드 레이어 옮기기"],
-  ["⌥ 끌기", "스냅 끄기"],
-  ["화살표", "1px 옮기기(⇧ 10px)"],
+  ["손잡이 누르기", "코드 레이어 선택"],
+  ["↑ ↓", "고른 레이어를 위·아래로"],
   ["⌘C ⌘X ⌘V", "레이어 복사"],
-  ["⌘[ ⌘]", "겹침 순서"],
   ["⌘B ⌘E ⌘U", "편집 중 굵게·빨강·밑줄"],
   ["⌘⇧X", "편집 중 블러"],
 ];

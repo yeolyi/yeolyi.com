@@ -3,7 +3,7 @@ import Button from "@yeolyi/ui/Button";
 import IconButton from "@yeolyi/ui/IconButton";
 import { Plus, X } from "lucide-react";
 import { Fragment, useState } from "react";
-import { type Deck, uid } from "../model";
+import { type Deck, type Slide, uid } from "../model";
 import { Thumb } from "../SlideView";
 import { ic } from "../ui";
 import type { Commit } from "./store";
@@ -52,7 +52,12 @@ export function SlideList({
     setSi(to > from ? to - 1 : to);
   };
 
-  const blank = () => ({ id: uid(), memo: "", layers: [] });
+  const blank = (): Slide => ({
+    id: uid(),
+    memo: "",
+    valign: "top",
+    layers: [],
+  });
   // 장 사이 틈: 올리면 + 가 보이고, 누르면 그 자리에 빈 장을 넣는다.
   const gap = (at: number) => (
     <button

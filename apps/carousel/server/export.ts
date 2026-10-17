@@ -4,44 +4,21 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
-import { H, normalizeDeck, W } from "../src/model.ts";
+import { H, MARGIN, normalizeDeck, W } from "../src/model.ts";
 import type { LayoutBox } from "../src/Render.tsx";
 
-// 워터마크·장 번호가 들어가는 띠. 다른 레이어가 여기에 걸치면 경고한다.
-const WATERMARK_BAND = { top: 1290, bottom: 1340 };
-
-// 캔버스 밖으로 나가는 건 일부러 그러기도 해서 넘어간다.
+// 배치는 규칙이 정하므로 겹침·여백 걱정은 없다. 남는 건 글이 너무 길어 아래 여백(워터마크 위)을 넘는 경우뿐이다.
 function warnings(layout: LayoutBox[][]) {
   const out: string[] = [];
   layout.forEach((boxes, i) => {
-    const n = i + 1;
-    const layers = boxes.filter((b) => b.type !== "watermark");
-    for (const b of layers) {
-      const inBand =
-        b.y < WATERMARK_BAND.bottom &&
-        b.y + b.h > WATERMARK_BAND.top &&
-        b.x < W / 2 + 200 &&
-        b.x + b.w > W / 2 - 200;
-      if (inBand && b.y + b.h < H)
-        out.push(
-          `${n}장 ${b.type} ${b.id}: 워터마크 자리(y ${WATERMARK_BAND.top}~${WATERMARK_BAND.bottom})에 걸쳐요`,
-        );
-      if (b.type === "text" && b.x + b.w > W - 80 + 1)
-        out.push(
-          `${n}장 text ${b.id}: 오른쪽 여백(x ${W - 80})을 넘어요(오른쪽 끝 ${Math.round(b.x + b.w)})`,
-        );
-    }
-    const texts = layers.filter((b) => b.type === "text");
-    const others = layers.filter((b) => b.type !== "text");
-    for (const t of texts)
-      for (const o of others) {
-        const ix = Math.min(t.x + t.w, o.x + o.w) - Math.max(t.x, o.x);
-        const iy = Math.min(t.y + t.h, o.y + o.h) - Math.max(t.y, o.y);
-        if (ix > 4 && iy > 4)
-          out.push(
-            `${n}장 text ${t.id} 와 ${o.type} ${o.id}: ${Math.round(ix)}×${Math.round(iy)}px 겹쳐요`,
-          );
-      }
+    const bottom = Math.max(
+      0,
+      ...boxes.filter((b) => b.type !== "watermark").map((b) => b.y + b.h),
+    );
+    if (bottom > H - MARGIN.bottom + 1)
+      out.push(
+        `${i + 1}장: 아래 여백을 ${Math.round(bottom - (H - MARGIN.bottom))}px 넘쳐요. 글을 줄이거나 장을 나누세요`,
+      );
   });
   return out;
 }

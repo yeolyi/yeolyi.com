@@ -4,39 +4,19 @@ import IconButton from "@yeolyi/ui/IconButton";
 import RadioGroup from "@yeolyi/ui/RadioGroup";
 import Textarea from "@yeolyi/ui/Textarea";
 import { clsx } from "clsx";
-import { sumBy } from "es-toolkit";
-import {
-  AlignCenter,
-  AlignCenterHorizontal,
-  AlignCenterVertical,
-  AlignLeft,
-  AlignRight,
-  AlignVerticalSpaceAround,
-  ChevronDown,
-  ChevronUp,
-  Crop,
-  EyeOff,
-  MoveHorizontal,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Crop, EyeOff, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import {
-  type Align,
   type Deck,
-  EDGE_MARGIN,
-  H,
   type ImageLayer,
   type Layer,
   plainText,
-  TEXT_STYLES,
   type TextLayer,
-  W,
+  type VAlign,
 } from "../model";
 import { ic } from "../ui";
 import { execColor, execMark, stripRed, toggleWholeBlur } from "./richtext";
 import { type Commit, mapSlide, patchLayer } from "./store";
-
-export type ZOp = "front" | "forward" | "backward" | "back";
 
 type Props = {
   deck: Deck;
@@ -50,57 +30,6 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-// 텍스트 상자는 너비가 없어서(내용에 맞춤) 화면에 그려진 너비를 읽는다.
-const renderedWidth = (id: string) =>
-  (document.querySelector(`.world [data-id="${id}"]`) as HTMLElement | null)
-    ?.offsetWidth ?? 0;
-const renderedHeight = (id: string) =>
-  (document.querySelector(`.world [data-id="${id}"]`) as HTMLElement | null)
-    ?.offsetHeight ?? 0;
-
-// 세로 정리: 요소 사이를 본문 빈 줄 하나만큼 띄워 쌓고, 전체를 감싸는 사각형을 캔버스 세로 중앙에 둔다.
-// 세로 범위가 겹치는 요소(글을 얹은 사진, 나란히 놓은 두 장)는 한 덩어리로 같이 옮겨 모양을 지킨다.
-// 화면을 덮는 이미지는 배경으로 보고 건드리지 않는다(넣으면 모든 게 한 덩어리가 된다).
-const STACK_GAP = TEXT_STYLES.body.size * TEXT_STYLES.body.lineHeight;
-const round2 = (v: number) => Math.round(v * 100) / 100;
-
-function stackVertically(layers: Layer[]): Layer[] {
-  const isBackdrop = (l: Layer) =>
-    l.type === "image" &&
-    l.x <= 0 &&
-    l.y <= 0 &&
-    l.x + l.w >= W &&
-    l.y + l.h >= H;
-  const height = (l: Layer) =>
-    l.type === "image" ? l.h : renderedHeight(l.id);
-  const items = layers
-    .filter((l) => !isBackdrop(l))
-    .map((l) => ({ l, top: l.y, bottom: l.y + height(l) }));
-  items.sort((a, b) => a.top - b.top);
-
-  const groups: { top: number; bottom: number; ids: string[] }[] = [];
-  for (const it of items) {
-    const g = groups.at(-1);
-    if (g && it.top < g.bottom) {
-      g.bottom = Math.max(g.bottom, it.bottom);
-      g.ids.push(it.l.id);
-    } else groups.push({ top: it.top, bottom: it.bottom, ids: [it.l.id] });
-  }
-  if (!groups.length) return layers;
-
-  const total =
-    sumBy(groups, (g) => g.bottom - g.top) + STACK_GAP * (groups.length - 1);
-  const shift = new Map<string, number>();
-  let y = (H - total) / 2;
-  for (const g of groups) {
-    for (const id of g.ids) shift.set(id, y - g.top);
-    y += g.bottom - g.top + STACK_GAP;
-  }
-  return layers.map((l) =>
-    shift.has(l.id) ? { ...l, y: round2(l.y + (shift.get(l.id) ?? 0)) } : l,
-  );
-}
-
 export function Panel(p: Props & { children?: ReactNode }) {
   const { layer, children } = p;
   return (
@@ -113,31 +42,30 @@ export function Panel(p: Props & { children?: ReactNode }) {
   );
 }
 
-// 이 장의 모든 요소. 위가 앞이고, 행마다 위·아래 버튼으로 겹침 순서를 바꾼다.
+// 이 장의 모든 요소. 목록 순서가 장에 쌓이는 순서(위→아래)이고, 행마다 위·아래 버튼으로 바꾼다.
 function LayerList({ deck, si, layer, commit, setSel, onDelete }: Props) {
-  const shown = deck.slides[si].layers.toReversed();
-  // 화면 순서(앞→뒤)에서 한 칸 옮긴 뒤 다시 뒤집어 저장한다.
+  const slide = deck.slides[si];
+  const shown = slide.layers;
   const move = (i: number, dir: -1 | 1) => {
     const next = [...shown];
     [next[i], next[i + dir]] = [next[i + dir], next[i]];
-    commit((d) => mapSlide(d, si, () => next.reverse()));
+    commit((d) => mapSlide(d, si, () => next));
   };
+  const setVAlign = (valign: VAlign) =>
+    commit((d) => ({
+      ...d,
+      slides: d.slides.map((s, i) => (i === si ? { ...s, valign } : s)),
+    }));
 
   return (
     <section>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <h3 className="flex-1">
           레이어{" "}
-          <span className="text-muted-foreground font-normal">위가 앞</span>
+          <span className="text-muted-foreground font-normal">
+            위에서 아래로
+          </span>
         </h3>
-        <IconButton
-          title="세로 정리: 빈 줄 하나 간격으로 쌓고 세로 가운데에 놓습니다(겹친 요소는 같이 움직입니다)"
-          aria-label="세로 정리"
-          disabled={!shown.length}
-          onClick={() => commit((d) => mapSlide(d, si, stackVertically))}
-        >
-          <AlignVerticalSpaceAround {...ic} />
-        </IconButton>
         <IconButton
           title="삭제 ⌫"
           aria-label="레이어 삭제"
@@ -146,6 +74,18 @@ function LayerList({ deck, si, layer, commit, setSel, onDelete }: Props) {
         >
           <Trash2 {...ic} />
         </IconButton>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-muted-foreground">세로 위치</span>
+        <RadioGroup
+          aria-label="세로 위치"
+          value={slide.valign}
+          options={[
+            { value: "top", label: "위" },
+            { value: "center", label: "가운데" },
+          ]}
+          onValueChange={(v) => setVAlign(v as VAlign)}
+        />
       </div>
       <ol className="layers">
         {shown.map((l, i) => {
@@ -185,16 +125,16 @@ function LayerList({ deck, si, layer, commit, setSel, onDelete }: Props) {
                 </span>
               </button>
               <IconButton
-                title="앞으로 ⌘]"
-                aria-label="앞으로"
+                title="위로 ↑"
+                aria-label="위로"
                 disabled={i === 0}
                 onClick={() => move(i, -1)}
               >
                 <ChevronUp {...ic} />
               </IconButton>
               <IconButton
-                title="뒤로 ⌘["
-                aria-label="뒤로"
+                title="아래로 ↓"
+                aria-label="아래로"
                 disabled={i === shown.length - 1}
                 onClick={() => move(i, 1)}
               >
@@ -222,16 +162,6 @@ function TextProps({
   // 편집 중이면 선택한 글자에만, 아니면 상자 전체에 적용한다.
   const color = (c: "black" | "red") =>
     editing ? execColor(c) : set({ color: c, text: stripRed(l.text) });
-  // 상자를 캔버스 왼쪽·가운데·오른쪽에 놓고, 여러 줄일 때 줄 정렬도 같은 쪽으로 맞춘다.
-  const place = (where: Align) => {
-    const w = renderedWidth(l.id);
-    const x = {
-      left: EDGE_MARGIN,
-      center: (W - w) / 2,
-      right: W - EDGE_MARGIN - w,
-    }[where];
-    set({ x: Math.round(x), align: where });
-  };
   return (
     <>
       <section>
@@ -273,22 +203,6 @@ function TextProps({
           >
             <EyeOff {...ic} />
           </IconButton>
-          {(
-            [
-              ["left", "왼쪽", AlignLeft],
-              ["center", "가운데", AlignCenter],
-              ["right", "오른쪽", AlignRight],
-            ] as const
-          ).map(([where, label, Icon]) => (
-            <IconButton
-              key={where}
-              aria-label={`${label}에 배치`}
-              title={`${label}에 배치합니다(가장자리 여백 ${EDGE_MARGIN}px, 줄도 ${label} 정렬)`}
-              onClick={() => place(where)}
-            >
-              <Icon {...ic} />
-            </IconButton>
-          ))}
         </div>
       </section>
       <section>
@@ -328,29 +242,15 @@ function ImageProps({
         <p className="text-muted-foreground font-mono text-base break-all">
           {l.src.replace(/^assets\//, "")}
         </p>
-        <div className="flex flex-wrap gap-2">
-          <IconButton
-            aria-label="가로 가운데"
-            title="가로 가운데"
-            onClick={() => set({ x: (W - l.w) / 2 })}
-          >
-            <AlignCenterHorizontal {...ic} />
-          </IconButton>
-          <IconButton
-            aria-label="세로 가운데"
-            title="세로 가운데"
-            onClick={() => set({ y: (H - l.h) / 2 })}
-          >
-            <AlignCenterVertical {...ic} />
-          </IconButton>
-          <IconButton
-            aria-label="너비 채우기"
-            title="너비 채우기"
-            onClick={() => set({ x: 0, w: W, h: (W * l.h) / l.w })}
-          >
-            <MoveHorizontal {...ic} />
-          </IconButton>
-        </div>
+        <RadioGroup
+          aria-label="폭"
+          value={l.full ? "full" : "content"}
+          options={[
+            { value: "content", label: "본문 폭" },
+            { value: "full", label: "꽉 채움" },
+          ]}
+          onValueChange={(v) => set({ full: v === "full" })}
+        />
       </section>
       <section>
         <h3>크롭</h3>
@@ -362,12 +262,7 @@ function ImageProps({
             <Crop {...ic} />
             {cropping === l.id ? "크롭 끝내기" : "크롭 편집"}
           </Button>
-          {/* 지금 너비를 유지한 채 원본 비율로 되돌린다. */}
-          <Button
-            onClick={() =>
-              set({ crop: { x: 0, y: 0, w: 1, h: 1 }, h: l.w * (l.nh / l.nw) })
-            }
-          >
+          <Button onClick={() => set({ crop: { x: 0, y: 0, w: 1, h: 1 } })}>
             크롭 없애기
           </Button>
         </div>
