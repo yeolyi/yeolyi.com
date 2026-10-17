@@ -59,7 +59,7 @@ const yesNo = (
 });
 
 /** 사람마다 통장 요건. 가구 단위(무주택·5년 내 당첨)는 따로 한 번만 넣으니 뺀다. 정보가 빈 사람은 넣기 줄 하나. */
-function accountRows(
+export function accountRows(
   s: Settings,
   n: Notice,
   today: string,

@@ -5,6 +5,7 @@ import { uniq } from "es-toolkit";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { Progress } from "../components/Progress.tsx";
+import { RemainingCount } from "../components/RemainingCount.tsx";
 import { useClearSettings, useSaveSettings } from "../data.ts";
 import { type Step, stepsFor } from "../settings/steps.tsx";
 import { go, ic } from "../util.ts";
@@ -94,6 +95,7 @@ function Question({
       {!alone && (
         <div className="mt-[1rlh]">
           <Progress at={i + 1} of={walk.length} label="개인화 진행" />
+          <RemainingCount d={d} />
         </div>
       )}
       <h1 className="mt-[1rlh]">
